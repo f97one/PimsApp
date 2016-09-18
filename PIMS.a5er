@@ -138,14 +138,14 @@ Fields1=CATEGORY_ID
 Fields2=CATEGORY_ID
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,2795,7205,5792,R,R
+Position="MAIN",0,8462,7417,5088,R,R
 Dependence=0
 Caption=
 PName=
 LineMode=0
-Bar1=280
-Bar2=720
-Bar3=579
+Bar1=846
+Bar2=742
+Bar3=509
 TermPos1=R
 TermPos2=R
 
@@ -202,12 +202,12 @@ ModifiedDateTime=20160918192859
 Position="MAIN",150,1550
 
 [Relation]
-Entity1=SEVIER_LEVEL_MASTER
+Entity1=SEVERE_LEVEL_MASTER
 Entity2=ISSUE_ITEMS
 RelationType1=1
 RelationType2=3
-Fields1=SEVIER_LEVEL_ID
-Fields2=SEVIER_LEVEL_ID
+Fields1=SEVERE_LEVEL_ID
+Fields2=SEVERE_LEVEL_ID
 Cardinarity1=
 Cardinarity2=
 Position="MAIN",0,2795,3523,3112,R,R
@@ -223,19 +223,19 @@ TermPos1=R
 TermPos2=R
 
 [Entity]
-PName=SEVIER_LEVEL_MASTER
+PName=SEVERE_LEVEL_MASTER
 LName=緊急度マスタ
 Comment=
 TableOption=
 Page=MAIN
 Left=100
 Top=1150
-Field="緊急度ID","SEVIER_LEVEL_ID","serial",,0,"","",$FFFFFFFF,""
-Field="緊急度","SEVIER_LEVEL","@VARCHAR(8)",,,"","",$FFFFFFFF,""
+Field="緊急度ID","SEVERE_LEVEL_ID","serial",,0,"","",$FFFFFFFF,""
+Field="緊急度","SEVERE_LEVEL","@VARCHAR(8)",,,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20160918192839
+ModifiedDateTime=20160918202443
 Position="MAIN",100,1150
 
 [Relation]
@@ -270,7 +270,7 @@ Top=300
 Field="課題台帳ID","LEDGER_ID","@INT",,0,"","",$FFFFFFFF,""
 Field="課題項目ID","ISSUE_ID","serial",,1,"","",$FFFFFFFF,""
 Field="対応状況","ACTION_STATUS_ID","@INT",,,"","",$FFFFFFFF,""
-Field="緊急度","SEVIER_LEVEL_ID","@INT",,,"","",$FFFFFFFF,""
+Field="緊急度","SEVERE_LEVEL_ID","@INT",,,"","",$FFFFFFFF,""
 Field="発見者","FOUND_USER","@VARCHAR(32)",,,"","",$FFFFFFFF,""
 Field="発見日","FOUND_DATE","@DATETIME",,,"","",$FFFFFFFF,""
 Field="工程","FOUND_PROCESS_ID","INT",,,"","",$FFFFFFFF,""
@@ -283,12 +283,12 @@ Field="対応時間","CORRESPONDING_TIME","@TIME",,,"00:00:00","",$FFFFFFFF,""
 Field="対応終了日","CORRESPONDING_END_DATE","@DATETIME",,,"","",$FFFFFFFF,""
 Field="確認者","CONFIRMED_ID","@VARCHAR(32)",,,"","",$FFFFFFFF,""
 Field="確認日","COMFIRMED_DATE","@DATETIME",,,"","",$FFFFFFFF,""
-Index==0,LEDGER_ID,ISSUE_ID,SEVIER_LEVEL_ID
+Index==0,LEDGER_ID,ISSUE_ID,SEVERE_LEVEL_ID
 Index==0,LEDGER_ID,ISSUE_ID,CORRESPONDING_END_DATE
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20160918192929
+ModifiedDateTime=20160918202505
 Position="MAIN",1400,300
 
 [Entity]

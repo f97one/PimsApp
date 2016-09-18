@@ -1,5 +1,5 @@
 -- Project Name : PIMS
--- Date/Time    : 2016/09/18 19:30:05
+-- Date/Time    : 2016/09/18 20:25:53
 -- Author       : 2016 HAJIME Fukuna (a.k.a. f97one)
 -- RDBMS Type   : PostgreSQL
 -- Application  : A5:SQL Mk-2
@@ -50,10 +50,10 @@ create table PROCESS_MASTER (
 ) ;
 
 -- 緊急度マスタ
-create table SEVIER_LEVEL_MASTER (
-  SEVIER_LEVEL_ID serial
-  , SEVIER_LEVEL character varying(8)
-  , constraint SEVIER_LEVEL_MASTER_PKC primary key (SEVIER_LEVEL_ID)
+create table SEVERE_LEVEL_MASTER (
+  SEVERE_LEVEL_ID serial
+  , SEVERE_LEVEL character varying(8)
+  , constraint SEVERE_LEVEL_MASTER_PKC primary key (SEVERE_LEVEL_ID)
 ) ;
 
 -- 課題項目
@@ -61,7 +61,7 @@ create table ISSUE_ITEMS (
   LEDGER_ID integer
   , ISSUE_ID serial
   , ACTION_STATUS_ID integer
-  , SEVIER_LEVEL_ID integer
+  , SEVERE_LEVEL_ID integer
   , FOUND_USER character varying(32)
   , FOUND_DATE timestamp
   , FOUND_PROCESS_ID INT
@@ -78,7 +78,7 @@ create table ISSUE_ITEMS (
 ) ;
 
 create index ISSUE_ITEMS_IX1
-  on ISSUE_ITEMS(LEDGER_ID,ISSUE_ID,SEVIER_LEVEL_ID);
+  on ISSUE_ITEMS(LEDGER_ID,ISSUE_ID,SEVERE_LEVEL_ID);
 
 create index ISSUE_ITEMS_IX2
   on ISSUE_ITEMS(LEDGER_ID,ISSUE_ID,CORRESPONDING_END_DATE);
@@ -114,7 +114,7 @@ alter table ISSUE_ITEMS
   on update cascade;
 
 alter table ISSUE_ITEMS
-  add constraint ISSUE_ITEMS_FK3 foreign key (SEVIER_LEVEL_ID) references SEVIER_LEVEL_MASTER(SEVIER_LEVEL_ID)
+  add constraint ISSUE_ITEMS_FK3 foreign key (SEVERE_LEVEL_ID) references SEVERE_LEVEL_MASTER(SEVERE_LEVEL_ID)
   on delete cascade
   on update cascade;
 
@@ -150,15 +150,15 @@ comment on table PROCESS_MASTER is '工程マスタ';
 comment on column PROCESS_MASTER.PROCESS_ID is '工程ID';
 comment on column PROCESS_MASTER.PROCESS_NAME is '工程';
 
-comment on table SEVIER_LEVEL_MASTER is '緊急度マスタ';
-comment on column SEVIER_LEVEL_MASTER.SEVIER_LEVEL_ID is '緊急度ID';
-comment on column SEVIER_LEVEL_MASTER.SEVIER_LEVEL is '緊急度';
+comment on table SEVERE_LEVEL_MASTER is '緊急度マスタ';
+comment on column SEVERE_LEVEL_MASTER.SEVERE_LEVEL_ID is '緊急度ID';
+comment on column SEVERE_LEVEL_MASTER.SEVERE_LEVEL is '緊急度';
 
 comment on table ISSUE_ITEMS is '課題項目';
 comment on column ISSUE_ITEMS.LEDGER_ID is '課題台帳ID';
 comment on column ISSUE_ITEMS.ISSUE_ID is '課題項目ID';
 comment on column ISSUE_ITEMS.ACTION_STATUS_ID is '対応状況';
-comment on column ISSUE_ITEMS.SEVIER_LEVEL_ID is '緊急度';
+comment on column ISSUE_ITEMS.SEVERE_LEVEL_ID is '緊急度';
 comment on column ISSUE_ITEMS.FOUND_USER is '発見者';
 comment on column ISSUE_ITEMS.FOUND_DATE is '発見日';
 comment on column ISSUE_ITEMS.FOUND_PROCESS_ID is '工程';
