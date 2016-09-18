@@ -1,11 +1,34 @@
 spring:
+  profiles:
+    active: develop
+  thymeleaf:
+    cache: false
+  jpa:
+    hibernate:
+      ddl-auto: validate
+---
+spring:
+  profiles: production
   datasource:
     driverClassName: org.h2.Driver
     url: jdbc:h2:file:./bin/pims.db
     username: sa
     password:
-  jpa:
-    hibernate:
-      ddl-auto: validate
-  thymeleaf:
-    cache: false
+
+---
+spring:
+  profiles: develop
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:postgresql://localhost/pimsdb
+    username: pims_admin
+    password: pimsAdmin
+
+---
+spring:
+  profiles: test
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
