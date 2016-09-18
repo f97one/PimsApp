@@ -1,5 +1,5 @@
 -- Project Name : PIMS
--- Date/Time    : 2016/09/18 20:25:53
+-- Date/Time    : 2016/09/18 21:45:59
 -- Author       : 2016 HAJIME Fukuna (a.k.a. f97one)
 -- RDBMS Type   : PostgreSQL
 -- Application  : A5:SQL Mk-2
@@ -70,7 +70,7 @@ create table ISSUE_ITEMS (
   , CAUSED character varying(16384)
   , COUNTERMEASURES character varying(16384)
   , CORRESPONDING_USER_ID character varying(32)
-  , CORRESPONDING_TIME time default 00:00:00
+  , CORRESPONDING_TIME time
   , CORRESPONDING_END_DATE timestamp
   , CONFIRMED_ID character varying(32)
   , COMFIRMED_DATE timestamp
