@@ -70,12 +70,12 @@ TableOption=
 Page=MAIN
 Left=100
 Top=750
-Field="ステータスID","STATUS_ID","@INT",,0,"","",$FFFFFFFF,""
+Field="ステータスID","STATUS_ID","serial",,0,"","",$FFFFFFFF,""
 Field="ステータス","STATUS_NAME","@VARCHAR(16)",,,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20160918191637
+ModifiedDateTime=20160918192828
 Position="MAIN",100,750
 
 [Entity]
@@ -157,12 +157,12 @@ TableOption=
 Page=MAIN
 Left=600
 Top=1950
-Field="カテゴリーID","CATEGORY_ID","@INT",,0,"","",$FFFFFFFF,""
+Field="カテゴリーID","CATEGORY_ID","serial",,0,"","",$FFFFFFFF,""
 Field="カテゴリー","CATEGORY_NAME","@VARCHAR(128)",,,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20160917234023
+ModifiedDateTime=20160918192912
 Position="MAIN",600,1950
 
 [Relation]
@@ -193,12 +193,12 @@ TableOption=
 Page=MAIN
 Left=150
 Top=1550
-Field="工程ID","PROCESS_ID","@INT",,0,"","",$FFFFFFFF,""
+Field="工程ID","PROCESS_ID","serial",,0,"","",$FFFFFFFF,""
 Field="工程","PROCESS_NAME","@VARCHAR(16)",,,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20160917233713
+ModifiedDateTime=20160918192859
 Position="MAIN",150,1550
 
 [Relation]
@@ -230,12 +230,12 @@ TableOption=
 Page=MAIN
 Left=100
 Top=1150
-Field="緊急度ID","SEVIER_LEVEL_ID","@INT",,0,"","",$FFFFFFFF,""
+Field="緊急度ID","SEVIER_LEVEL_ID","serial",,0,"","",$FFFFFFFF,""
 Field="緊急度","SEVIER_LEVEL","@VARCHAR(8)",,,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20160917233516
+ModifiedDateTime=20160918192839
 Position="MAIN",100,1150
 
 [Relation]
@@ -268,7 +268,7 @@ Page=MAIN
 Left=1400
 Top=300
 Field="課題台帳ID","LEDGER_ID","@INT",,0,"","",$FFFFFFFF,""
-Field="課題項目ID","ISSUE_ID","@INT",,1,"","",$FFFFFFFF,""
+Field="課題項目ID","ISSUE_ID","serial",,1,"","",$FFFFFFFF,""
 Field="対応状況","ACTION_STATUS_ID","@INT",,,"","",$FFFFFFFF,""
 Field="緊急度","SEVIER_LEVEL_ID","@INT",,,"","",$FFFFFFFF,""
 Field="発見者","FOUND_USER","@VARCHAR(32)",,,"","",$FFFFFFFF,""
@@ -288,7 +288,7 @@ Index==0,LEDGER_ID,ISSUE_ID,CORRESPONDING_END_DATE
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20160918175623
+ModifiedDateTime=20160918192929
 Position="MAIN",1400,300
 
 [Entity]
@@ -299,13 +299,13 @@ TableOption=
 Page=MAIN
 Left=100
 Top=350
-Field="台帳ID","LEDGER_ID","@INT",,0,"","",$FFFFFFFF,""
+Field="台帳ID","LEDGER_ID","serial",,0,"","",$FFFFFFFF,""
 Field="台帳名","LEDGER_NAME","@VARCHAR(64)",,,"","",$FFFFFFFF,""
 Field="ステータス","OPEN_STATUS_ID","@INT",,,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20160918191703
+ModifiedDateTime=20160918192811
 Position="MAIN",100,350
 
 [Entity]

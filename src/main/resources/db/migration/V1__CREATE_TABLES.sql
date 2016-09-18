@@ -1,12 +1,12 @@
 -- Project Name : PIMS
--- Date/Time    : 2016/09/18 19:19:56
+-- Date/Time    : 2016/09/18 19:30:05
 -- Author       : 2016 HAJIME Fukuna (a.k.a. f97one)
 -- RDBMS Type   : PostgreSQL
 -- Application  : A5:SQL Mk-2
 
 -- ステータスマスタ
 create table STATUS_MASTER (
-  STATUS_ID integer
+  STATUS_ID serial
   , STATUS_NAME character varying(16)
   , constraint STATUS_MASTER_PKC primary key (STATUS_ID)
 ) ;
@@ -37,21 +37,21 @@ create table USERS (
 
 -- カテゴリーマスタ
 create table CATEGORY_MASTER (
-  CATEGORY_ID integer
+  CATEGORY_ID serial
   , CATEGORY_NAME character varying(128)
   , constraint CATEGORY_MASTER_PKC primary key (CATEGORY_ID)
 ) ;
 
 -- 工程マスタ
 create table PROCESS_MASTER (
-  PROCESS_ID integer
+  PROCESS_ID serial
   , PROCESS_NAME character varying(16)
   , constraint PROCESS_MASTER_PKC primary key (PROCESS_ID)
 ) ;
 
 -- 緊急度マスタ
 create table SEVIER_LEVEL_MASTER (
-  SEVIER_LEVEL_ID integer
+  SEVIER_LEVEL_ID serial
   , SEVIER_LEVEL character varying(8)
   , constraint SEVIER_LEVEL_MASTER_PKC primary key (SEVIER_LEVEL_ID)
 ) ;
@@ -59,7 +59,7 @@ create table SEVIER_LEVEL_MASTER (
 -- 課題項目
 create table ISSUE_ITEMS (
   LEDGER_ID integer
-  , ISSUE_ID integer
+  , ISSUE_ID serial
   , ACTION_STATUS_ID integer
   , SEVIER_LEVEL_ID integer
   , FOUND_USER character varying(32)
@@ -85,7 +85,7 @@ create index ISSUE_ITEMS_IX2
 
 -- 課題台帳
 create table ISSUE_LEDGER (
-  LEDGER_ID integer
+  LEDGER_ID serial
   , LEDGER_NAME character varying(64)
   , OPEN_STATUS_ID integer
   , constraint ISSUE_LEDGER_PKC primary key (LEDGER_ID)
