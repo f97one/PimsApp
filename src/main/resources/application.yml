@@ -6,6 +6,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+
 ---
 spring:
   profiles: production
@@ -19,8 +20,8 @@ spring:
 spring:
   profiles: develop
   datasource:
-    driverClassName: org.h2.Driver
-    url: jdbc:postgresql://localhost/pimsdb
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/pimsdb
     username: pims_admin
     password: pimsAdmin
 
