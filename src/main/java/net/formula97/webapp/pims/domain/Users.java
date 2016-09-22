@@ -12,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * ユーザー
  * 
@@ -39,6 +41,7 @@ public class Users implements Serializable {
     @Column(name = COLUMN_USER_ID, length = 32)
     private String userId;
 
+    @JsonIgnore
     @Column(name = COLUMN_ENCODED_PASSWD, length = 128)
     private String encodedPasswd;
 
