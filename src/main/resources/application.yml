@@ -6,6 +6,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+security:
+  basic:
+    enabled: false
 
 ---
 spring:
