@@ -10,6 +10,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
 
 /**
  * ユーザー
@@ -32,7 +33,7 @@ public class Users implements Serializable {
     public static final String COLUMN_ENCODED_PASSWD = "ENCODED_PASSWD";
     public static final String COLUMN_DISPLAY_NAME = "DISPLAY_NAME";
     public static final String COLUMN_LAST_LOGIN_DATE = "LAST_LOGIN_DATE";
-    public static final String COLUMN_MAIN_GROUP_ID = "MAIN_GROUP_ID";
+    public static final String COLUMN_MAIL_ADDRESS = "MAIL_ADDRESS";
 
     @Id
     @Column(name = COLUMN_USER_ID, length = 32)
@@ -45,11 +46,17 @@ public class Users implements Serializable {
     private String displayName;
 
     @Column(name = COLUMN_LAST_LOGIN_DATE)
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date lastLoginDate;
 
-    @Column(name = COLUMN_MAIN_GROUP_ID, length = 32)
-    private String mainGroupId;
+    @Column(name = COLUMN_MAIL_ADDRESS, length = 128)
+    private String mailAddress;
 
+    public Users() {
+        this.userId = "";
+        this.encodedPasswd = "";
+    }
+    
     /**
      * @return the userId
      */
@@ -111,18 +118,18 @@ public class Users implements Serializable {
     }
 
     /**
-     * @return the mainGroupId
+     * @return the mailAddress
      */
-    public String getMainGroupId() {
-        return mainGroupId;
+    public String getMailAddress() {
+        return mailAddress;
     }
 
     /**
-     * @param mainGroupId
-     *            the mainGroupId to set
+     * @param mailAddress
+     *            the mailAddress to set
      */
-    public void setMainGroupId(String mainGroupId) {
-        this.mainGroupId = mainGroupId;
+    public void setMailAddress(String mailAddress) {
+        this.mailAddress = mailAddress;
     }
 
 }

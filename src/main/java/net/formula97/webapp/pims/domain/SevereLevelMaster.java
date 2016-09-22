@@ -34,6 +34,7 @@ public class SevereLevelMaster implements Serializable {
 
     public static final String COLUMN_SEVERE_LEVEL_ID = "SEVERE_LEVEL_ID";
     public static final String COLUMN_SEVERE_LEVEL = "SEVERE_LEVEL";
+    public static final String COLUMN_DISP_ORDER = "DISP_ORDER";
 
     /**
      * 緊急度ID
@@ -45,7 +46,14 @@ public class SevereLevelMaster implements Serializable {
 
     @Column(name = COLUMN_SEVERE_LEVEL, length = 8)
     private String severeLevel;
+    
+    @Column(name = COLUMN_DISP_ORDER)
+    private Integer dispOrder;
 
+    public SevereLevelMaster() {
+        this.dispOrder = 0;
+    }
+    
     /**
      * @return the severeLevelId
      */
@@ -74,6 +82,14 @@ public class SevereLevelMaster implements Serializable {
      */
     public void setSevereLevel(String severeLevel) {
         this.severeLevel = severeLevel;
+    }
+
+    public Integer getDispOrder() {
+        return dispOrder;
+    }
+
+    public void setDispOrder(Integer dispOrder) {
+        this.dispOrder = dispOrder;
     }
 
 }

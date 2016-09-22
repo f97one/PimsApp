@@ -12,6 +12,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  * 課題項目
@@ -69,6 +71,7 @@ public class IssueItems implements Serializable {
     private String foundUser;
 
     @Column(name = COLUMN_FOUND_DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date foundDate;
 
     @Column(name = COLUMN_FOUND_PROCESS_ID)
@@ -90,17 +93,24 @@ public class IssueItems implements Serializable {
     private String correspondingUserId;
 
     @Column(name = COLUMN_CORRESPONDING_TIME)
+    @Temporal(TemporalType.TIME)
     private Date correspondingTime;
 
     @Column(name = COLUMN_CORRESPONDING_END_DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date correspondingEndDate;
 
     @Column(name = COLUMN_CONFIRMED_ID, length = 32)
     private String confirmedId;
 
     @Column(name = COLUMN_COMFIRMED_DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date confirmedDate;
 
+    public IssueItems() {
+        
+    }
+    
     /**
      * @return the ledgerId
      */

@@ -1,37 +1,31 @@
 -- Project Name : PIMS
--- Date/Time    : 2016/09/18 21:45:59
+-- Date/Time    : 2016/09/22 9:36:01
 -- Author       : 2016 HAJIME Fukuna (a.k.a. f97one)
 -- RDBMS Type   : PostgreSQL
 -- Application  : A5:SQL Mk-2
+
+-- 台帳参照ユーザー
+create table LEDGER_REF_USER (
+  LEDGER_ID integer
+  , USER_ID character varying(32)
+  , constraint LEDGER_REF_USER_PKC primary key (LEDGER_ID,USER_ID)
+) ;
 
 -- ステータスマスタ
 create table STATUS_MASTER (
   STATUS_ID serial
   , STATUS_NAME character varying(16)
+  , DISP_ORDER integer default 0
   , constraint STATUS_MASTER_PKC primary key (STATUS_ID)
-) ;
-
--- グループ所属
-create table GROUP_BELONGINGS (
-  USER_ID character varying(32)
-  , GROUP_ID character varying(32)
-  , constraint GROUP_BELONGINGS_PKC primary key (USER_ID,GROUP_ID)
-) ;
-
--- グループマスタ
-create table GROUP_MASTER (
-  GROUP_ID character varying(32)
-  , GROUP_DESC character varying(2048)
-  , constraint GROUP_MASTER_PKC primary key (GROUP_ID)
 ) ;
 
 -- ユーザーマスタ
 create table USERS (
   USER_ID character varying(32)
-  , ENCODED_PASSWD character varying(128) not null
+  , ENCODED_PASSWD character varying(128) default ' ' not null
   , DISPLAY_NAME character varying(128)
+  , MAIL_ADDRESS character varying(128)
   , LAST_LOGIN_DATE timestamp
-  , MAIN_GROUP_ID character varying
   , constraint USERS_PKC primary key (USER_ID)
 ) ;
 
@@ -39,6 +33,7 @@ create table USERS (
 create table CATEGORY_MASTER (
   CATEGORY_ID serial
   , CATEGORY_NAME character varying(128)
+  , DISP_ORDER integer
   , constraint CATEGORY_MASTER_PKC primary key (CATEGORY_ID)
 ) ;
 
@@ -46,6 +41,7 @@ create table CATEGORY_MASTER (
 create table PROCESS_MASTER (
   PROCESS_ID serial
   , PROCESS_NAME character varying(16)
+  , DISP_ORDER integer
   , constraint PROCESS_MASTER_PKC primary key (PROCESS_ID)
 ) ;
 
@@ -53,6 +49,7 @@ create table PROCESS_MASTER (
 create table SEVERE_LEVEL_MASTER (
   SEVERE_LEVEL_ID serial
   , SEVERE_LEVEL character varying(8)
+  , DISP_ORDER integer default 0
   , constraint SEVERE_LEVEL_MASTER_PKC primary key (SEVERE_LEVEL_ID)
 ) ;
 
@@ -88,6 +85,7 @@ create table ISSUE_LEDGER (
   LEDGER_ID serial
   , LEDGER_NAME character varying(64)
   , OPEN_STATUS_ID integer
+  , IS_PUBLIC boolean default false not null
   , constraint ISSUE_LEDGER_PKC primary key (LEDGER_ID)
 ) ;
 
@@ -98,13 +96,23 @@ create table SYSTEM_CONFIG (
   , constraint SYSTEM_CONFIG_PKC primary key (CONFIG_KEY)
 ) ;
 
-alter table ISSUE_LEDGER
-  add constraint ISSUE_LEDGER_FK1 foreign key (OPEN_STATUS_ID) references STATUS_MASTER(STATUS_ID)
+alter table LEDGER_REF_USER
+  add constraint LEDGER_REF_USER_FK1 foreign key (USER_ID) references USERS(USER_ID)
+  on delete cascade
+  on update cascade;
+
+alter table LEDGER_REF_USER
+  add constraint LEDGER_REF_USER_FK2 foreign key (LEDGER_ID) references ISSUE_LEDGER(LEDGER_ID)
   on delete cascade
   on update cascade;
 
 alter table ISSUE_ITEMS
   add constraint ISSUE_ITEMS_FK1 foreign key (CATEGORY_ID) references CATEGORY_MASTER(CATEGORY_ID)
+  on delete cascade
+  on update cascade;
+
+alter table ISSUE_LEDGER
+  add constraint ISSUE_LEDGER_FK1 foreign key (OPEN_STATUS_ID) references STATUS_MASTER(STATUS_ID)
   on delete cascade
   on update cascade;
 
@@ -123,36 +131,36 @@ alter table ISSUE_ITEMS
   on delete cascade
   on update cascade;
 
+comment on table LEDGER_REF_USER is '台帳参照ユーザー';
+comment on column LEDGER_REF_USER.LEDGER_ID is '台帳ID';
+comment on column LEDGER_REF_USER.USER_ID is 'ユーザーID';
+
 comment on table STATUS_MASTER is 'ステータスマスタ';
 comment on column STATUS_MASTER.STATUS_ID is 'ステータスID';
 comment on column STATUS_MASTER.STATUS_NAME is 'ステータス';
-
-comment on table GROUP_BELONGINGS is 'グループ所属';
-comment on column GROUP_BELONGINGS.USER_ID is 'ユーザーID';
-comment on column GROUP_BELONGINGS.GROUP_ID is 'グループID';
-
-comment on table GROUP_MASTER is 'グループマスタ';
-comment on column GROUP_MASTER.GROUP_ID is 'グループID';
-comment on column GROUP_MASTER.GROUP_DESC is 'グループ概要';
+comment on column STATUS_MASTER.DISP_ORDER is '表示順序';
 
 comment on table USERS is 'ユーザーマスタ';
 comment on column USERS.USER_ID is 'ユーザーID';
 comment on column USERS.ENCODED_PASSWD is 'パスワード';
 comment on column USERS.DISPLAY_NAME is '表示名';
+comment on column USERS.MAIL_ADDRESS is 'メールアドレス';
 comment on column USERS.LAST_LOGIN_DATE is '最終ログイン日時';
-comment on column USERS.MAIN_GROUP_ID is '主グループ';
 
 comment on table CATEGORY_MASTER is 'カテゴリーマスタ';
 comment on column CATEGORY_MASTER.CATEGORY_ID is 'カテゴリーID';
 comment on column CATEGORY_MASTER.CATEGORY_NAME is 'カテゴリー';
+comment on column CATEGORY_MASTER.DISP_ORDER is '表示順序';
 
 comment on table PROCESS_MASTER is '工程マスタ';
 comment on column PROCESS_MASTER.PROCESS_ID is '工程ID';
 comment on column PROCESS_MASTER.PROCESS_NAME is '工程';
+comment on column PROCESS_MASTER.DISP_ORDER is '表示順序';
 
 comment on table SEVERE_LEVEL_MASTER is '緊急度マスタ';
 comment on column SEVERE_LEVEL_MASTER.SEVERE_LEVEL_ID is '緊急度ID';
 comment on column SEVERE_LEVEL_MASTER.SEVERE_LEVEL is '緊急度';
+comment on column SEVERE_LEVEL_MASTER.DISP_ORDER is '表示順序';
 
 comment on table ISSUE_ITEMS is '課題項目';
 comment on column ISSUE_ITEMS.LEDGER_ID is '課題台帳ID';
@@ -176,6 +184,7 @@ comment on table ISSUE_LEDGER is '課題台帳';
 comment on column ISSUE_LEDGER.LEDGER_ID is '台帳ID';
 comment on column ISSUE_LEDGER.LEDGER_NAME is '台帳名';
 comment on column ISSUE_LEDGER.OPEN_STATUS_ID is 'ステータス';
+comment on column ISSUE_LEDGER.IS_PUBLIC is '公開可能フラグ	 trueのときログインしていなくても参照可能';
 
 comment on table SYSTEM_CONFIG is 'システム設定';
 comment on column SYSTEM_CONFIG.CONFIG_KEY is '設定キー';

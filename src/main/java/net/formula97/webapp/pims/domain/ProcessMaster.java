@@ -34,14 +34,15 @@ public class ProcessMaster implements Serializable {
 
     public static final String COLUMN_PROCESS_ID = "PROCESS_ID";
     public static final String COLUMN_PROCESS_NAME = "PROCESS_NAME";
-
+    public static final String COLUMN_DISP_ORDER = "DISP_ORDER";
+    
     /**
      * 工程ID
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = COLUMN_PROCESS_ID)
-    private int processId;
+    private Integer processId;
 
     /**
      * 工程名
@@ -49,17 +50,24 @@ public class ProcessMaster implements Serializable {
     @Column(name = COLUMN_PROCESS_NAME, length = 16)
     private String processName;
 
+    @Column(name = COLUMN_DISP_ORDER)
+    private Integer dispOrder;
+    
+    public ProcessMaster() {
+        
+    }
+    
     /**
      * @return the processId
      */
-    public int getProcessId() {
+    public Integer getProcessId() {
         return processId;
     }
 
     /**
      * @param processId the processId to set
      */
-    public void setProcessId(int processId) {
+    public void setProcessId(Integer processId) {
         this.processId = processId;
     }
 
@@ -76,4 +84,13 @@ public class ProcessMaster implements Serializable {
     public void setProcessName(String processName) {
         this.processName = processName;
     }
+
+    public Integer getDispOrder() {
+        return dispOrder;
+    }
+
+    public void setDispOrder(Integer dispOrder) {
+        this.dispOrder = dispOrder;
+    }
+
 }

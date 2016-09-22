@@ -30,6 +30,7 @@ public class IssueLedger implements Serializable {
     public static final String COLUMN_LEDGER_ID = "LEDGER_ID";
     public static final String COLUMN_LEDGER_NAME = "LEDGER_NAME";
     public static final String COLUMN_OPEN_STATUS_ID = "OPEN_STATUS_ID";
+    public static final String COLUMN_IS_PUBLIC = "IS_PUBLIC";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,6 +42,21 @@ public class IssueLedger implements Serializable {
 
     @Column(name = COLUMN_OPEN_STATUS_ID)
     private Integer openStatus;
+    
+    @Column(name = COLUMN_IS_PUBLIC)
+    private Boolean isPublic;
+
+    public IssueLedger() {
+        this.isPublic = false;
+    }
+    
+    public Boolean getIsPublic() {
+        return isPublic;
+    }
+
+    public void setIsPublic(Boolean isPublic) {
+        this.isPublic = isPublic;
+    }
 
     /**
      * @return the ledgerId

@@ -34,6 +34,7 @@ public class CategoryMaster implements Serializable {
     
     public static final String COLUMN_CATEGORY_ID = "CATEGORY_ID";
     public static final String COLUMN_CATEGORY_NAME = "CATEGORY_NAME";
+    public static final String COLUMN_DISP_ORDER = "DISP_ORDER";
     
     /**
      * カテゴリーID
@@ -49,6 +50,13 @@ public class CategoryMaster implements Serializable {
     @Column(name = COLUMN_CATEGORY_NAME, length = 128)
     private String categoryName;
 
+    @Column(name = COLUMN_DISP_ORDER)
+    private Integer dispOrder;
+    
+    public CategoryMaster() {
+        this.dispOrder = 0;
+    }
+    
     /**
      * @return the categoryId
      */
@@ -76,6 +84,13 @@ public class CategoryMaster implements Serializable {
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }
-    
-    
+
+    public Integer getDispOrder() {
+        return dispOrder;
+    }
+
+    public void setDispOrder(Integer dispOrder) {
+        this.dispOrder = dispOrder;
+    }
+        
 }

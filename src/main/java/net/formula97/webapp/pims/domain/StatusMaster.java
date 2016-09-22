@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package net.formula97.webapp.pims.domain;
 
@@ -14,7 +14,7 @@ import javax.persistence.Table;
 
 /**
  * ステータスマスタ
- * 
+ *
  * @author f97one
  *
  */
@@ -23,7 +23,7 @@ import javax.persistence.Table;
 public class StatusMaster implements Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -7130357214974979860L;
 
@@ -31,6 +31,7 @@ public class StatusMaster implements Serializable {
 
     public static final String COLUMN_STATUS_ID = "STATUS_ID";
     public static final String COLUMN_STATUS_NAME = "STATUS_NAME";
+    public static final String COLUMN_DISP_ORDER = "DISP_ORDER";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +41,21 @@ public class StatusMaster implements Serializable {
     @Column(name = COLUMN_STATUS_NAME, length = 16)
     private String statusName;
 
+    @Column(name = COLUMN_DISP_ORDER)
+    private Integer dispOrder;
+    
+    public StatusMaster() {
+        this.dispOrder = 0;
+    }
+
+    public Integer getDispOrder() {
+        return dispOrder;
+    }
+
+    public void setDispOrder(Integer dispOrder) {
+        this.dispOrder = dispOrder;
+    }
+
     /**
      * @return the statusId
      */
@@ -48,8 +64,7 @@ public class StatusMaster implements Serializable {
     }
 
     /**
-     * @param statusId
-     *            the statusId to set
+     * @param statusId the statusId to set
      */
     public void setStatusId(Integer statusId) {
         this.statusId = statusId;
@@ -63,8 +78,7 @@ public class StatusMaster implements Serializable {
     }
 
     /**
-     * @param statusName
-     *            the statusName to set
+     * @param statusName the statusName to set
      */
     public void setStatusName(String statusName) {
         this.statusName = statusName;
