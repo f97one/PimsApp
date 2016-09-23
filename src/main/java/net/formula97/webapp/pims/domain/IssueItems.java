@@ -7,10 +7,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -32,8 +30,6 @@ public class IssueItems implements Serializable {
 
     public static final String TABLE_NAME = "ISSUE_ITEMS";
 
-    public static final String COLUMN_LEDGER_ID = "LEDGER_ID";
-    public static final String COLUMN_ISSUE_ID = "ISSUE_ID";
     public static final String COLUMN_ACTION_STATUS_ID = "ACTION_STATUS_ID";
     public static final String COLUMN_SEVERE_LEVEL_ID = "SEVERE_LEVEL_ID";
     public static final String COLUMN_FOUND_USER = "FOUND_USER";
@@ -49,17 +45,8 @@ public class IssueItems implements Serializable {
     public static final String COLUMN_CONFIRMED_ID = "CONFIRMED_ID";
     public static final String COLUMN_COMFIRMED_DATE = "COMFIRMED_DATE";
 
-    /**
-     * 
-     */
-    @Id
-    @Column(name = COLUMN_LEDGER_ID)
-    private Integer ledgerId;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = COLUMN_ISSUE_ID)
-    private Integer issueId;
+    @EmbeddedId
+    private IssueItemsPK issueItemsPK;
 
     @Column(name = COLUMN_ACTION_STATUS_ID)
     private Integer actionStatusId;
@@ -109,36 +96,6 @@ public class IssueItems implements Serializable {
 
     public IssueItems() {
         
-    }
-    
-    /**
-     * @return the ledgerId
-     */
-    public Integer getLedgerId() {
-        return ledgerId;
-    }
-
-    /**
-     * @param ledgerId
-     *            the ledgerId to set
-     */
-    public void setLedgerId(Integer ledgerId) {
-        this.ledgerId = ledgerId;
-    }
-
-    /**
-     * @return the issueId
-     */
-    public Integer getIssueId() {
-        return issueId;
-    }
-
-    /**
-     * @param issueId
-     *            the issueId to set
-     */
-    public void setIssueId(Integer issueId) {
-        this.issueId = issueId;
     }
 
     /**
@@ -349,5 +306,19 @@ public class IssueItems implements Serializable {
      */
     public void setConfirmedDate(Date confirmedDate) {
         this.confirmedDate = confirmedDate;
+    }
+
+    /**
+     * @return the issueItemsPK
+     */
+    public IssueItemsPK getIssueItemsPK() {
+        return issueItemsPK;
+    }
+
+    /**
+     * @param issueItemsPK the issueItemsPK to set
+     */
+    public void setIssueItemsPK(IssueItemsPK issueItemsPK) {
+        this.issueItemsPK = issueItemsPK;
     }
 }
