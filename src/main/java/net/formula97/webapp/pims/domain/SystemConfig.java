@@ -35,8 +35,11 @@ public class SystemConfig implements Serializable {
     @Column(name = COLUMN_CONFIG_VALUE, length = 256)
     private String configValue;
 
-    public SystemConfig() {
-        this.configKey = "";
+    public SystemConfig() { }
+    
+    public SystemConfig(String configKey, String configValue) {
+        this.configKey = configKey;
+        this.configValue = configValue;
     }
     
     /**

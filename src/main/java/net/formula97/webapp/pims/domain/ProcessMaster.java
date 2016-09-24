@@ -53,8 +53,12 @@ public class ProcessMaster implements Serializable {
     @Column(name = COLUMN_DISP_ORDER)
     private Integer dispOrder;
     
-    public ProcessMaster() {
-        
+    public ProcessMaster() { }
+    
+    public ProcessMaster(Integer processId, String processName, Integer dispOrder) {
+        this.processId = processId;
+        this.processName = processName;
+        this.dispOrder = dispOrder;
     }
     
     /**

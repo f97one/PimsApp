@@ -54,6 +54,12 @@ public class SevereLevelMaster implements Serializable {
         this.dispOrder = 0;
     }
     
+    public SevereLevelMaster(Integer severeLevelId, String severeLevel, Integer dispOrder) {
+        this.severeLevelId = severeLevelId;
+        this.severeLevel = severeLevel;
+        this.dispOrder = dispOrder;
+    }
+    
     /**
      * @return the severeLevelId
      */

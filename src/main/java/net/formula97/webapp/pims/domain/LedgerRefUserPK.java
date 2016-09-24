@@ -29,6 +29,13 @@ public class LedgerRefUserPK implements Serializable {
     @Column(name = COLUMN_USER_ID, length = 32)
     private String userId;
 
+    public LedgerRefUserPK() { }
+    
+    public LedgerRefUserPK(Integer ledgerId, String userId) {
+        this.ledgerId = ledgerId;
+        this.userId = userId;
+    }
+    
     /**
      * @return the ledgerId
      */

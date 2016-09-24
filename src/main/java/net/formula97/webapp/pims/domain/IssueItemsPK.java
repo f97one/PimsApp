@@ -32,6 +32,13 @@ public class IssueItemsPK implements Serializable {
 
     @Column(name = COLUMN_ISSUE_ID)
     private Integer issueId;
+    
+    public IssueItemsPK() { }
+    
+    public IssueItemsPK(Integer ledgerId, Integer issueId) {
+        this.ledgerId = ledgerId;
+        this.issueId = issueId;
+    }
 
     /**
      * @return the ledgerId

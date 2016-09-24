@@ -47,6 +47,12 @@ public class StatusMaster implements Serializable {
     public StatusMaster() {
         this.dispOrder = 0;
     }
+    
+    public StatusMaster(Integer statusId, String statusName, Integer dispOrder) {
+        this.statusId = statusId;
+        this.statusName = statusName;
+        this.dispOrder = dispOrder;
+    }
 
     public Integer getDispOrder() {
         return dispOrder;
