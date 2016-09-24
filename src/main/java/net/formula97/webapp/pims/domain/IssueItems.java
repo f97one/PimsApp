@@ -7,8 +7,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -21,6 +22,7 @@ import javax.persistence.TemporalType;
  */
 @Entity
 @Table(name = IssueItems.TABLE_NAME)
+@IdClass(IssueItemsPK.class)
 public class IssueItems implements Serializable {
 
     /**
@@ -30,6 +32,8 @@ public class IssueItems implements Serializable {
 
     public static final String TABLE_NAME = "ISSUE_ITEMS";
 
+    public static final String COLUMN_LEDGER_ID = "LEDGER_ID";
+    public static final String COLUMN_ISSUE_ID = "ISSUE_ID";
     public static final String COLUMN_ACTION_STATUS_ID = "ACTION_STATUS_ID";
     public static final String COLUMN_SEVERE_LEVEL_ID = "SEVERE_LEVEL_ID";
     public static final String COLUMN_FOUND_USER = "FOUND_USER";
@@ -45,8 +49,11 @@ public class IssueItems implements Serializable {
     public static final String COLUMN_CONFIRMED_ID = "CONFIRMED_ID";
     public static final String COLUMN_COMFIRMED_DATE = "COMFIRMED_DATE";
 
-    @EmbeddedId
-    private IssueItemsPK issueItemsPK;
+    @Id
+    private Integer ledgerId;
+
+    @Id
+    private Integer issueId;
 
     @Column(name = COLUMN_ACTION_STATUS_ID)
     private Integer actionStatusId;
@@ -308,17 +315,4 @@ public class IssueItems implements Serializable {
         this.confirmedDate = confirmedDate;
     }
 
-    /**
-     * @return the issueItemsPK
-     */
-    public IssueItemsPK getIssueItemsPK() {
-        return issueItemsPK;
-    }
-
-    /**
-     * @param issueItemsPK the issueItemsPK to set
-     */
-    public void setIssueItemsPK(IssueItemsPK issueItemsPK) {
-        this.issueItemsPK = issueItemsPK;
-    }
 }

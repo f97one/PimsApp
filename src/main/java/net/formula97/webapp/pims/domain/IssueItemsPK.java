@@ -9,7 +9,6 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.ManyToOne;
 
 
 /**
@@ -28,11 +27,9 @@ public class IssueItemsPK implements Serializable {
     private static final long serialVersionUID = 7050763019022228894L;
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ManyToOne(optional = false)
     @Column(name = COLUMN_LEDGER_ID)
     private Integer ledgerId;
 
-    @ManyToOne(optional = false)
     @Column(name = COLUMN_ISSUE_ID)
     private Integer issueId;
 
