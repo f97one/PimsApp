@@ -6,9 +6,9 @@
 package net.formula97.webapp.pims.domain;
 
 import java.io.Serializable;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 /**
@@ -17,21 +17,17 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = LedgerRefUser.TABLE_NAME)
+@IdClass(LedgerRefUserPK.class)
 public class LedgerRefUser implements Serializable {
     
     private static final long serialVersionUID = 958929577010643134L;
 
     public static final String TABLE_NAME = "LEDGER_REF_USER";
     
-    public static final String COLUMN_LEDGER_ID = "LEDGER_ID";
-    public static final String COLUMN_USER_ID = "USER_ID";
-    
     @Id
-    @Column(name = COLUMN_LEDGER_ID)
     private Integer ledgerId;
     
     @Id
-    @Column(name = COLUMN_USER_ID, length = 32)
     private String userId;
 
     public LedgerRefUser() {
