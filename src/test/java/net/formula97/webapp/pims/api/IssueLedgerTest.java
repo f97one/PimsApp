@@ -5,6 +5,8 @@ package net.formula97.webapp.pims.api;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -20,7 +22,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-
 import net.formula97.webapp.pims.BaseTestCase;
 import net.formula97.webapp.pims.domain.IssueLedger;
 import net.formula97.webapp.pims.repository.IssueLedgerRepository;
@@ -60,6 +61,27 @@ public class IssueLedgerTest extends BaseTestCase {
     @Before
     public void setUp() throws Exception {
         apiEndpoint = getApiEndpoint("api", "ledger");
+        
+        IssueLedger il1 = new IssueLedger();
+        il1.setLedgerId(1);
+        il1.setIsPublic(true);
+        il1.setLedgerName("公開台帳１");
+        il1.setOpenStatus(1);
+        
+        IssueLedger il2 = new IssueLedger();
+        il2.setLedgerId(2);
+        il2.setIsPublic(true);
+        il2.setLedgerName("公開台帳２");
+        il2.setOpenStatus(2);
+        
+        IssueLedger il3 = new IssueLedger();
+        il3.setLedgerId(3);
+        il3.setIsPublic(false);
+        il3.setLedgerName("非公開台帳１");
+        il3.setOpenStatus(3);
+        
+        issueLedgerRepository.save(Arrays.asList(il1, il2, il3));
+
     }
 
     /**
@@ -67,12 +89,11 @@ public class IssueLedgerTest extends BaseTestCase {
      */
     @After
     public void tearDown() throws Exception {
+        issueLedgerRepository.deleteAll();
     }
 
     @Test
     public void getPublicLedgerで公開台帳を取得できる() {
-        fail("Not yet implemented");
-        
         ResponseEntity<Page<IssueLedger>> actualPublicLedger = restTemplate.exchange(
                 apiEndpoint, HttpMethod.GET, null, new ParameterizedTypeReference<Page<IssueLedger>>() {
         });
