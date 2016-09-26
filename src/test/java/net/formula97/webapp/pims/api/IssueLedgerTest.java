@@ -3,11 +3,12 @@
  */
 package net.formula97.webapp.pims.api;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
+import java.util.List;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -22,6 +23,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+
 import net.formula97.webapp.pims.BaseTestCase;
 import net.formula97.webapp.pims.domain.IssueLedger;
 import net.formula97.webapp.pims.repository.IssueLedgerRepository;
@@ -81,7 +83,6 @@ public class IssueLedgerTest extends BaseTestCase {
         il3.setOpenStatus(3);
         
         issueLedgerRepository.save(Arrays.asList(il1, il2, il3));
-
     }
 
     /**
@@ -94,13 +95,27 @@ public class IssueLedgerTest extends BaseTestCase {
 
     @Test
     public void getPublicLedgerで公開台帳を取得できる() {
-        ResponseEntity<Page<IssueLedger>> actualPublicLedger = restTemplate.exchange(
-                apiEndpoint, HttpMethod.GET, null, new ParameterizedTypeReference<Page<IssueLedger>>() {
-        });
+        ResponseEntity<List<IssueLedger>> resp = restTemplate.exchange(
+                apiEndpoint,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<IssueLedger>>() { });
         
-        assertThat(actualPublicLedger.getStatusCode(), CoreMatchers.is(HttpStatus.OK));
         
+        assertThat(resp.getStatusCode(), is(HttpStatus.OK));
         
+        assertThat(resp.getBody().size(), is(2));
+
+        IssueLedger il1 = resp.getBody().get(0);
+        assertThat(il1.getLedgerName(), is("公開台帳１"));
+        assertThat(il1.getIsPublic(), is(true));
+        assertThat(il1.getOpenStatus(), is(1));
+        
+        IssueLedger il2 = resp.getBody().get(1);
+        assertThat(il2.getLedgerName(), is("公開台帳２"));
+        assertThat(il2.getIsPublic(), is(true));
+        assertThat(il2.getOpenStatus(), is(2));
+
     }
 
 }
