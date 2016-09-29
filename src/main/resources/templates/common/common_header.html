@@ -4,7 +4,8 @@ To change this license header, choose License Headers in Project Properties.
 To change this template file, choose Tools | Templates
 and open the template in the editor.
 -->
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
   <head>
     <meta charset="UTF-8"></meta>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
@@ -20,8 +21,9 @@ and open the template in the editor.
         <button id="configBtn" type="button" class="btn btn-link">設定</button>
       </span>
       <span class="col-lg-4 col-sm-4 right">
-        <button id="loginBtn" type="button" class="btn btn-link">ログイン</button>
-        <button id="logoutBtn" type="button" class="btn btn-link">ログアウト</button>
+        <a id="loginLink" class="btn btn-link" th:href="@{/loginFomr}">ログイン</a>
+        <span sec:authentication="principal.user.userName">f97one</span>
+        <a id="logoutLink" class="btn btn-link" th:href="@{/logout}">ログアウト</a>
       </span>
     </div>
   </body>

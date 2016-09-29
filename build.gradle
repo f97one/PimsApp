@@ -38,6 +38,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-security')
     compile('org.springframework.boot:spring-boot-configuration-processor')
     compile('org.flywaydb:flyway-core')
+    compile('org.thymeleaf.extras:thymeleaf-extras-springsecurity4')
     compile('org.webjars:bootstrap:3.3.7-1')
 	compile('org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16')
     runtime('org.postgresql:postgresql')
