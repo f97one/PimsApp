@@ -5,7 +5,10 @@ package net.formula97.webapp.pims;
 
 import java.util.Locale;
 
+import org.junit.Rule;
 import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -29,6 +32,12 @@ public abstract class BaseTestCase {
      */
     @Value("${local.server.port}")
     protected int port;
+    
+    /**
+     * モックオブジェクトルール
+     */
+    @Rule
+    public final MockitoRule mockRule = MockitoJUnit.rule();
     
     /**
      * API Endpoint格納変数
