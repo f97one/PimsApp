@@ -19,7 +19,7 @@ import net.formula97.webapp.pims.repository.UserRepository;
  *
  */
 @Service
-public class AutorizedUsersService implements UserDetailsService {
+public class AuthorizedUsersService implements UserDetailsService {
 
     @Autowired
     UserRepository userRepository;
