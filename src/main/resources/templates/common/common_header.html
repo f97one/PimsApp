@@ -17,13 +17,18 @@ and open the template in the editor.
   <body>
     <div th:fragment="common_header">
       <span class="col-lg-8 col-sm-8">
-        <button id="projectsBtn" type="button" class="btn btn-link">プロジェクト</button>
-        <button id="configBtn" type="button" class="btn btn-link">設定</button>
+        <a id="toHomeLink" class="btn btn-link" th:href="@{/}">ホーム</a>
+        <a id="projectsBtn" class="btn btn-link">プロジェクト</a>
+        <a id="configBtn" class="btn btn-link">設定</a>
       </span>
       <span class="col-lg-4 col-sm-4 right">
-        <a id="loginLink" class="btn btn-link" th:href="@{/loginFomr}">ログイン</a>
-        <span sec:authentication="principal.user.userName">f97one</span>
-        <a id="logoutLink" class="btn btn-link" th:href="@{/logout}">ログアウト</a>
+        <span th:if="${#httpServletRequest.remoteUser == null}">
+          <a id="loginLink" class="btn btn-link" th:href="@{/loginFomr}">ログイン</a>
+        </span>
+        <span th:if="${#httpServletRequest.remoteUser != null}">
+          <span sec:authentication="principal.user.userName">f97one</span>
+          <a id="logoutLink" class="btn btn-link" th:href="@{/logout}">ログアウト</a>
+        </span>
       </span>
     </div>
   </body>
