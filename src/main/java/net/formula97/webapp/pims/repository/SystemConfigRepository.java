@@ -16,5 +16,5 @@ import net.formula97.webapp.pims.domain.SystemConfig;
 @Repository
 public interface SystemConfigRepository extends JpaRepository<SystemConfig, String>, JpaSpecificationExecutor<String> {
 
-    String findByConfigKey(String configKey);
+    SystemConfig findByConfigKey(String configKey);
 }
