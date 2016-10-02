@@ -28,6 +28,10 @@ public class IssueLedgerService {
         return issueLedgerRepository.findAll(Specifications.where(IssueLedgerSpecifications.isPublicSpecified(true)));
     }
     
+    public List<IssueLedger> getLedgersForUser(String userId) {
+        return issueLedgerRepository.findForUser(userId);
+    }
+    
     static class IssueLedgerSpecifications {
         
         static Specification<IssueLedger> nameContains(String ledgerName) {

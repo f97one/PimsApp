@@ -27,4 +27,7 @@ public interface IssueLedgerRepository extends JpaRepository<IssueLedger, Intege
     
     @Query("SELECT o FROM IssueLedger o WHERE o.isPublic = true ORDER BY ledgerId")
     List<IssueLedger> findByPublicLedger();
+    
+    @Query("SELECT o FROM IssueLedger o, LedgerRefUser u WHERE o.ledgerId = u.ledgerId AND u.userId = userId")
+    List<IssueLedger> findForUser(String userId);
 }
