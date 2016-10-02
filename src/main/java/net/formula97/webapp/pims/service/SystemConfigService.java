@@ -48,7 +48,9 @@ public class SystemConfigService {
      * @return キーに対応する設定値
      */
     public String getConfig(String configKey) {
-        return sysConfigRepos.findByConfigKey(configKey).getConfigValue();
+        SystemConfig il = sysConfigRepos.findByConfigKey(configKey);
+        
+        return il == null ? "" : il.getConfigValue();
     }
 
     static class SysConfigSpecifications {
