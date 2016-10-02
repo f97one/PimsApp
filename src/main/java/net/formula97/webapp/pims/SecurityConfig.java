@@ -17,6 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import net.formula97.webapp.pims.service.AuthorizedUsersService;
+
 /**
  * @author f97one
  *
@@ -25,6 +27,9 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Autowired
+    AuthorizedUsersService authorizedUserSvc;
+    
     /**
      * 
      * @see org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter#configure(org.springframework.security.config.annotation.web.builders.HttpSecurity)
@@ -42,6 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .defaultSuccessUrl("/title", true)
             .usernameParameter("userId")
             .passwordParameter("passwd")
+            .permitAll()
             .and();
         
         http.logout()
@@ -58,6 +64,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/webjars/**", "/css/**");
     }
+
+    /**
+     * 
+     * @see org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter#configure(org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder)
+     */
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(authorizedUserSvc);
+    }
+
+
 
     @Configuration
     static class AuthenticationConfiguration extends GlobalAuthenticationConfigurerAdapter {
