@@ -32,17 +32,17 @@ public class IssueLedgerService {
         return issueLedgerRepository.findForUser(userId);
     }
     
-    static class IssueLedgerSpecifications {
+    public static class IssueLedgerSpecifications {
         
-        static Specification<IssueLedger> nameContains(String ledgerName) {
+        public static Specification<IssueLedger> nameContains(String ledgerName) {
             return StringUtils.isEmpty(ledgerName) ? null : (root, query, cb) -> cb.like(root.get("ledgerName"), "%" + ledgerName + "%");
         }
         
-        static Specification<IssueLedger> openStatusSpecified(Integer openStatusId) {
+        public static Specification<IssueLedger> openStatusSpecified(Integer openStatusId) {
             return openStatusId == null ? null : (root, query, cb) -> cb.equal(root.get("openStatus"), openStatusId);
         }
         
-        static Specification<IssueLedger> isPublicSpecified(Boolean isPublic) {
+        public static Specification<IssueLedger> isPublicSpecified(Boolean isPublic) {
             return isPublic == null ? null : (root, query, cb) -> cb.equal(root.get("isPublic"), isPublic);
         }
     }
