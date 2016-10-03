@@ -64,20 +64,22 @@ public class IssueLedgerTest extends BaseTestCase {
     public void setUp() throws Exception {
         apiEndpoint = getApiEndpoint("api", "ledger");
         
+        issueLedgerRepository.deleteAll();
+        
         IssueLedger il1 = new IssueLedger();
-        il1.setLedgerId(1);
+        il1.setLedgerId(11);
         il1.setIsPublic(true);
         il1.setLedgerName("公開台帳１");
         il1.setOpenStatus(1);
         
         IssueLedger il2 = new IssueLedger();
-        il2.setLedgerId(2);
+        il2.setLedgerId(12);
         il2.setIsPublic(true);
         il2.setLedgerName("公開台帳２");
         il2.setOpenStatus(2);
         
         IssueLedger il3 = new IssueLedger();
-        il3.setLedgerId(3);
+        il3.setLedgerId(13);
         il3.setIsPublic(false);
         il3.setLedgerName("非公開台帳１");
         il3.setOpenStatus(3);
