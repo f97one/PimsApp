@@ -4,6 +4,7 @@
 package net.formula97.webapp.pims.web;
 
 import java.net.URI;
+import java.util.Date;
 import java.util.Locale;
 
 import org.junit.After;
@@ -13,10 +14,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -26,8 +27,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import net.formula97.webapp.pims.BaseTestCase;
-import net.formula97.webapp.pims.service.IssueLedgerService;
-import net.formula97.webapp.pims.service.SystemConfigService;
+import net.formula97.webapp.pims.domain.IssueLedger;
+import net.formula97.webapp.pims.domain.LedgerRefUser;
+import net.formula97.webapp.pims.domain.Users;
+import net.formula97.webapp.pims.repository.IssueLedgerRepository;
+import net.formula97.webapp.pims.repository.LedgerRefUserRepository;
+import net.formula97.webapp.pims.repository.UserRepository;
+import net.formula97.webapp.pims.service.IssueLedgerService.IssueLedgerSpecifications;
 
 /**
  * タイトル画面Controllerのテストケース。
@@ -44,13 +50,14 @@ public class TitleControllerTest extends BaseTestCase {
     private TitleController mController;
     @Autowired
     private WebApplicationContext wac;
+    @Autowired
+    private UserRepository userRepo;
+    @Autowired
+    private LedgerRefUserRepository ledgerRefUserRepo;
+    @Autowired
+    private IssueLedgerRepository issueLedgerRepo;
     
     private MockMvc mMvcMock;
-    
-    @Mock
-    private IssueLedgerService issueLedgerSvc;
-    @Mock
-    private SystemConfigService sysConfigSvc;
     
     /**
      * @throws java.lang.Exception
@@ -73,6 +80,26 @@ public class TitleControllerTest extends BaseTestCase {
     public void setUp() throws Exception {
         mMvcMock = MockMvcBuilders.webAppContextSetup(wac).build();
         apiEndpoint = String.format(Locale.getDefault(), "http://localhost:%d/", port);
+        
+        Users user1 = new Users();
+        user1.setUserId("user1");
+        user1.setEncodedPasswd("");
+        user1.setDisplayName("JUnit test");
+        user1.setLastLoginDate(new Date());
+        user1.setMailAddress("test@example.com");
+        userRepo.save(user1);
+        
+        IssueLedger l1 = new IssueLedger();
+        l1.setIsPublic(true);
+        l1.setLedgerName("テスト用台帳１");
+        l1.setOpenStatus(1);
+        issueLedgerRepo.save(l1);
+        IssueLedger ledger = issueLedgerRepo.findOne(Specifications.where(IssueLedgerSpecifications.nameContains(l1.getLedgerName())));
+        
+        LedgerRefUser lru1 = new LedgerRefUser();
+        lru1.setUserId(user1.getUserId());
+        lru1.setLedgerId(ledger.getLedgerId());
+        ledgerRefUserRepo.save(lru1);
     }
 
     /**
@@ -80,6 +107,10 @@ public class TitleControllerTest extends BaseTestCase {
      */
     @After
     public void tearDown() throws Exception {
+        // レコードを全部消す
+        ledgerRefUserRepo.deleteAll();
+        issueLedgerRepo.deleteAll();
+        userRepo.deleteAll();
     }
 
     @Test

@@ -29,12 +29,14 @@ and open the template in the editor.
               <tr>
                 <th class="text-center">台帳名</th>
                 <th class="text-center">ステータス</th>
+                <th class="text-center">最終更新日時</th>
               </tr>
             </thead>
             <tbody>
-              <tr th:each="ledger : ${issueLedgers}">
+              <tr th:each="ledger : ${dispIssueLedgers}">
                 <td th:text="${ledger.ledgerName}"><a th:href="@{/ledger/} + ${ledger.ledgerId}">hoge改造</a></td>
                 <td th:text="${ledger.status}" class="text-center">進行中</td>
+                <td th:text="${ledger.lastUpdatedAt}" class="text-center">2016/10/01 12:34:56</td>
               </tr>
             </tbody>
           </table>

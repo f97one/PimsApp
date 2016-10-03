@@ -4,7 +4,10 @@
 package net.formula97.webapp.pims.web;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -17,6 +20,8 @@ import net.formula97.webapp.pims.domain.IssueLedger;
 import net.formula97.webapp.pims.misc.AppConstants;
 import net.formula97.webapp.pims.service.AuthorizedUsers;
 import net.formula97.webapp.pims.service.IssueLedgerService;
+import net.formula97.webapp.pims.service.StatusMasterService;
+import net.formula97.webapp.pims.web.forms.DispLedgerForm;
 
 /**
  * @author f97one
@@ -28,7 +33,9 @@ public class TitleController extends BaseWebController {
     
     @Autowired
     IssueLedgerService issueLedgerSvc;
-
+    @Autowired
+    StatusMasterService statusMasterSvc;
+    
 	@RequestMapping(method = RequestMethod.GET)
 	public String createTitle(Model model, Principal principal) {
 	    
@@ -46,8 +53,23 @@ public class TitleController extends BaseWebController {
 	        
 	        issueLeddgerList = issueLedgerSvc.getLedgersForUser(authUsers.getUsers().getUserId());
 	    }
-	    model.addAttribute("issueLedgers", issueLeddgerList);
+	    
+	    Map<Integer, String> smMap = statusMasterSvc.getStatusMap();
+	    List<DispLedgerForm> frm = new ArrayList<>();
+	    for (IssueLedger l : issueLeddgerList) {
+	        DispLedgerForm f = new DispLedgerForm();
+	        f.setLedgerId(l.getLedgerId());
+	        f.setLedgerName(l.getLedgerName());
+	        f.setStatus(smMap.get(l.getOpenStatus()));
+	        f.setLastUpdatedAt(new Date());
+	        
+	        frm.add(f);
+	    }
+	    
+	    model.addAttribute("dispIssueLedgers", frm);
 	    
 		return "title";
 	}
+	
+	
 }
