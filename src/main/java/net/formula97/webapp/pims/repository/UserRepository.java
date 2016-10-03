@@ -4,6 +4,7 @@
 package net.formula97.webapp.pims.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import net.formula97.webapp.pims.domain.Users;
@@ -13,6 +14,6 @@ import net.formula97.webapp.pims.domain.Users;
  *
  */
 @Repository
-public interface UserRepository extends JpaRepository<Users, String> {
+public interface UserRepository extends JpaRepository<Users, String>, JpaSpecificationExecutor<Users> {
 
 }

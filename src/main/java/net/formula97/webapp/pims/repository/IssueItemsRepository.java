@@ -1,6 +1,7 @@
 package net.formula97.webapp.pims.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import net.formula97.webapp.pims.domain.IssueItems;
@@ -11,6 +12,6 @@ import net.formula97.webapp.pims.domain.IssueItemsPK;
  *
  */
 @Repository
-public interface IssueItemsRepository extends JpaRepository<IssueItems, IssueItemsPK> {
+public interface IssueItemsRepository extends JpaRepository<IssueItems, IssueItemsPK>, JpaSpecificationExecutor<IssueItems> {
 
 }
