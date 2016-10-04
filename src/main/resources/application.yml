@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: develop
+    active: test
   thymeleaf:
     cache: false
   jpa:
