@@ -1,5 +1,5 @@
 ﻿-- Project Name : PIMS
--- Date/Time    : 2016/10/04 23:35:08
+-- Date/Time    : 2016/10/04 23:44:39
 -- Author       : 2016 HAJIME Fukuna (a.k.a. f97one)
 -- RDBMS Type   : PostgreSQL
 -- Application  : A5:SQL Mk-2
@@ -103,7 +103,7 @@ create table ISSUE_LEDGER (
   , LEDGER_NAME character varying(64)
   , OPEN_STATUS_ID integer
   , IS_PUBLIC boolean default false not null
-  , LAST_UPDATED_AT timestamp with time zone
+  , LAST_UPDATED_AT timestamp
   , constraint ISSUE_LEDGER_PKC primary key (LEDGER_ID)
 ) ;
 
