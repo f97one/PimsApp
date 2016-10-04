@@ -43,6 +43,42 @@ ShowCommonAttributes=0
 
 [Relation]
 Entity1=USERS
+Entity2=AUTHORITIES
+RelationType1=1
+RelationType2=3
+Fields1=USER_ID
+Fields2=USER_ID
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,8938,4934,7914,R,R
+Dependence=1
+Caption=
+PName=
+LineMode=0
+Bar1=894
+Bar2=493
+Bar3=791
+TermPos1=R
+TermPos2=R
+
+[Entity]
+PName=AUTHORITIES
+LName=許可権限
+Comment=
+TableOption=
+Page=MAIN
+Left=3000
+Top=1050
+Field="ユーザーID","USER_ID","@VARCHAR(32)",,0,"","",$FFFFFFFF,""
+Field="権限","AUTHORITY","@VARCHAR(128)",,,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20161001000301
+Position="MAIN",3000,1050
+
+[Relation]
+Entity1=USERS
 Entity2=LEDGER_REF_USER
 RelationType1=1
 RelationType2=3
@@ -147,13 +183,13 @@ TableOption=
 Page=MAIN
 Left=100
 Top=500
-Field="ステータスID","STATUS_ID","serial",,0,"","",$FFFFFFFF,""
+Field="ステータスID","STATUS_ID","@INT",,0,"","",$FFFFFFFF,""
 Field="ステータス","STATUS_NAME","@VARCHAR(16)",,,"","",$FFFFFFFF,""
 Field="表示順序","DISP_ORDER","@INT",,,"0","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20160922085028
+ModifiedDateTime=20161004221722
 Position="MAIN",100,500
 
 [Entity]
@@ -183,13 +219,13 @@ TableOption=
 Page=MAIN
 Left=100
 Top=1550
-Field="カテゴリーID","CATEGORY_ID","serial",,0,"","",$FFFFFFFF,""
+Field="カテゴリーID","CATEGORY_ID","@INT",,0,"","",$FFFFFFFF,""
 Field="カテゴリー","CATEGORY_NAME","@VARCHAR(128)",,,"","",$FFFFFFFF,""
 Field="表示順序","DISP_ORDER","@INT",,,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20160922085232
+ModifiedDateTime=20161004221752
 Position="MAIN",100,1550,945,146
 
 [Relation]
@@ -220,13 +256,13 @@ TableOption=
 Page=MAIN
 Left=100
 Top=1150
-Field="工程ID","PROCESS_ID","serial",,0,"","",$FFFFFFFF,""
+Field="工程ID","PROCESS_ID","@INT",,0,"","",$FFFFFFFF,""
 Field="工程","PROCESS_NAME","@VARCHAR(16)",,,"","",$FFFFFFFF,""
 Field="表示順序","DISP_ORDER","@INT",,,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20160922085119
+ModifiedDateTime=20161004221744
 Position="MAIN",100,1150
 
 [Relation]
@@ -258,13 +294,13 @@ TableOption=
 Page=MAIN
 Left=100
 Top=800
-Field="緊急度ID","SEVERE_LEVEL_ID","serial",,0,"","",$FFFFFFFF,""
+Field="緊急度ID","SEVERE_LEVEL_ID","@INT",,0,"","",$FFFFFFFF,""
 Field="緊急度","SEVERE_LEVEL","@VARCHAR(8)",,,"","",$FFFFFFFF,""
 Field="表示順序","DISP_ORDER","@INT",,,"0","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20160922085057
+ModifiedDateTime=20161004221735
 Position="MAIN",100,800
 
 [Relation]
@@ -326,17 +362,18 @@ LName=課題台帳
 Comment=
 TableOption=
 Page=MAIN
-Left=1500
-Top=200
+Left=1400
+Top=150
 Field="台帳ID","LEDGER_ID","serial",,0,"","",$FFFFFFFF,""
 Field="台帳名","LEDGER_NAME","@VARCHAR(64)",,,"","",$FFFFFFFF,""
 Field="ステータス","OPEN_STATUS_ID","@INT",,,"","",$FFFFFFFF,""
 Field="公開可能フラグ","IS_PUBLIC","boolean","NOT NULL",,"false","trueのときログインしていなくても参照可能",$FFFFFFFF,""
+Field="更新日時","LAST_UPDATED_AT","timestamp with time zone",,,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20160922093551
-Position="MAIN",1500,200
+ModifiedDateTime=20161004221600
+Position="MAIN",1400,150
 
 [Entity]
 PName=SYSTEM_CONFIG
