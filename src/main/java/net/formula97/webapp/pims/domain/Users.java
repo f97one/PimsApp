@@ -4,13 +4,20 @@
 package net.formula97.webapp.pims.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -24,7 +31,7 @@ import net.formula97.webapp.pims.misc.AppConstants;
  */
 @Entity
 @Table(name = Users.TABLE_NAME)
-public class Users implements Serializable {
+public class Users implements Serializable, UserDetails {
 
     /**
      * 
@@ -154,6 +161,44 @@ public class Users implements Serializable {
      */
     public void setAuthority(String authority) {
         this.authority = authority;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(this.authority));
+        
+        return authorities;
+    }
+
+    @Override
+    public String getPassword() {
+        return this.encodedPasswd;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.userId;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
 }

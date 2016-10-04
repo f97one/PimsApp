@@ -3,7 +3,6 @@
  */
 package net.formula97.webapp.pims.service;
 
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 
 import net.formula97.webapp.pims.domain.Users;
@@ -22,7 +21,7 @@ public class AuthorizedUsers extends User {
     private final Users users;
     
     public AuthorizedUsers(Users user) {
-        super(user.getUserId(), user.getEncodedPasswd(), AuthorityUtils.createAuthorityList("ROLE_USER"));
+        super(user.getUserId(), user.getEncodedPasswd(), user.getAuthorities());
         this.users = user;
     }
     
