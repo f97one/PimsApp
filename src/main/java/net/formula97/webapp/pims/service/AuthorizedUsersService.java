@@ -32,7 +32,7 @@ public class AuthorizedUsersService implements UserDetailsService {
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         Users users = userRepository.findOne(userId);
         
-        if (users == null) {
+        if (users == null || userId.length() == 0) {
             throw new UsernameNotFoundException(String.format(Locale.getDefault(), "Requested userId ( %s ) not found.", userId));
         }
         
