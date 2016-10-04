@@ -335,11 +335,11 @@ Field="台帳ID","LEDGER_ID","serial",,0,"","",$FFFFFFFF,""
 Field="台帳名","LEDGER_NAME","@VARCHAR(64)",,,"","",$FFFFFFFF,""
 Field="ステータス","OPEN_STATUS_ID","@INT",,,"","",$FFFFFFFF,""
 Field="公開可能フラグ","IS_PUBLIC","boolean","NOT NULL",,"false","trueのときログインしていなくても参照可能",$FFFFFFFF,""
-Field="更新日時","LAST_UPDATED_AT","timestamp with time zone",,,"","",$FFFFFFFF,""
+Field="更新日時","LAST_UPDATED_AT","@DATETIME",,,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20161004221600
+ModifiedDateTime=20161004234432
 Position="MAIN",1400,150
 
 [Entity]
