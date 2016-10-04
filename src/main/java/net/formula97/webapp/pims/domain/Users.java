@@ -14,6 +14,8 @@ import javax.persistence.Temporal;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import net.formula97.webapp.pims.misc.AppConstants;
+
 /**
  * ユーザー
  * 
@@ -36,13 +38,14 @@ public class Users implements Serializable {
     public static final String COLUMN_DISPLAY_NAME = "DISPLAY_NAME";
     public static final String COLUMN_LAST_LOGIN_DATE = "LAST_LOGIN_DATE";
     public static final String COLUMN_MAIL_ADDRESS = "MAIL_ADDRESS";
+    public static final String COLUMN_AUTHORITY = "AUTHORITY";
 
     @Id
     @Column(name = COLUMN_USER_ID, length = 32)
     private String userId;
 
     @JsonIgnore
-    @Column(name = COLUMN_ENCODED_PASSWD, length = 128)
+    @Column(name = COLUMN_ENCODED_PASSWD, length = 128, nullable = false)
     private String encodedPasswd;
 
     @Column(name = COLUMN_DISPLAY_NAME, length = 128)
@@ -55,9 +58,13 @@ public class Users implements Serializable {
     @Column(name = COLUMN_MAIL_ADDRESS, length = 128)
     private String mailAddress;
 
+    @Column(name = COLUMN_AUTHORITY, length = 64, nullable = false)
+    private String authority;
+    
     public Users() {
         this.userId = "";
         this.encodedPasswd = "";
+        this.authority = AppConstants.AUTHORITY_USER;
     }
     
     /**
@@ -133,6 +140,20 @@ public class Users implements Serializable {
      */
     public void setMailAddress(String mailAddress) {
         this.mailAddress = mailAddress;
+    }
+
+    /**
+     * @return the authority
+     */
+    public String getAuthority() {
+        return authority;
+    }
+
+    /**
+     * @param authority the authority to set
+     */
+    public void setAuthority(String authority) {
+        this.authority = authority;
     }
 
 }
