@@ -1,10 +1,12 @@
--- Project Name : PIMS
--- Date/Time    : 2016/09/22 9:36:01
+﻿-- Project Name : PIMS
+-- Date/Time    : 2016/10/04 23:35:08
 -- Author       : 2016 HAJIME Fukuna (a.k.a. f97one)
 -- RDBMS Type   : PostgreSQL
 -- Application  : A5:SQL Mk-2
 
 -- 台帳参照ユーザー
+drop table if exists LEDGER_REF_USER cascade;
+
 create table LEDGER_REF_USER (
   LEDGER_ID integer
   , USER_ID character varying(32)
@@ -12,48 +14,61 @@ create table LEDGER_REF_USER (
 ) ;
 
 -- ステータスマスタ
+drop table if exists STATUS_MASTER cascade;
+
 create table STATUS_MASTER (
-  STATUS_ID serial
+  STATUS_ID integer
   , STATUS_NAME character varying(16)
   , DISP_ORDER integer default 0
   , constraint STATUS_MASTER_PKC primary key (STATUS_ID)
 ) ;
 
 -- ユーザーマスタ
+drop table if exists USERS cascade;
+
 create table USERS (
   USER_ID character varying(32)
   , ENCODED_PASSWD character varying(128) default ' ' not null
   , DISPLAY_NAME character varying(128)
   , MAIL_ADDRESS character varying(128)
   , LAST_LOGIN_DATE timestamp
+  , AUTHORITY character varying(64) default ' ' not null
   , constraint USERS_PKC primary key (USER_ID)
 ) ;
 
 -- カテゴリーマスタ
+drop table if exists CATEGORY_MASTER cascade;
+
 create table CATEGORY_MASTER (
-  CATEGORY_ID serial
+  CATEGORY_ID integer
   , CATEGORY_NAME character varying(128)
   , DISP_ORDER integer
   , constraint CATEGORY_MASTER_PKC primary key (CATEGORY_ID)
 ) ;
 
 -- 工程マスタ
+drop table if exists PROCESS_MASTER cascade;
+
 create table PROCESS_MASTER (
-  PROCESS_ID serial
+  PROCESS_ID integer
   , PROCESS_NAME character varying(16)
   , DISP_ORDER integer
   , constraint PROCESS_MASTER_PKC primary key (PROCESS_ID)
 ) ;
 
 -- 緊急度マスタ
+drop table if exists SEVERE_LEVEL_MASTER cascade;
+
 create table SEVERE_LEVEL_MASTER (
-  SEVERE_LEVEL_ID serial
+  SEVERE_LEVEL_ID integer
   , SEVERE_LEVEL character varying(8)
   , DISP_ORDER integer default 0
   , constraint SEVERE_LEVEL_MASTER_PKC primary key (SEVERE_LEVEL_ID)
 ) ;
 
 -- 課題項目
+drop table if exists ISSUE_ITEMS cascade;
+
 create table ISSUE_ITEMS (
   LEDGER_ID integer
   , ISSUE_ID serial
@@ -81,15 +96,20 @@ create index ISSUE_ITEMS_IX2
   on ISSUE_ITEMS(LEDGER_ID,ISSUE_ID,CORRESPONDING_END_DATE);
 
 -- 課題台帳
+drop table if exists ISSUE_LEDGER cascade;
+
 create table ISSUE_LEDGER (
   LEDGER_ID serial
   , LEDGER_NAME character varying(64)
   , OPEN_STATUS_ID integer
   , IS_PUBLIC boolean default false not null
+  , LAST_UPDATED_AT timestamp with time zone
   , constraint ISSUE_LEDGER_PKC primary key (LEDGER_ID)
 ) ;
 
 -- システム設定
+drop table if exists SYSTEM_CONFIG cascade;
+
 create table SYSTEM_CONFIG (
   CONFIG_KEY character varying(32)
   , CONFIG_VALUE character varying(256)
@@ -146,6 +166,7 @@ comment on column USERS.ENCODED_PASSWD is 'パスワード';
 comment on column USERS.DISPLAY_NAME is '表示名';
 comment on column USERS.MAIL_ADDRESS is 'メールアドレス';
 comment on column USERS.LAST_LOGIN_DATE is '最終ログイン日時';
+comment on column USERS.AUTHORITY is '権限';
 
 comment on table CATEGORY_MASTER is 'カテゴリーマスタ';
 comment on column CATEGORY_MASTER.CATEGORY_ID is 'カテゴリーID';
@@ -185,6 +206,7 @@ comment on column ISSUE_LEDGER.LEDGER_ID is '台帳ID';
 comment on column ISSUE_LEDGER.LEDGER_NAME is '台帳名';
 comment on column ISSUE_LEDGER.OPEN_STATUS_ID is 'ステータス';
 comment on column ISSUE_LEDGER.IS_PUBLIC is '公開可能フラグ	 trueのときログインしていなくても参照可能';
+comment on column ISSUE_LEDGER.LAST_UPDATED_AT is '更新日時';
 
 comment on table SYSTEM_CONFIG is 'システム設定';
 comment on column SYSTEM_CONFIG.CONFIG_KEY is '設定キー';

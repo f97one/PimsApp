@@ -29,6 +29,8 @@ FooterRight=
 ShowPageoutRelation=1
 RDBMSType=6
 RDBMSTypeName=PostgreSQL
+GenerateDropTableStatement=1
+DropTableIfExists=1
 CreateFk=1
 FkOnDeleteOption=on delete cascade
 FkOnUpdateOption=on update cascade
@@ -40,42 +42,6 @@ DefaultFkName=%0:s_FK%1:d
 SqlSeparator=0
 ShowTag=1
 ShowCommonAttributes=0
-
-[Relation]
-Entity1=USERS
-Entity2=AUTHORITIES
-RelationType1=1
-RelationType2=3
-Fields1=USER_ID
-Fields2=USER_ID
-Cardinarity1=
-Cardinarity2=
-Position="MAIN",0,8938,4934,7914,R,R
-Dependence=1
-Caption=
-PName=
-LineMode=0
-Bar1=894
-Bar2=493
-Bar3=791
-TermPos1=R
-TermPos2=R
-
-[Entity]
-PName=AUTHORITIES
-LName=許可権限
-Comment=
-TableOption=
-Page=MAIN
-Left=3000
-Top=1050
-Field="ユーザーID","USER_ID","@VARCHAR(32)",,0,"","",$FFFFFFFF,""
-Field="権限","AUTHORITY","@VARCHAR(128)",,,"","",$FFFFFFFF,""
-EffectMode=None
-Color=$000000
-BkColor=$FFFFFF
-ModifiedDateTime=20161001000301
-Position="MAIN",3000,1050
 
 [Relation]
 Entity1=USERS
@@ -123,15 +89,15 @@ LName=台帳参照ユーザー
 Comment=
 TableOption=
 Page=MAIN
-Left=2700
-Top=650
+Left=2800
+Top=800
 Field="台帳ID","LEDGER_ID","@INT",,0,"","",$FFFFFFFF,""
 Field="ユーザーID","USER_ID","@VARCHAR(32)",,1,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20160921222339
-Position="MAIN",2700,650
+Position="MAIN",2800,800
 
 [Relation]
 Entity1=CATEGORY_MASTER
@@ -205,10 +171,11 @@ Field="パスワード","ENCODED_PASSWD","@VARCHAR(128)","NOT NULL",,"\q \q","",
 Field="表示名","DISPLAY_NAME","@VARCHAR(128)",,,"","",$FFFFFFFF,""
 Field="メールアドレス","MAIL_ADDRESS","@VARCHAR(128)",,,"","",$FFFFFFFF,""
 Field="最終ログイン日時","LAST_LOGIN_DATE","@DATETIME",,,"","",$FFFFFFFF,""
+Field="権限","AUTHORITY","@VARCHAR(64)","NOT NULL",,"\q \q","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20160921225547
+ModifiedDateTime=20161004233432
 Position="MAIN",2950,150
 
 [Entity]
