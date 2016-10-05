@@ -48,6 +48,7 @@ public class IssueItems implements Serializable {
     public static final String COLUMN_CORRESPONDING_END_DATE = "CORRESPONDING_END_DATE";
     public static final String COLUMN_CONFIRMED_ID = "CONFIRMED_ID";
     public static final String COLUMN_COMFIRMED_DATE = "COMFIRMED_DATE";
+    public static final String COLUMN_ROW_UPDATED_AT = "ROW_UPDATED_AT";
 
     @Id
     private Integer ledgerId;
@@ -101,6 +102,10 @@ public class IssueItems implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date confirmedDate;
 
+    @Column(name = COLUMN_ROW_UPDATED_AT)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date rowUpdatedAt;
+    
     public IssueItems() {
         
     }
@@ -313,6 +318,48 @@ public class IssueItems implements Serializable {
      */
     public void setConfirmedDate(Date confirmedDate) {
         this.confirmedDate = confirmedDate;
+    }
+
+    /**
+     * @return the rowUpdatedAt
+     */
+    public Date getRowUpdatedAt() {
+        return rowUpdatedAt;
+    }
+
+    /**
+     * @param rowUpdatedAt the rowUpdatedAt to set
+     */
+    public void setRowUpdatedAt(Date rowUpdatedAt) {
+        this.rowUpdatedAt = rowUpdatedAt;
+    }
+
+    /**
+     * @return the ledgerId
+     */
+    public Integer getLedgerId() {
+        return ledgerId;
+    }
+
+    /**
+     * @param ledgerId the ledgerId to set
+     */
+    public void setLedgerId(Integer ledgerId) {
+        this.ledgerId = ledgerId;
+    }
+
+    /**
+     * @return the issueId
+     */
+    public Integer getIssueId() {
+        return issueId;
+    }
+
+    /**
+     * @param issueId the issueId to set
+     */
+    public void setIssueId(Integer issueId) {
+        this.issueId = issueId;
     }
 
 }
