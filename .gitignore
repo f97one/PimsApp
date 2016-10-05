@@ -36,6 +36,7 @@ local.properties
 # Eclipse Core
 .project
 .classpath
+.factorypath
 
 .gradle/*
 gradle.properties
@@ -44,3 +45,4 @@ gradle.properties
 # for IntelliJ IDEA
 .idea/*
 *.iml
+/.apt_generated/

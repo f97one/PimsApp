@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -78,7 +79,7 @@ public class TitleControllerTest extends BaseTestCase {
      */
     @Before
     public void setUp() throws Exception {
-        mMvcMock = MockMvcBuilders.webAppContextSetup(wac).build();
+        mMvcMock = MockMvcBuilders.webAppContextSetup(wac).apply(SecurityMockMvcConfigurers.springSecurity()).build();
         apiEndpoint = String.format(Locale.getDefault(), "http://localhost:%d/", port);
         
         Users user1 = new Users();
