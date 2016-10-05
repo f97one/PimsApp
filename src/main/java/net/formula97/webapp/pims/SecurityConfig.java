@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import net.formula97.webapp.pims.misc.AppConstants;
 import net.formula97.webapp.pims.service.AuthorizedUsersService;
 
 /**
@@ -36,6 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
             .antMatchers("/", "/loginForm", "/api/*").permitAll()
+            .antMatchers("/admin/**").hasRole(AppConstants.AUTHORITY_ADMIN)
             .anyRequest().authenticated();
 
         http.formLogin()
