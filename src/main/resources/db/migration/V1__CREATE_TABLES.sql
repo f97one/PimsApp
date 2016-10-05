@@ -1,5 +1,5 @@
 ﻿-- Project Name : PIMS
--- Date/Time    : 2016/10/04 23:44:39
+-- Date/Time    : 2016/10/05 22:27:45
 -- Author       : 2016 HAJIME Fukuna (a.k.a. f97one)
 -- RDBMS Type   : PostgreSQL
 -- Application  : A5:SQL Mk-2
@@ -31,7 +31,6 @@ create table USERS (
   , ENCODED_PASSWD character varying(128) default ' ' not null
   , DISPLAY_NAME character varying(128)
   , MAIL_ADDRESS character varying(128)
-  , LAST_LOGIN_DATE timestamp
   , AUTHORITY character varying(64) default ' ' not null
   , constraint USERS_PKC primary key (USER_ID)
 ) ;
@@ -86,6 +85,7 @@ create table ISSUE_ITEMS (
   , CORRESPONDING_END_DATE timestamp
   , CONFIRMED_ID character varying(32)
   , COMFIRMED_DATE timestamp
+  , ROW_UPDATED_AT timestamp
   , constraint ISSUE_ITEMS_PKC primary key (LEDGER_ID,ISSUE_ID)
 ) ;
 
@@ -165,7 +165,6 @@ comment on column USERS.USER_ID is 'ユーザーID';
 comment on column USERS.ENCODED_PASSWD is 'パスワード';
 comment on column USERS.DISPLAY_NAME is '表示名';
 comment on column USERS.MAIL_ADDRESS is 'メールアドレス';
-comment on column USERS.LAST_LOGIN_DATE is '最終ログイン日時';
 comment on column USERS.AUTHORITY is '権限';
 
 comment on table CATEGORY_MASTER is 'カテゴリーマスタ';
@@ -200,6 +199,7 @@ comment on column ISSUE_ITEMS.CORRESPONDING_TIME is '対応時間';
 comment on column ISSUE_ITEMS.CORRESPONDING_END_DATE is '対応終了日';
 comment on column ISSUE_ITEMS.CONFIRMED_ID is '確認者';
 comment on column ISSUE_ITEMS.COMFIRMED_DATE is '確認日';
+comment on column ISSUE_ITEMS.ROW_UPDATED_AT is '行更新日時';
 
 comment on table ISSUE_LEDGER is '課題台帳';
 comment on column ISSUE_LEDGER.LEDGER_ID is '台帳ID';

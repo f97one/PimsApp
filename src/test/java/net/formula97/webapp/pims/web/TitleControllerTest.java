@@ -4,7 +4,6 @@
 package net.formula97.webapp.pims.web;
 
 import java.net.URI;
-import java.util.Date;
 import java.util.Locale;
 
 import org.junit.After;
@@ -86,7 +85,6 @@ public class TitleControllerTest extends BaseTestCase {
         user1.setUserId("user1");
         user1.setEncodedPasswd("");
         user1.setDisplayName("JUnit test");
-        user1.setLastLoginDate(new Date());
         user1.setMailAddress("test@example.com");
         userRepo.save(user1);
         

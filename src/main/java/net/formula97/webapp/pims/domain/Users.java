@@ -6,15 +6,12 @@ package net.formula97.webapp.pims.domain;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -43,7 +40,6 @@ public class Users implements Serializable, UserDetails {
     public static final String COLUMN_USER_ID = "USER_ID";
     public static final String COLUMN_ENCODED_PASSWD = "ENCODED_PASSWD";
     public static final String COLUMN_DISPLAY_NAME = "DISPLAY_NAME";
-    public static final String COLUMN_LAST_LOGIN_DATE = "LAST_LOGIN_DATE";
     public static final String COLUMN_MAIL_ADDRESS = "MAIL_ADDRESS";
     public static final String COLUMN_AUTHORITY = "AUTHORITY";
 
@@ -57,10 +53,6 @@ public class Users implements Serializable, UserDetails {
 
     @Column(name = COLUMN_DISPLAY_NAME, length = 128)
     private String displayName;
-
-    @Column(name = COLUMN_LAST_LOGIN_DATE)
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
-    private Date lastLoginDate;
 
     @Column(name = COLUMN_MAIL_ADDRESS, length = 128)
     private String mailAddress;
@@ -117,21 +109,6 @@ public class Users implements Serializable, UserDetails {
      */
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
-    }
-
-    /**
-     * @return the lastLoginDate
-     */
-    public Date getLastLoginDate() {
-        return lastLoginDate;
-    }
-
-    /**
-     * @param lastLoginDate
-     *            the lastLoginDate to set
-     */
-    public void setLastLoginDate(Date lastLoginDate) {
-        this.lastLoginDate = lastLoginDate;
     }
 
     /**

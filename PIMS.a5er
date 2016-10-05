@@ -164,19 +164,18 @@ LName=ユーザーマスタ
 Comment=
 TableOption=
 Page=MAIN
-Left=2950
+Left=2900
 Top=150
 Field="ユーザーID","USER_ID","@VARCHAR(32)",,0,"","",$FFFFFFFF,""
 Field="パスワード","ENCODED_PASSWD","@VARCHAR(128)","NOT NULL",,"\q \q","",$FFFFFFFF,""
 Field="表示名","DISPLAY_NAME","@VARCHAR(128)",,,"","",$FFFFFFFF,""
 Field="メールアドレス","MAIL_ADDRESS","@VARCHAR(128)",,,"","",$FFFFFFFF,""
-Field="最終ログイン日時","LAST_LOGIN_DATE","@DATETIME",,,"","",$FFFFFFFF,""
 Field="権限","AUTHORITY","@VARCHAR(64)","NOT NULL",,"\q \q","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20161004233432
-Position="MAIN",2950,150
+ModifiedDateTime=20161005222916
+Position="MAIN",2900,150
 
 [Entity]
 PName=CATEGORY_MASTER
@@ -315,12 +314,13 @@ Field="対応時間","CORRESPONDING_TIME","@TIME",,,"","",$FFFFFFFF,""
 Field="対応終了日","CORRESPONDING_END_DATE","@DATETIME",,,"","",$FFFFFFFF,""
 Field="確認者","CONFIRMED_ID","@VARCHAR(32)",,,"","",$FFFFFFFF,""
 Field="確認日","COMFIRMED_DATE","@DATETIME",,,"","",$FFFFFFFF,""
+Field="行更新日時","ROW_UPDATED_AT","@DATETIME",,,"","",$FFFFFFFF,""
 Index==0,LEDGER_ID,ISSUE_ID,SEVERE_LEVEL_ID
 Index==0,LEDGER_ID,ISSUE_ID,CORRESPONDING_END_DATE
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20160918214548
+ModifiedDateTime=20161005222627
 Position="MAIN",1400,700
 
 [Entity]
