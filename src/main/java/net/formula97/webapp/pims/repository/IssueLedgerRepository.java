@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import net.formula97.webapp.pims.domain.IssueLedger;
@@ -29,5 +30,5 @@ public interface IssueLedgerRepository extends JpaRepository<IssueLedger, Intege
     List<IssueLedger> findByPublicLedger();
     
     @Query("SELECT o FROM IssueLedger o , LedgerRefUser u WHERE o.ledgerId = u.ledgerId AND u.userId = :userId")
-    List<IssueLedger> findForUser(String userId);
+    List<IssueLedger> findForUser(@Param("userId") String userId);
 }
