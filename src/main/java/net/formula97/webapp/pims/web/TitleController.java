@@ -50,6 +50,7 @@ public class TitleController extends BaseWebController {
 	    } else {
 	        Authentication auth = (Authentication) principal;
 	        AuthorizedUsers authUsers = (AuthorizedUsers) auth.getPrincipal();
+	        model.addAttribute("authUsers", authUsers);
 	        
 	        issueLeddgerList = issueLedgerSvc.getLedgersForUser(authUsers.getUsers().getUserId());
 	    }
