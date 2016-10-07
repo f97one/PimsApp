@@ -36,6 +36,7 @@ import net.formula97.webapp.pims.BaseTestCase;
 import net.formula97.webapp.pims.domain.IssueLedger;
 import net.formula97.webapp.pims.domain.LedgerRefUser;
 import net.formula97.webapp.pims.domain.Users;
+import net.formula97.webapp.pims.misc.AppConstants;
 import net.formula97.webapp.pims.repository.IssueLedgerRepository;
 import net.formula97.webapp.pims.repository.LedgerRefUserRepository;
 import net.formula97.webapp.pims.repository.UserRepository;
@@ -95,7 +96,16 @@ public class TitleControllerTest extends BaseTestCase {
         user1.setEncodedPasswd(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
         user1.setDisplayName("JUnit test");
         user1.setMailAddress("test@example.com");
+        user1.setAuthority(AppConstants.AUTHORITY_USER);
         userRepo.save(user1);
+        
+        Users user2 = new Users();
+        user2.setUserId("user2");
+        user2.setEncodedPasswd(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
+        user2.setDisplayName("JUnit test 2");
+        user2.setMailAddress("test2@example.com");
+        user2.setAuthority(AppConstants.AUTHORITY_ADMIN);
+        userRepo.save(user2);
         
         IssueLedger l1 = new IssueLedger();
         l1.setIsPublic(true);
@@ -109,6 +119,12 @@ public class TitleControllerTest extends BaseTestCase {
         l2.setOpenStatus(1);
         issueLedgerRepo.save(l2);
         
+        IssueLedger l3 = new IssueLedger();
+        l3.setIsPublic(false);
+        l3.setLedgerName("テスト用非公開台帳２");
+        l3.setOpenStatus(1);
+        issueLedgerRepo.save(l3);
+        
         IssueLedger ledger = issueLedgerRepo.findOne(Specifications.where(IssueLedgerSpecifications.nameContains(l1.getLedgerName())));
         LedgerRefUser lru1 = new LedgerRefUser();
         lru1.setUserId(user1.getUserId());
@@ -119,8 +135,14 @@ public class TitleControllerTest extends BaseTestCase {
         lru2.setUserId(user1.getUserId());
         lru2.setLedgerId(ledger2.getLedgerId());
         
+        IssueLedger ledger3 = issueLedgerRepo.findOne(Specifications.where(IssueLedgerSpecifications.nameContains(l3.getLedgerName())));
+        LedgerRefUser lru3 = new LedgerRefUser();
+        lru3.setUserId(user2.getUserId());
+        lru3.setLedgerId(ledger3.getLedgerId());
+        
         ledgerRefUserRepo.save(lru1);
         ledgerRefUserRepo.save(lru2);
+        ledgerRefUserRepo.save(lru3);
     }
 
     /**
