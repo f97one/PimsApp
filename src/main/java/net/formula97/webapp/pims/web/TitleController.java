@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,14 +46,14 @@ public class TitleController extends BaseWebController {
 	    
 	    // 台帳一覧
 	    List<IssueLedger> issueLeddgerList;
-	    if (principal == null) {
-	        issueLeddgerList = issueLedgerSvc.getPublicLedgers();
+	    if (principal instanceof UserDetails) {
+            Authentication auth = (Authentication) principal;
+            AuthorizedUsers authUsers = (AuthorizedUsers) auth.getPrincipal();
+            model.addAttribute("displayName", authUsers.getUsers().getDisplayName());
+            
+            issueLeddgerList = issueLedgerSvc.getLedgersForUser(authUsers.getUsers().getUserId());
 	    } else {
-	        Authentication auth = (Authentication) principal;
-	        AuthorizedUsers authUsers = (AuthorizedUsers) auth.getPrincipal();
-	        model.addAttribute("authUsers", authUsers);
-	        
-	        issueLeddgerList = issueLedgerSvc.getLedgersForUser(authUsers.getUsers().getUserId());
+            issueLeddgerList = issueLedgerSvc.getPublicLedgers();
 	    }
 	    
 	    Map<Integer, String> smMap = statusMasterSvc.getStatusMap();
