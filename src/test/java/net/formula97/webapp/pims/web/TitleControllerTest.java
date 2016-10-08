@@ -40,6 +40,7 @@ import net.formula97.webapp.pims.misc.AppConstants;
 import net.formula97.webapp.pims.repository.IssueLedgerRepository;
 import net.formula97.webapp.pims.repository.LedgerRefUserRepository;
 import net.formula97.webapp.pims.repository.UserRepository;
+import net.formula97.webapp.pims.service.IssueLedgerService;
 import net.formula97.webapp.pims.service.IssueLedgerService.IssueLedgerSpecifications;
 
 /**
@@ -63,6 +64,8 @@ public class TitleControllerTest extends BaseTestCase {
     private LedgerRefUserRepository ledgerRefUserRepo;
     @Autowired
     private IssueLedgerRepository issueLedgerRepo;
+    @Autowired
+    private IssueLedgerService issueLedgerSvc;
     
     private MockMvc mMvcMock;
     
@@ -125,6 +128,12 @@ public class TitleControllerTest extends BaseTestCase {
         l3.setOpenStatus(1);
         issueLedgerRepo.save(l3);
         
+        IssueLedger l4 = new IssueLedger();
+        l4.setIsPublic(true);
+        l4.setLedgerName("テスト用台帳２");
+        l4.setOpenStatus(1);
+        issueLedgerRepo.save(l4);
+        
         IssueLedger ledger = issueLedgerRepo.findOne(Specifications.where(IssueLedgerSpecifications.nameContains(l1.getLedgerName())));
         LedgerRefUser lru1 = new LedgerRefUser();
         lru1.setUserId(user1.getUserId());
@@ -158,8 +167,8 @@ public class TitleControllerTest extends BaseTestCase {
 
     @Test
     public void 普通に起動すると公開データだけ表示される() throws Exception {
-        List<IssueLedger> currList = issueLedgerRepo.findByPublicLedger();
-        assertThat("取得できる台帳は1個", currList.size(), Matchers.is(1));
+        List<IssueLedger> currList = issueLedgerSvc.getPublicLedgers();
+        assertThat("取得できる台帳は2個", currList.size(), Matchers.is(2));
 
         URI uri = new URI(apiEndpoint);
         this.mMvcMock.perform(MockMvcRequestBuilders.get(uri))
@@ -172,8 +181,8 @@ public class TitleControllerTest extends BaseTestCase {
     @Test
     @WithMockUser(username = "user1")
     public void ログインしているとそのユーザーの台帳が表示される() throws Exception {
-        List<IssueLedger> currList = issueLedgerRepo.findForUser("user1");
-        assertThat("取得できる台帳は2個", currList.size(), Matchers.is(2));
+        List<IssueLedger> currList = issueLedgerSvc.getLedgersForUser("user1");
+        assertThat("取得できる台帳は3個", currList.size(), Matchers.is(3));
         
         URI uri = new URI(apiEndpoint);
         this.mMvcMock.perform(MockMvcRequestBuilders.get(uri))

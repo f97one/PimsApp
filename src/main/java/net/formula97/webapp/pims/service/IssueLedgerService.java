@@ -3,8 +3,9 @@
  */
 package net.formula97.webapp.pims.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.domain.Specifications;
@@ -29,7 +30,15 @@ public class IssueLedgerService {
     }
     
     public List<IssueLedger> getLedgersForUser(String userId) {
-        return issueLedgerRepository.findForUser(userId);
+        List<IssueLedger> joinedLedgers = issueLedgerRepository.findForUser(userId);
+        List<IssueLedger> publicLedgers = getPublicLedgers();
+        
+        List<IssueLedger> retList = new ArrayList<>(joinedLedgers);
+        retList.addAll(publicLedgers);
+        
+        IssueLedger[] retArray = retList.stream().distinct().toArray(n -> new IssueLedger[n]);
+        
+        return new ArrayList<>(Arrays.asList(retArray));
     }
     
     public static class IssueLedgerSpecifications {

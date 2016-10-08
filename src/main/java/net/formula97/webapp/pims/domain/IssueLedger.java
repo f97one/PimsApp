@@ -102,4 +102,55 @@ public class IssueLedger implements Serializable {
     public void setOpenStatus(Integer openStatus) {
         this.openStatus = openStatus;
     }
+
+    /**
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((isPublic == null) ? 0 : isPublic.hashCode());
+        result = prime * result + ((ledgerId == null) ? 0 : ledgerId.hashCode());
+        result = prime * result + ((ledgerName == null) ? 0 : ledgerName.hashCode());
+        result = prime * result + ((openStatus == null) ? 0 : openStatus.hashCode());
+        return result;
+    }
+
+    /**
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        IssueLedger other = (IssueLedger) obj;
+        if (isPublic == null) {
+            if (other.isPublic != null)
+                return false;
+        } else if (!isPublic.equals(other.isPublic))
+            return false;
+        if (ledgerId == null) {
+            if (other.ledgerId != null)
+                return false;
+        } else if (!ledgerId.equals(other.ledgerId))
+            return false;
+        if (ledgerName == null) {
+            if (other.ledgerName != null)
+                return false;
+        } else if (!ledgerName.equals(other.ledgerName))
+            return false;
+        if (openStatus == null) {
+            if (other.openStatus != null)
+                return false;
+        } else if (!openStatus.equals(other.openStatus))
+            return false;
+        return true;
+    }
 }
