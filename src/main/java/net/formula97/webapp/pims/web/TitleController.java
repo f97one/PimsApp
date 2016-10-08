@@ -10,16 +10,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import net.formula97.webapp.pims.domain.IssueLedger;
+import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.misc.AppConstants;
-import net.formula97.webapp.pims.service.AuthorizedUsers;
 import net.formula97.webapp.pims.service.IssueLedgerService;
 import net.formula97.webapp.pims.service.StatusMasterService;
 import net.formula97.webapp.pims.web.forms.DispLedgerForm;
@@ -39,6 +37,8 @@ public class TitleController extends BaseWebController {
     
 	@RequestMapping(method = RequestMethod.GET)
 	public String createTitle(Model model, Principal principal) {
+	    // ログイン中ユーザーを取得
+	    Users users = getUserState(model, principal);
 	    
 	    // タイトル
 	    String title = sysConfSvc.getConfig(AppConstants.SysConfig.APP_TITLE);
@@ -46,14 +46,10 @@ public class TitleController extends BaseWebController {
 	    
 	    // 台帳一覧
 	    List<IssueLedger> issueLeddgerList;
-	    if (principal instanceof UserDetails) {
-            Authentication auth = (Authentication) principal;
-            AuthorizedUsers authUsers = (AuthorizedUsers) auth.getPrincipal();
-            model.addAttribute("displayName", authUsers.getUsers().getDisplayName());
-            
-            issueLeddgerList = issueLedgerSvc.getLedgersForUser(authUsers.getUsers().getUserId());
-	    } else {
+	    if (users == null) {
             issueLeddgerList = issueLedgerSvc.getPublicLedgers();
+	    } else {
+            issueLeddgerList = issueLedgerSvc.getLedgersForUser(users.getUserId());
 	    }
 	    
 	    Map<Integer, String> smMap = statusMasterSvc.getStatusMap();
