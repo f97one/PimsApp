@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Insert title here</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}" />
+  <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+    th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap-theme.min.css}" />
+</head>
+
+<body>
+  <div class="container">
+    <div th:replace="/common/common_header::common_header"></div>
+
+    <h2 class="h2">台帳追加</h2>
+
+    <form th:action="@{/ledger/create}" th:object="@{newLedgerForm}" class="form-horizontal" method="POST">
+      <!-- tableでインデントを強制、枠線はインラインスタイルで強制消去 -->
+      <table class="table table-condensed">
+        <tr>
+          <td class="col-sg-1" style="border-style: none;">台帳名称</td>
+          <td class="col-sg-11" style="border-style: none;">
+            <input type="text" id="ledgerName" th:field="*{ledgerName}" th:errorClass="form-control" class="form-control" value="hogeシステム改修" />
+            <span th:if="${fields.hasErrors('ledgerName')}" th:errors="*{ledgerName}" class="help-block">Error</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="col-sg-1" style="border-style: none;"></td>
+          <td class="col-sg-11" style="border-style: none;">
+            <input type="checkbox" id="isPublicCheck" th:field="*{isPublic}" /><label for="isPublicCheck">参加ユーザー以外も参照できるようにする</label>
+          </td>
+        </tr>
+        <tr>
+          <td class="col-sg-1" style="border-style: none;"></td>
+          <td class="col-sg-11 form-inline" style="border-style: none;">
+            <input type="submit" class="btn btn-default col-sg-4" name="returnBtn" value="戻る" />
+            <input type="submit" class="btn btn-primary col-sg-4" name="addLedgerBtn" value="追加" />
+          </td>
+        </tr>
+      </table>
+    </form>
+  </div>
+</body>
+
+</html>
