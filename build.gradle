@@ -43,6 +43,7 @@ dependencies {
 	compile('org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16')
     runtime('org.postgresql:postgresql')
     runtime('com.h2database:h2')
+    providedCompile('org.projectlombok:lombok:1.16.10')
     providedRuntime('org.springframework.boot:spring-boot-starter-tomcat')
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('org.springframework.security:spring-security-test')
