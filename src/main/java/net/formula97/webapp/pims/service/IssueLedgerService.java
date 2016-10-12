@@ -46,6 +46,10 @@ public class IssueLedgerService {
         public static Specification<IssueLedger> nameContains(String ledgerName) {
             return StringUtils.isEmpty(ledgerName) ? null : (root, query, cb) -> cb.like(root.get("ledgerName"), "%" + ledgerName + "%");
         }
+
+        public static Specification<IssueLedger> nameEquals(String ledgerName) {
+            return StringUtils.isEmpty(ledgerName) ? null : (root, query, cb) -> cb.equal(root.get("ledgerName"), ledgerName);
+        }
         
         public static Specification<IssueLedger> openStatusSpecified(Integer openStatusId) {
             return openStatusId == null ? null : (root, query, cb) -> cb.equal(root.get("openStatus"), openStatusId);
