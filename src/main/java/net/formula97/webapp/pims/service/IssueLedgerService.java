@@ -6,6 +6,10 @@ package net.formula97.webapp.pims.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import net.formula97.webapp.pims.domain.LedgerRefUser;
+import net.formula97.webapp.pims.domain.Users;
+import net.formula97.webapp.pims.repository.LedgerRefUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.domain.Specifications;
@@ -15,6 +19,8 @@ import org.springframework.util.StringUtils;
 import net.formula97.webapp.pims.domain.IssueLedger;
 import net.formula97.webapp.pims.repository.IssueLedgerRepository;
 
+import javax.transaction.Transactional;
+
 /**
  * @author f97one
  *
@@ -23,24 +29,43 @@ import net.formula97.webapp.pims.repository.IssueLedgerRepository;
 public class IssueLedgerService {
 
     @Autowired
-    IssueLedgerRepository issueLedgerRepository;
+    IssueLedgerRepository issueLedgerRepo;
+    @Autowired
+    LedgerRefUserRepository ledgerRefUserRepo;
     
     public List<IssueLedger> getPublicLedgers() {
-        return issueLedgerRepository.findAll(Specifications.where(IssueLedgerSpecifications.isPublicSpecified(true)));
+        return issueLedgerRepo.findAll(Specifications.where(IssueLedgerSpecifications.isPublicSpecified(true)));
     }
     
     public List<IssueLedger> getLedgersForUser(String userId) {
-        List<IssueLedger> joinedLedgers = issueLedgerRepository.findForUser(userId);
+        List<IssueLedger> joinedLedgers = issueLedgerRepo.findForUser(userId);
         List<IssueLedger> publicLedgers = getPublicLedgers();
         
         List<IssueLedger> retList = new ArrayList<>(joinedLedgers);
         retList.addAll(publicLedgers);
         
-        IssueLedger[] retArray = retList.stream().distinct().toArray(n -> new IssueLedger[n]);
+        IssueLedger[] retArray = retList.stream().distinct().toArray(IssueLedger[]::new);
         
         return new ArrayList<>(Arrays.asList(retArray));
     }
-    
+
+    @Transactional
+    public void saveLedger(IssueLedger ledger, Users users) {
+        issueLedgerRepo.save(ledger);
+
+        IssueLedger ledger1;
+        if (ledger.getLedgerId() == null) {
+            ledger1 = issueLedgerRepo.findOne(Specifications.where(IssueLedgerSpecifications.nameEquals(ledger.getLedgerName())));
+        } else {
+            ledger1 = ledger;
+        }
+        LedgerRefUser lru = new LedgerRefUser();
+        lru.setLedgerId(ledger1.getLedgerId());
+        lru.setUserId(users.getUserId());
+
+        ledgerRefUserRepo.save(lru);
+    }
+
     public static class IssueLedgerSpecifications {
         
         public static Specification<IssueLedger> nameContains(String ledgerName) {

@@ -17,20 +17,22 @@
 
     <h2 class="h2">台帳追加</h2>
 
-    <form th:action="@{/ledger/create}" th:object="@{newLedgerForm}" class="form-horizontal" method="POST">
+    <div th:if="${errMsg}" class="alert alert-danger">ユーザー名、またはパスワードが正しくありません。</div>
+
+    <form th:action="@{/ledger/create}" th:object="${newLedgerForm}" class="form-horizontal" method="POST">
       <!-- tableでインデントを強制、枠線はインラインスタイルで強制消去 -->
       <table class="table table-condensed">
         <tr>
           <td class="col-sg-1" style="border-style: none;">台帳名称</td>
           <td class="col-sg-11" style="border-style: none;">
             <input type="text" id="ledgerName" th:field="*{ledgerName}" th:errorClass="form-control" class="form-control" value="hogeシステム改修" />
-            <span th:if="${fields.hasErrors('ledgerName')}" th:errors="*{ledgerName}" class="help-block">Error</span>
+            <span th:if="${#fields.hasErrors('ledgerName')}" th:errors="*{ledgerName}" class="help-block">Error</span>
           </td>
         </tr>
         <tr>
           <td class="col-sg-1" style="border-style: none;"></td>
           <td class="col-sg-11" style="border-style: none;">
-            <input type="checkbox" id="isPublicCheck" th:field="*{isPublic}" /><label for="isPublicCheck">参加ユーザー以外も参照できるようにする</label>
+            <input type="checkbox" id="isPublicCheck" th:field="*{public}" /><label for="isPublicCheck">参加ユーザー以外も参照できるようにする</label>
           </td>
         </tr>
         <tr>

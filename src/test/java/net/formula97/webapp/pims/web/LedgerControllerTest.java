@@ -118,8 +118,8 @@ public class LedgerControllerTest extends BaseTestCase {
     @Test
     public void ログインしていないユーザーには台帳が追加できない() throws Exception {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("ledgerName", "追加テスト用台帳");
-        params.add("isPublic", "true");
+        params.add("ledgerName", "ユーザーなし追加テスト用台帳");
+        params.add("public", "true");
 
         ResultActions actions = mMvcMock.perform(MockMvcRequestBuilders.post(apiEndpoint + "/create")
                 .params(params)
@@ -129,11 +129,11 @@ public class LedgerControllerTest extends BaseTestCase {
     }
 
     @Test
-    @WithMockUser(username = "user1")
+    @WithMockUser(username = "user11")
     public void ログインしている場合台帳が作成できる() throws Exception {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("ledgerName", "追加テスト用台帳");
-        params.add("isPublic", "true");
+        params.add("ledgerName", "ユーザーあり追加テスト用台帳");
+        params.add("public", "true");
 
         ResultActions actions = mMvcMock.perform(MockMvcRequestBuilders.post(apiEndpoint + "/create")
                 .params(params)
@@ -144,7 +144,7 @@ public class LedgerControllerTest extends BaseTestCase {
 
         ModelMap modelMap = actions.andReturn().getModelAndView().getModelMap();
         NewLedgerForm resultForm = (NewLedgerForm) modelMap.get("newLedgerForm");
-        assertThat("台帳名は「追加テスト用台帳」", resultForm.getLedgerName(), Matchers.is("追加テスト用台帳"));
+        assertThat("台帳名は「ユーザーあり追加テスト用台帳」", resultForm.getLedgerName(), Matchers.is("ユーザーあり追加テスト用台帳"));
         assertThat("公開台帳になっている", resultForm.isPublic(), Matchers.is(true));
     }
 }

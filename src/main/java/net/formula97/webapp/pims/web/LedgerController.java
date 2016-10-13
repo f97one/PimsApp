@@ -6,6 +6,7 @@ package net.formula97.webapp.pims.web;
 import java.security.Principal;
 import java.util.List;
 
+import net.formula97.webapp.pims.domain.IssueLedger;
 import net.formula97.webapp.pims.web.forms.NewLedgerForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -42,7 +43,7 @@ public class LedgerController extends BaseWebController {
         Users users = getUserState(model, principal);
         
         if (users == null) {
-            
+
         } else {
             
         }
@@ -51,21 +52,36 @@ public class LedgerController extends BaseWebController {
         return null;
     }
 
+    @RequestMapping(value = "create", method = RequestMethod.GET)
+    public String showLedger(NewLedgerForm form, Model model, Principal principal) {
+        Users users = getUserState(model, principal);
+        model.addAttribute("newLedgerForm", form);
+
+        return "ledger/addLedger";
+    }
+
     @RequestMapping(value = "create", params = "addLedgerBtn", method = RequestMethod.POST)
     public String addLedger(@Validated NewLedgerForm form, BindingResult result, Model model, Principal principal) {
         Users users = getUserState(model, principal);
 
+        String dest = null;
         if (result.hasErrors()) {
-
+            return showLedger(form, model, principal);
         }
 
         if (users == null) {
-            
+            dest = "ledger/addLedger";
         } else {
-            
+            IssueLedger ledger = new IssueLedger();
+            ledger.setLedgerName(form.getLedgerName());
+            ledger.setOpenStatus(1);
+            ledger.setIsPublic(form.isPublic());
+
+            issueLedgerSvc.saveLedger(ledger, users);
+
+            dest = "redirect:/title";
         }
-        
-        //return "redirect:/title";s
-        return null;
+
+        return dest;
     }
 }

@@ -49,5 +49,8 @@ public class BaseWebController {
         
         return users;
     }
-    
+
+    protected void putErrMsg(Model model, String errMessage) {
+        model.addAttribute("errMsg", errMessage);
+    }
 }
