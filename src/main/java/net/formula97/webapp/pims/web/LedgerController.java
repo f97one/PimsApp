@@ -79,7 +79,7 @@ public class LedgerController extends BaseWebController {
 
             issueLedgerSvc.saveLedger(ledger, users);
 
-            dest = "redirect:/title";
+            dest = "redirect:/";
         }
 
         return dest;
