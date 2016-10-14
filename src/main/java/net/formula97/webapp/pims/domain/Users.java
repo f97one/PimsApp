@@ -14,11 +14,15 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import groovy.transform.EqualsAndHashCode;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 
 /**
  * ユーザー
@@ -28,8 +32,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name = Users.TABLE_NAME)
-@EqualsAndHashCode
-public class Users extends User implements Serializable {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Users implements UserDetails, Serializable {
 
     /**
      * 
@@ -38,19 +44,20 @@ public class Users extends User implements Serializable {
 
     public static final String TABLE_NAME = "USERS";
 
-    public static final String COLUMN_USER_ID = "USER_ID";
-    public static final String COLUMN_ENCODED_PASSWD = "ENCODED_PASSWD";
+    public static final String COLUMN_USERNAME = "USERNAME";
+    public static final String COLUMN_PASSWORD = "PASSWORD";
     public static final String COLUMN_DISPLAY_NAME = "DISPLAY_NAME";
     public static final String COLUMN_MAIL_ADDRESS = "MAIL_ADDRESS";
+    public static final String COLUMN_ENABLED = "ENABLED";
     public static final String COLUMN_AUTHORITY = "AUTHORITY";
 
     @Id
-    @Column(name = COLUMN_USER_ID, length = 32)
-    private String userId;
+    @Column(name = COLUMN_USERNAME, length = 32)
+    private String username;
 
     @JsonIgnore
-    @Column(name = COLUMN_ENCODED_PASSWD, length = 128, nullable = false)
-    private String encodedPasswd;
+    @Column(name = COLUMN_PASSWORD, length = 128, nullable = false)
+    private String password;
 
     @Column(name = COLUMN_DISPLAY_NAME, length = 128)
     private String displayName;
@@ -58,107 +65,28 @@ public class Users extends User implements Serializable {
     @Column(name = COLUMN_MAIL_ADDRESS, length = 128)
     private String mailAddress;
 
+    @Column(name = COLUMN_ENABLED)
+    private Boolean enabled;
+
     @Column(name = COLUMN_AUTHORITY, length = 64, nullable = false)
     private String authority;
 
-    public Users(String username, String password, Collection<? extends GrantedAuthority> authorities) {
-        super(username, password, authorities);
-    }
-
-    public Users(String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
-        super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
-    }
-
-    /**
-     * @return the userId
-     */
-    public String getUserId() {
-        return userId;
-    }
-
-    /**
-     * @param userId
-     *            the userId to set
-     */
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    /**
-     * @return the encodedPasswd
-     */
-    public String getEncodedPasswd() {
-        return encodedPasswd;
-    }
-
-    /**
-     * @param encodedPasswd
-     *            the encodedPasswd to set
-     */
-    public void setEncodedPasswd(String encodedPasswd) {
-        this.encodedPasswd = encodedPasswd;
-    }
-
-    /**
-     * @return the displayName
-     */
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    /**
-     * @param displayName
-     *            the displayName to set
-     */
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
-    /**
-     * @return the mailAddress
-     */
-    public String getMailAddress() {
-        return mailAddress;
-    }
-
-    /**
-     * @param mailAddress
-     *            the mailAddress to set
-     */
-    public void setMailAddress(String mailAddress) {
-        this.mailAddress = mailAddress;
-    }
-
-    /**
-     * @return the authority
-     */
-    public String getAuthority() {
-        return authority;
-    }
-
-    /**
-     * @param authority the authority to set
-     */
-    public void setAuthority(String authority) {
-        this.authority = authority;
-    }
-
     @Override
-    public Collection<GrantedAuthority> getAuthorities() {
+    public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(this.authority));
-        
+
         return authorities;
     }
 
     @Override
     public String getPassword() {
-        return this.encodedPasswd;
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return this.userId;
+        return username;
     }
 
     @Override
@@ -178,7 +106,6 @@ public class Users extends User implements Serializable {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
-
 }

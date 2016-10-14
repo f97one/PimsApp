@@ -61,7 +61,7 @@ public class IssueLedgerService {
         }
         LedgerRefUser lru = new LedgerRefUser();
         lru.setLedgerId(ledger1.getLedgerId());
-        lru.setUserId(users.getUserId());
+        lru.setUserId(users.getUsername());
 
         ledgerRefUserRepo.save(lru);
     }

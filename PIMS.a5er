@@ -48,7 +48,7 @@ Entity1=USERS
 Entity2=LEDGER_REF_USER
 RelationType1=1
 RelationType2=3
-Fields1=USER_ID
+Fields1=USERNAME
 Fields2=USER_ID
 Cardinarity1=
 Cardinarity2=
@@ -129,13 +129,13 @@ Fields1=STATUS_ID
 Fields2=OPEN_STATUS_ID
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,1274,4819,2432,R,R
+Position="MAIN",0,3285,4819,2432,R,R
 Dependence=0
 Caption=
 PName=
 ModifiedDateTime=20160918191719
 LineMode=0
-Bar1=127
+Bar1=328
 Bar2=482
 Bar3=243
 TermPos1=R
@@ -148,7 +148,7 @@ Comment=
 TableOption=
 Page=MAIN
 Left=100
-Top=500
+Top=450
 Field="ステータスID","STATUS_ID","@INT",,0,"","",$FFFFFFFF,""
 Field="ステータス","STATUS_NAME","@VARCHAR(16)",,,"","",$FFFFFFFF,""
 Field="表示順序","DISP_ORDER","@INT",,,"0","",$FFFFFFFF,""
@@ -156,7 +156,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20161004221722
-Position="MAIN",100,500
+Position="MAIN",100,450
 
 [Entity]
 PName=USERS
@@ -166,15 +166,16 @@ TableOption=
 Page=MAIN
 Left=2900
 Top=150
-Field="ユーザーID","USER_ID","@VARCHAR(32)",,0,"","",$FFFFFFFF,""
-Field="パスワード","ENCODED_PASSWD","@VARCHAR(128)","NOT NULL",,"\q \q","",$FFFFFFFF,""
+Field="ユーザーID","USERNAME","@VARCHAR(32)",,0,"","",$FFFFFFFF,""
+Field="パスワード","PASSWORD","@VARCHAR(128)","NOT NULL",,"\q \q","",$FFFFFFFF,""
 Field="表示名","DISPLAY_NAME","@VARCHAR(128)",,,"","",$FFFFFFFF,""
 Field="メールアドレス","MAIL_ADDRESS","@VARCHAR(128)",,,"","",$FFFFFFFF,""
+Field="有効フラグ","ENABLED","boolean",,,"true","",$FFFFFFFF,""
 Field="権限","AUTHORITY","@VARCHAR(64)","NOT NULL",,"\q \q","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20161005222916
+ModifiedDateTime=20161015004909
 Position="MAIN",2900,150
 
 [Entity]
@@ -317,10 +318,11 @@ Field="確認日","COMFIRMED_DATE","@DATETIME",,,"","",$FFFFFFFF,""
 Field="行更新日時","ROW_UPDATED_AT","@DATETIME",,,"","",$FFFFFFFF,""
 Index==0,LEDGER_ID,ISSUE_ID,SEVERE_LEVEL_ID
 Index==0,LEDGER_ID,ISSUE_ID,CORRESPONDING_END_DATE
+Index==0,LEDGER_ID,ISSUE_ID
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20161005222627
+ModifiedDateTime=20161015005734
 Position="MAIN",1400,700
 
 [Entity]
@@ -334,12 +336,11 @@ Top=150
 Field="台帳ID","LEDGER_ID","serial",,0,"","",$FFFFFFFF,""
 Field="台帳名","LEDGER_NAME","@VARCHAR(64)",,,"","",$FFFFFFFF,""
 Field="ステータス","OPEN_STATUS_ID","@INT",,,"","",$FFFFFFFF,""
-Field="公開可能フラグ","IS_PUBLIC","boolean","NOT NULL",,"false","trueのときログインしていなくても参照可能",$FFFFFFFF,""
-Field="更新日時","LAST_UPDATED_AT","@DATETIME",,,"","",$FFFFFFFF,""
+Field="公開可能フラグ","PUBLIC_LEDGER","boolean","NOT NULL",,"false","trueのときログインしていなくても参照可能",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20161004234432
+ModifiedDateTime=20161015000412
 Position="MAIN",1400,150
 
 [Entity]

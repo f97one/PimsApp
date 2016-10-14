@@ -1,5 +1,5 @@
 ﻿-- Project Name : PIMS
--- Date/Time    : 2016/10/05 22:27:45
+-- Date/Time    : 2016/10/15 0:57:44
 -- Author       : 2016 HAJIME Fukuna (a.k.a. f97one)
 -- RDBMS Type   : PostgreSQL
 -- Application  : A5:SQL Mk-2
@@ -27,12 +27,13 @@ create table STATUS_MASTER (
 drop table if exists USERS cascade;
 
 create table USERS (
-  USER_ID character varying(32)
-  , ENCODED_PASSWD character varying(128) default ' ' not null
+  USERNAME character varying(32)
+  , PASSWORD character varying(128) default ' ' not null
   , DISPLAY_NAME character varying(128)
   , MAIL_ADDRESS character varying(128)
+  , ENABLED boolean default true
   , AUTHORITY character varying(64) default ' ' not null
-  , constraint USERS_PKC primary key (USER_ID)
+  , constraint USERS_PKC primary key (USERNAME)
 ) ;
 
 -- カテゴリーマスタ
@@ -95,6 +96,9 @@ create index ISSUE_ITEMS_IX1
 create index ISSUE_ITEMS_IX2
   on ISSUE_ITEMS(LEDGER_ID,ISSUE_ID,CORRESPONDING_END_DATE);
 
+create index ISSUE_ITEMS_IX3
+  on ISSUE_ITEMS(LEDGER_ID,ISSUE_ID);
+
 -- 課題台帳
 drop table if exists ISSUE_LEDGER cascade;
 
@@ -102,8 +106,7 @@ create table ISSUE_LEDGER (
   LEDGER_ID serial
   , LEDGER_NAME character varying(64)
   , OPEN_STATUS_ID integer
-  , IS_PUBLIC boolean default false not null
-  , LAST_UPDATED_AT timestamp
+  , PUBLIC_LEDGER boolean default false not null
   , constraint ISSUE_LEDGER_PKC primary key (LEDGER_ID)
 ) ;
 
@@ -117,7 +120,7 @@ create table SYSTEM_CONFIG (
 ) ;
 
 alter table LEDGER_REF_USER
-  add constraint LEDGER_REF_USER_FK1 foreign key (USER_ID) references USERS(USER_ID)
+  add constraint LEDGER_REF_USER_FK1 foreign key (USER_ID) references USERS(USERNAME)
   on delete cascade
   on update cascade;
 
@@ -161,10 +164,11 @@ comment on column STATUS_MASTER.STATUS_NAME is 'ステータス';
 comment on column STATUS_MASTER.DISP_ORDER is '表示順序';
 
 comment on table USERS is 'ユーザーマスタ';
-comment on column USERS.USER_ID is 'ユーザーID';
-comment on column USERS.ENCODED_PASSWD is 'パスワード';
+comment on column USERS.USERNAME is 'ユーザーID';
+comment on column USERS.PASSWORD is 'パスワード';
 comment on column USERS.DISPLAY_NAME is '表示名';
 comment on column USERS.MAIL_ADDRESS is 'メールアドレス';
+comment on column USERS.ENABLED is '有効フラグ';
 comment on column USERS.AUTHORITY is '権限';
 
 comment on table CATEGORY_MASTER is 'カテゴリーマスタ';
@@ -205,8 +209,7 @@ comment on table ISSUE_LEDGER is '課題台帳';
 comment on column ISSUE_LEDGER.LEDGER_ID is '台帳ID';
 comment on column ISSUE_LEDGER.LEDGER_NAME is '台帳名';
 comment on column ISSUE_LEDGER.OPEN_STATUS_ID is 'ステータス';
-comment on column ISSUE_LEDGER.IS_PUBLIC is '公開可能フラグ	 trueのときログインしていなくても参照可能';
-comment on column ISSUE_LEDGER.LAST_UPDATED_AT is '更新日時';
+comment on column ISSUE_LEDGER.PUBLIC_LEDGER is '公開可能フラグ	 trueのときログインしていなくても参照可能';
 
 comment on table SYSTEM_CONFIG is 'システム設定';
 comment on column SYSTEM_CONFIG.CONFIG_KEY is '設定キー';

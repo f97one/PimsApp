@@ -49,7 +49,7 @@ public class TitleController extends BaseWebController {
 	    if (users == null) {
             issueLeddgerList = issueLedgerSvc.getPublicLedgers();
 	    } else {
-            issueLeddgerList = issueLedgerSvc.getLedgersForUser(users.getUserId());
+            issueLeddgerList = issueLedgerSvc.getLedgersForUser(users.getUsername());
 	    }
 	    
 	    Map<Integer, String> smMap = statusMasterSvc.getStatusMap();

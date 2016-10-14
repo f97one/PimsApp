@@ -95,16 +95,16 @@ public class TitleControllerTest extends BaseTestCase {
         apiEndpoint = String.format(Locale.getDefault(), "http://localhost:%d/", port);
         
         Users user1 = new Users();
-        user1.setUserId("user1");
-        user1.setEncodedPasswd(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
+        user1.setUsername("user1");
+        user1.setPassword(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
         user1.setDisplayName("JUnit test");
         user1.setMailAddress("test@example.com");
         user1.setAuthority(AppConstants.AUTHORITY_USER);
         userRepo.save(user1);
         
         Users user2 = new Users();
-        user2.setUserId("user2");
-        user2.setEncodedPasswd(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
+        user2.setUsername("user2");
+        user2.setPassword(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
         user2.setDisplayName("JUnit test 2");
         user2.setMailAddress("test2@example.com");
         user2.setAuthority(AppConstants.AUTHORITY_ADMIN);
@@ -136,17 +136,17 @@ public class TitleControllerTest extends BaseTestCase {
         
         IssueLedger ledger = issueLedgerRepo.findOne(Specifications.where(IssueLedgerSpecifications.nameContains(l1.getLedgerName())));
         LedgerRefUser lru1 = new LedgerRefUser();
-        lru1.setUserId(user1.getUserId());
+        lru1.setUserId(user1.getUsername());
         lru1.setLedgerId(ledger.getLedgerId());
         
         IssueLedger ledger2 = issueLedgerRepo.findOne(Specifications.where(IssueLedgerSpecifications.nameContains(l2.getLedgerName())));
         LedgerRefUser lru2 = new LedgerRefUser();
-        lru2.setUserId(user1.getUserId());
+        lru2.setUserId(user1.getUsername());
         lru2.setLedgerId(ledger2.getLedgerId());
         
         IssueLedger ledger3 = issueLedgerRepo.findOne(Specifications.where(IssueLedgerSpecifications.nameContains(l3.getLedgerName())));
         LedgerRefUser lru3 = new LedgerRefUser();
-        lru3.setUserId(user2.getUserId());
+        lru3.setUserId(user2.getUsername());
         lru3.setLedgerId(ledger3.getLedgerId());
         
         ledgerRefUserRepo.save(lru1);

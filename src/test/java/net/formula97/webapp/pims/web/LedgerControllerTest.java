@@ -83,8 +83,8 @@ public class LedgerControllerTest extends BaseTestCase {
         apiEndpoint = String.format(Locale.getDefault(), "http://localhost:%d/ledger", port);
 
         Users user1 = new Users();
-        user1.setUserId("user11");
-        user1.setEncodedPasswd(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
+        user1.setUsername("user11");
+        user1.setPassword(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
         user1.setDisplayName("JUnit test11");
         user1.setMailAddress("test@example.com");
         user1.setAuthority(AppConstants.AUTHORITY_USER);
@@ -98,7 +98,7 @@ public class LedgerControllerTest extends BaseTestCase {
 
         IssueLedger ledger = issueLedgerRepo.findOne(Specifications.where(IssueLedgerService.IssueLedgerSpecifications.nameEquals(l1.getLedgerName())));
         LedgerRefUser lru1 = new LedgerRefUser();
-        lru1.setUserId(user1.getUserId());
+        lru1.setUserId(user1.getUsername());
         lru1.setLedgerId(ledger.getLedgerId());
         ledgerRefUserRepo.save(lru1);
 

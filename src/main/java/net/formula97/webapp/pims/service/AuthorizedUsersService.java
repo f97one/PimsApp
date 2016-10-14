@@ -29,11 +29,11 @@ public class AuthorizedUsersService implements UserDetailsService {
      * @see org.springframework.security.core.userdetails.UserDetailsService#loadUserByUsername(java.lang.String)
      */
     @Override
-    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        Users users = userRepository.findOne(userId);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Users users = userRepository.findOne(username);
         
-        if (users == null || userId.length() == 0) {
-            throw new UsernameNotFoundException(String.format(Locale.getDefault(), "Requested userId ( %s ) not found.", userId));
+        if (users == null || username.length() == 0) {
+            throw new UsernameNotFoundException(String.format(Locale.getDefault(), "Requested username ( %s ) not found.", username));
         }
         
         return new AuthorizedUsers(users);

@@ -21,7 +21,7 @@ public class AuthorizedUsers extends User {
     private final Users users;
     
     public AuthorizedUsers(Users user) {
-        super(user.getUserId(), user.getEncodedPasswd(), user.getAuthorities());
+        super(user.getUsername(), user.getPassword(), user.getAuthorities());
         this.users = user;
     }
     
