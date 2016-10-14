@@ -44,8 +44,6 @@ public class BaseWebController {
             AuthorizedUsers authUsers = (AuthorizedUsers) auth.getPrincipal();
             
             users = authUsers.getUsers();
-            
-            model.addAttribute("displayName", users.getDisplayName());
         }
         
         return users;
