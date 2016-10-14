@@ -3,6 +3,10 @@
  */
 package net.formula97.webapp.pims.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 import javax.persistence.Column;
@@ -20,6 +24,9 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = ProcessMaster.TABLE_NAME)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProcessMaster implements Serializable {
 
     /**
@@ -52,49 +59,4 @@ public class ProcessMaster implements Serializable {
 
     @Column(name = COLUMN_DISP_ORDER)
     private Integer dispOrder;
-    
-    public ProcessMaster() { }
-    
-    public ProcessMaster(Integer processId, String processName, Integer dispOrder) {
-        this.processId = processId;
-        this.processName = processName;
-        this.dispOrder = dispOrder;
-    }
-    
-    /**
-     * @return the processId
-     */
-    public Integer getProcessId() {
-        return processId;
-    }
-
-    /**
-     * @param processId the processId to set
-     */
-    public void setProcessId(Integer processId) {
-        this.processId = processId;
-    }
-
-    /**
-     * @return the processName
-     */
-    public String getProcessName() {
-        return processName;
-    }
-
-    /**
-     * @param processName the processName to set
-     */
-    public void setProcessName(String processName) {
-        this.processName = processName;
-    }
-
-    public Integer getDispOrder() {
-        return dispOrder;
-    }
-
-    public void setDispOrder(Integer dispOrder) {
-        this.dispOrder = dispOrder;
-    }
-
 }

@@ -81,7 +81,7 @@ public class IssueLedgerService {
         }
         
         public static Specification<IssueLedger> isPublicSpecified(Boolean isPublic) {
-            return isPublic == null ? null : (root, query, cb) -> cb.equal(root.get("isPublic"), isPublic);
+            return isPublic == null ? null : (root, query, cb) -> cb.equal(root.get("publicLedger"), isPublic);
         }
     }
 }

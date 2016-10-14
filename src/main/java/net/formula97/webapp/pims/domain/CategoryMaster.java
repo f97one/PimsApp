@@ -3,6 +3,10 @@
  */
 package net.formula97.webapp.pims.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 import javax.persistence.Column;
@@ -20,6 +24,9 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = CategoryMaster.TABLE_NAME)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CategoryMaster implements Serializable {
     
     /**
@@ -52,45 +59,4 @@ public class CategoryMaster implements Serializable {
 
     @Column(name = COLUMN_DISP_ORDER)
     private Integer dispOrder;
-    
-    public CategoryMaster() {
-        this.dispOrder = 0;
-    }
-    
-    /**
-     * @return the categoryId
-     */
-    public Integer getCategoryId() {
-        return categoryId;
-    }
-
-    /**
-     * @param categoryId the categoryId to set
-     */
-    public void setCategoryId(Integer categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    /**
-     * @return the categoryName
-     */
-    public String getCategoryName() {
-        return categoryName;
-    }
-
-    /**
-     * @param categoryName the categoryName to set
-     */
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
-
-    public Integer getDispOrder() {
-        return dispOrder;
-    }
-
-    public void setDispOrder(Integer dispOrder) {
-        this.dispOrder = dispOrder;
-    }
-        
 }

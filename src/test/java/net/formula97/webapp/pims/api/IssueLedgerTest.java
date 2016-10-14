@@ -68,19 +68,19 @@ public class IssueLedgerTest extends BaseTestCase {
         
         IssueLedger il1 = new IssueLedger();
         il1.setLedgerId(11);
-        il1.setIsPublic(true);
+        il1.setPublicLedger(true);
         il1.setLedgerName("公開台帳１");
         il1.setOpenStatus(1);
         
         IssueLedger il2 = new IssueLedger();
         il2.setLedgerId(12);
-        il2.setIsPublic(true);
+        il2.setPublicLedger(true);
         il2.setLedgerName("公開台帳２");
         il2.setOpenStatus(2);
         
         IssueLedger il3 = new IssueLedger();
         il3.setLedgerId(13);
-        il3.setIsPublic(false);
+        il3.setPublicLedger(false);
         il3.setLedgerName("非公開台帳１");
         il3.setOpenStatus(3);
         
@@ -110,12 +110,12 @@ public class IssueLedgerTest extends BaseTestCase {
 
         IssueLedger il1 = resp.getBody().get(0);
         assertThat(il1.getLedgerName(), is("公開台帳１"));
-        assertThat(il1.getIsPublic(), is(true));
+        assertThat(il1.getPublicLedger(), is(true));
         assertThat(il1.getOpenStatus(), is(1));
         
         IssueLedger il2 = resp.getBody().get(1);
         assertThat(il2.getLedgerName(), is("公開台帳２"));
-        assertThat(il2.getIsPublic(), is(true));
+        assertThat(il2.getPublicLedger(), is(true));
         assertThat(il2.getOpenStatus(), is(2));
 
     }

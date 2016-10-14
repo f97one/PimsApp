@@ -12,13 +12,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import groovy.transform.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.User;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import net.formula97.webapp.pims.misc.AppConstants;
 
 /**
  * ユーザー
@@ -28,7 +28,8 @@ import net.formula97.webapp.pims.misc.AppConstants;
  */
 @Entity
 @Table(name = Users.TABLE_NAME)
-public class Users implements Serializable, UserDetails {
+@EqualsAndHashCode
+public class Users extends User implements Serializable {
 
     /**
      * 
@@ -59,13 +60,15 @@ public class Users implements Serializable, UserDetails {
 
     @Column(name = COLUMN_AUTHORITY, length = 64, nullable = false)
     private String authority;
-    
-    public Users() {
-        this.userId = "";
-        this.encodedPasswd = "";
-        this.authority = AppConstants.AUTHORITY_USER;
+
+    public Users(String username, String password, Collection<? extends GrantedAuthority> authorities) {
+        super(username, password, authorities);
     }
-    
+
+    public Users(String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
+        super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
+    }
+
     /**
      * @return the userId
      */
@@ -141,7 +144,7 @@ public class Users implements Serializable, UserDetails {
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    public Collection<GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(this.authority));
         

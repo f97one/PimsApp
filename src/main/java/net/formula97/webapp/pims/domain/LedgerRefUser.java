@@ -5,6 +5,10 @@
  */
 package net.formula97.webapp.pims.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -18,6 +22,9 @@ import javax.persistence.Table;
 @Entity
 @Table(name = LedgerRefUser.TABLE_NAME)
 @IdClass(LedgerRefUserPK.class)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class LedgerRefUser implements Serializable {
     
     private static final long serialVersionUID = 958929577010643134L;
@@ -29,26 +36,4 @@ public class LedgerRefUser implements Serializable {
     
     @Id
     private String userId;
-
-    public LedgerRefUser() {
-        
-    }
-    
-    public Integer getLedgerId() {
-        return ledgerId;
-    }
-
-    public void setLedgerId(Integer ledgerId) {
-        this.ledgerId = ledgerId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-    
-    
 }

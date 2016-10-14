@@ -3,6 +3,11 @@
  */
 package net.formula97.webapp.pims.domain;
 
+import groovy.transform.EqualsAndHashCode;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 import javax.persistence.Column;
@@ -20,6 +25,9 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = StatusMaster.TABLE_NAME)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class StatusMaster implements Serializable {
 
     /**
@@ -43,50 +51,4 @@ public class StatusMaster implements Serializable {
 
     @Column(name = COLUMN_DISP_ORDER)
     private Integer dispOrder;
-    
-    public StatusMaster() {
-        this.dispOrder = 0;
-    }
-    
-    public StatusMaster(Integer statusId, String statusName, Integer dispOrder) {
-        this.statusId = statusId;
-        this.statusName = statusName;
-        this.dispOrder = dispOrder;
-    }
-
-    public Integer getDispOrder() {
-        return dispOrder;
-    }
-
-    public void setDispOrder(Integer dispOrder) {
-        this.dispOrder = dispOrder;
-    }
-
-    /**
-     * @return the statusId
-     */
-    public Integer getStatusId() {
-        return statusId;
-    }
-
-    /**
-     * @param statusId the statusId to set
-     */
-    public void setStatusId(Integer statusId) {
-        this.statusId = statusId;
-    }
-
-    /**
-     * @return the statusName
-     */
-    public String getStatusName() {
-        return statusName;
-    }
-
-    /**
-     * @param statusName the statusName to set
-     */
-    public void setStatusName(String statusName) {
-        this.statusName = statusName;
-    }
 }

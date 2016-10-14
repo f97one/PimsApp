@@ -3,6 +3,10 @@
  */
 package net.formula97.webapp.pims.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -23,6 +27,9 @@ import javax.persistence.TemporalType;
 @Entity
 @Table(name = IssueItems.TABLE_NAME)
 @IdClass(IssueItemsPK.class)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class IssueItems implements Serializable {
 
     /**
@@ -32,8 +39,6 @@ public class IssueItems implements Serializable {
 
     public static final String TABLE_NAME = "ISSUE_ITEMS";
 
-    public static final String COLUMN_LEDGER_ID = "LEDGER_ID";
-    public static final String COLUMN_ISSUE_ID = "ISSUE_ID";
     public static final String COLUMN_ACTION_STATUS_ID = "ACTION_STATUS_ID";
     public static final String COLUMN_SEVERE_LEVEL_ID = "SEVERE_LEVEL_ID";
     public static final String COLUMN_FOUND_USER = "FOUND_USER";
@@ -105,261 +110,4 @@ public class IssueItems implements Serializable {
     @Column(name = COLUMN_ROW_UPDATED_AT)
     @Temporal(TemporalType.TIMESTAMP)
     private Date rowUpdatedAt;
-    
-    public IssueItems() {
-        
-    }
-
-    /**
-     * @return the actionStatusId
-     */
-    public Integer getActionStatusId() {
-        return actionStatusId;
-    }
-
-    /**
-     * @param actionStatusId
-     *            the actionStatusId to set
-     */
-    public void setActionStatusId(Integer actionStatusId) {
-        this.actionStatusId = actionStatusId;
-    }
-
-    /**
-     * @return the severeLevelId
-     */
-    public Integer getSevereLevelId() {
-        return severeLevelId;
-    }
-
-    /**
-     * @param severeLevelId
-     *            the severeLevelId to set
-     */
-    public void setSevereLevelId(Integer severeLevelId) {
-        this.severeLevelId = severeLevelId;
-    }
-
-    /**
-     * @return the foundUser
-     */
-    public String getFoundUser() {
-        return foundUser;
-    }
-
-    /**
-     * @param foundUser
-     *            the foundUser to set
-     */
-    public void setFoundUser(String foundUser) {
-        this.foundUser = foundUser;
-    }
-
-    /**
-     * @return the foundDate
-     */
-    public Date getFoundDate() {
-        return foundDate;
-    }
-
-    /**
-     * @param foundDate
-     *            the foundDate to set
-     */
-    public void setFoundDate(Date foundDate) {
-        this.foundDate = foundDate;
-    }
-
-    /**
-     * @return the foundProcessId
-     */
-    public Integer getFoundProcessId() {
-        return foundProcessId;
-    }
-
-    /**
-     * @param foundProcessId
-     *            the foundProcessId to set
-     */
-    public void setFoundProcessId(Integer foundProcessId) {
-        this.foundProcessId = foundProcessId;
-    }
-
-    /**
-     * @return the categoryId
-     */
-    public Integer getCategoryId() {
-        return categoryId;
-    }
-
-    /**
-     * @param categoryId
-     *            the categoryId to set
-     */
-    public void setCategoryId(Integer categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    /**
-     * @return the issueDetail
-     */
-    public String getIssueDetail() {
-        return issueDetail;
-    }
-
-    /**
-     * @param issueDetail
-     *            the issueDetail to set
-     */
-    public void setIssueDetail(String issueDetail) {
-        this.issueDetail = issueDetail;
-    }
-
-    /**
-     * @return the caused
-     */
-    public String getCaused() {
-        return caused;
-    }
-
-    /**
-     * @param caused
-     *            the caused to set
-     */
-    public void setCaused(String caused) {
-        this.caused = caused;
-    }
-
-    /**
-     * @return the countermeasures
-     */
-    public String getCountermeasures() {
-        return countermeasures;
-    }
-
-    /**
-     * @param countermeasures
-     *            the countermeasures to set
-     */
-    public void setCountermeasures(String countermeasures) {
-        this.countermeasures = countermeasures;
-    }
-
-    /**
-     * @return the correspondingUserId
-     */
-    public String getCorrespondingUserId() {
-        return correspondingUserId;
-    }
-
-    /**
-     * @param correspondingUserId
-     *            the correspondingUserId to set
-     */
-    public void setCorrespondingUserId(String correspondingUserId) {
-        this.correspondingUserId = correspondingUserId;
-    }
-
-    /**
-     * @return the correspondingTime
-     */
-    public Date getCorrespondingTime() {
-        return correspondingTime;
-    }
-
-    /**
-     * @param correspondingTime
-     *            the correspondingTime to set
-     */
-    public void setCorrespondingTime(Date correspondingTime) {
-        this.correspondingTime = correspondingTime;
-    }
-
-    /**
-     * @return the correspondingEndDate
-     */
-    public Date getCorrespondingEndDate() {
-        return correspondingEndDate;
-    }
-
-    /**
-     * @param correspondingEndDate
-     *            the correspondingEndDate to set
-     */
-    public void setCorrespondingEndDate(Date correspondingEndDate) {
-        this.correspondingEndDate = correspondingEndDate;
-    }
-
-    /**
-     * @return the confirmedId
-     */
-    public String getConfirmedId() {
-        return confirmedId;
-    }
-
-    /**
-     * @param confirmedId
-     *            the confirmedId to set
-     */
-    public void setConfirmedId(String confirmedId) {
-        this.confirmedId = confirmedId;
-    }
-
-    /**
-     * @return the confirmedDate
-     */
-    public Date getConfirmedDate() {
-        return confirmedDate;
-    }
-
-    /**
-     * @param confirmedDate
-     *            the confirmedDate to set
-     */
-    public void setConfirmedDate(Date confirmedDate) {
-        this.confirmedDate = confirmedDate;
-    }
-
-    /**
-     * @return the rowUpdatedAt
-     */
-    public Date getRowUpdatedAt() {
-        return rowUpdatedAt;
-    }
-
-    /**
-     * @param rowUpdatedAt the rowUpdatedAt to set
-     */
-    public void setRowUpdatedAt(Date rowUpdatedAt) {
-        this.rowUpdatedAt = rowUpdatedAt;
-    }
-
-    /**
-     * @return the ledgerId
-     */
-    public Integer getLedgerId() {
-        return ledgerId;
-    }
-
-    /**
-     * @param ledgerId the ledgerId to set
-     */
-    public void setLedgerId(Integer ledgerId) {
-        this.ledgerId = ledgerId;
-    }
-
-    /**
-     * @return the issueId
-     */
-    public Integer getIssueId() {
-        return issueId;
-    }
-
-    /**
-     * @param issueId the issueId to set
-     */
-    public void setIssueId(Integer issueId) {
-        this.issueId = issueId;
-    }
-
 }

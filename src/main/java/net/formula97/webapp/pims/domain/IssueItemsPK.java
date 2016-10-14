@@ -3,6 +3,10 @@
  */
 package net.formula97.webapp.pims.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 import javax.persistence.Column;
@@ -16,6 +20,9 @@ import javax.persistence.GenerationType;
  *
  */
 @Embeddable
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class IssueItemsPK implements Serializable {
 
     public static final String COLUMN_LEDGER_ID = "LEDGER_ID";
@@ -32,40 +39,4 @@ public class IssueItemsPK implements Serializable {
 
     @Column(name = COLUMN_ISSUE_ID)
     private Integer issueId;
-    
-    public IssueItemsPK() { }
-    
-    public IssueItemsPK(Integer ledgerId, Integer issueId) {
-        this.ledgerId = ledgerId;
-        this.issueId = issueId;
-    }
-
-    /**
-     * @return the ledgerId
-     */
-    public Integer getLedgerId() {
-        return ledgerId;
-    }
-
-    /**
-     * @param ledgerId the ledgerId to set
-     */
-    public void setLedgerId(Integer ledgerId) {
-        this.ledgerId = ledgerId;
-    }
-
-    /**
-     * @return the issueId
-     */
-    public Integer getIssueId() {
-        return issueId;
-    }
-
-    /**
-     * @param issueId the issueId to set
-     */
-    public void setIssueId(Integer issueId) {
-        this.issueId = issueId;
-    }
-
 }

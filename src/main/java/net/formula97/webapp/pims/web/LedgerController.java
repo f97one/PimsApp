@@ -75,7 +75,7 @@ public class LedgerController extends BaseWebController {
             IssueLedger ledger = new IssueLedger();
             ledger.setLedgerName(form.getLedgerName());
             ledger.setOpenStatus(1);
-            ledger.setIsPublic(form.isPublic());
+            ledger.setPublicLedger(form.isPublicLedger());
 
             issueLedgerSvc.saveLedger(ledger, users);
 

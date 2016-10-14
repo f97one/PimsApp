@@ -3,6 +3,11 @@
  */
 package net.formula97.webapp.pims.domain;
 
+import groovy.transform.EqualsAndHashCode;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 import javax.persistence.Column;
@@ -20,6 +25,9 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = SevereLevelMaster.TABLE_NAME)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SevereLevelMaster implements Serializable {
 
     /**
@@ -49,53 +57,4 @@ public class SevereLevelMaster implements Serializable {
     
     @Column(name = COLUMN_DISP_ORDER)
     private Integer dispOrder;
-
-    public SevereLevelMaster() {
-        this.dispOrder = 0;
-    }
-    
-    public SevereLevelMaster(Integer severeLevelId, String severeLevel, Integer dispOrder) {
-        this.severeLevelId = severeLevelId;
-        this.severeLevel = severeLevel;
-        this.dispOrder = dispOrder;
-    }
-    
-    /**
-     * @return the severeLevelId
-     */
-    public Integer getSevereLevelId() {
-        return severeLevelId;
-    }
-
-    /**
-     * @param severeLevelId
-     *            the severeLevelId to set
-     */
-    public void setSevereLevelId(Integer severeLevelId) {
-        this.severeLevelId = severeLevelId;
-    }
-
-    /**
-     * @return the severeLevel
-     */
-    public String getSevereLevel() {
-        return severeLevel;
-    }
-
-    /**
-     * @param severeLevel
-     *            the severeLevel to set
-     */
-    public void setSevereLevel(String severeLevel) {
-        this.severeLevel = severeLevel;
-    }
-
-    public Integer getDispOrder() {
-        return dispOrder;
-    }
-
-    public void setDispOrder(Integer dispOrder) {
-        this.dispOrder = dispOrder;
-    }
-
 }

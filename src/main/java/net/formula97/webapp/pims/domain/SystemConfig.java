@@ -3,6 +3,11 @@
  */
 package net.formula97.webapp.pims.domain;
 
+import groovy.transform.EqualsAndHashCode;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 import javax.persistence.Column;
@@ -16,6 +21,9 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = SystemConfig.TABLE_NAME)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SystemConfig implements Serializable {
 
     /**
@@ -34,41 +42,4 @@ public class SystemConfig implements Serializable {
 
     @Column(name = COLUMN_CONFIG_VALUE, length = 256)
     private String configValue;
-
-    public SystemConfig() { }
-    
-    public SystemConfig(String configKey, String configValue) {
-        this.configKey = configKey;
-        this.configValue = configValue;
-    }
-    
-    /**
-     * @return the configKey
-     */
-    public String getConfigKey() {
-        return configKey;
-    }
-
-    /**
-     * @param configKey
-     *            the configKey to set
-     */
-    public void setConfigKey(String configKey) {
-        this.configKey = configKey;
-    }
-
-    /**
-     * @return the configValue
-     */
-    public String getConfigValue() {
-        return configValue;
-    }
-
-    /**
-     * @param configValue
-     *            the configValue to set
-     */
-    public void setConfigValue(String configValue) {
-        this.configValue = configValue;
-    }
 }

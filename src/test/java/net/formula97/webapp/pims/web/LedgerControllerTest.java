@@ -25,7 +25,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
@@ -33,10 +32,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -95,7 +91,7 @@ public class LedgerControllerTest extends BaseTestCase {
         userRepo.save(user1);
 
         IssueLedger l1 = new IssueLedger();
-        l1.setIsPublic(true);
+        l1.setPublicLedger(true);
         l1.setLedgerName("LCTest用台帳１");
         l1.setOpenStatus(2);
         issueLedgerRepo.save(l1);
@@ -145,6 +141,6 @@ public class LedgerControllerTest extends BaseTestCase {
         ModelMap modelMap = actions.andReturn().getModelAndView().getModelMap();
         NewLedgerForm resultForm = (NewLedgerForm) modelMap.get("newLedgerForm");
         assertThat("台帳名は「ユーザーあり追加テスト用台帳」", resultForm.getLedgerName(), Matchers.is("ユーザーあり追加テスト用台帳"));
-        assertThat("公開台帳になっている", resultForm.isPublic(), Matchers.is(true));
+        assertThat("公開台帳になっている", resultForm.isPublicLedger(), Matchers.is(true));
     }
 }

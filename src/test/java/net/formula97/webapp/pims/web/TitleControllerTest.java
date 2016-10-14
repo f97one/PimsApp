@@ -111,25 +111,25 @@ public class TitleControllerTest extends BaseTestCase {
         userRepo.save(user2);
         
         IssueLedger l1 = new IssueLedger();
-        l1.setIsPublic(true);
+        l1.setPublicLedger(true);
         l1.setLedgerName("テスト用台帳１");
         l1.setOpenStatus(1);
         issueLedgerRepo.save(l1);
         
         IssueLedger l2 = new IssueLedger();
-        l2.setIsPublic(false);
+        l2.setPublicLedger(false);
         l2.setLedgerName("テスト用非公開台帳１");
         l2.setOpenStatus(1);
         issueLedgerRepo.save(l2);
         
         IssueLedger l3 = new IssueLedger();
-        l3.setIsPublic(false);
+        l3.setPublicLedger(false);
         l3.setLedgerName("テスト用非公開台帳２");
         l3.setOpenStatus(1);
         issueLedgerRepo.save(l3);
         
         IssueLedger l4 = new IssueLedger();
-        l4.setIsPublic(true);
+        l4.setPublicLedger(true);
         l4.setLedgerName("テスト用台帳２");
         l4.setOpenStatus(1);
         issueLedgerRepo.save(l4);
