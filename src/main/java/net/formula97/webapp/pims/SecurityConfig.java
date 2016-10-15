@@ -3,6 +3,8 @@
  */
 package net.formula97.webapp.pims;
 
+import net.formula97.webapp.pims.misc.AppConstants;
+import net.formula97.webapp.pims.service.AuthorizedUsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -14,9 +16,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
-import net.formula97.webapp.pims.misc.AppConstants;
-import net.formula97.webapp.pims.service.AuthorizedUsersService;
 
 /**
  * @author f97one
@@ -46,8 +45,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .loginPage("/loginForm")
             .failureUrl("/loginForm?error")
             .defaultSuccessUrl("/", true)
-            .usernameParameter("userId")
-            .passwordParameter("passwd")
+                .usernameParameter("username")
+                .passwordParameter("password")
             .permitAll();
         
         http.logout()
