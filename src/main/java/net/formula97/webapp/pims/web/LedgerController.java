@@ -3,10 +3,10 @@
  */
 package net.formula97.webapp.pims.web;
 
-import java.security.Principal;
-import java.util.List;
-
+import net.formula97.webapp.pims.domain.IssueItems;
 import net.formula97.webapp.pims.domain.IssueLedger;
+import net.formula97.webapp.pims.domain.Users;
+import net.formula97.webapp.pims.service.IssueLedgerService;
 import net.formula97.webapp.pims.web.forms.NewLedgerForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,9 +18,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import net.formula97.webapp.pims.domain.IssueItems;
-import net.formula97.webapp.pims.domain.Users;
-import net.formula97.webapp.pims.service.IssueLedgerService;
+import java.security.Principal;
+import java.util.List;
 
 /**
  * @author f97one
@@ -40,7 +39,7 @@ public class LedgerController extends BaseWebController {
     
     @RequestMapping(name = "{ledgerId}", method = RequestMethod.GET)
     public List<IssueItems> getLedgerItems(@PathVariable Integer ledgerId, Model model, Principal principal) {
-        Users users = getUserState(model, principal);
+        Users users = getUserState();
         
         if (users == null) {
 
@@ -54,7 +53,7 @@ public class LedgerController extends BaseWebController {
 
     @RequestMapping(value = "create", method = RequestMethod.GET)
     public String showLedger(NewLedgerForm form, Model model, Principal principal) {
-        Users users = getUserState(model, principal);
+        Users users = getUserState();
         model.addAttribute("newLedgerForm", form);
 
         return "ledger/addLedger";
@@ -62,7 +61,7 @@ public class LedgerController extends BaseWebController {
 
     @RequestMapping(value = "create", params = "addLedgerBtn", method = RequestMethod.POST)
     public String addLedger(@Validated NewLedgerForm form, BindingResult result, Model model, Principal principal) {
-        Users users = getUserState(model, principal);
+        Users users = getUserState();
 
         String dest = null;
         if (result.hasErrors()) {

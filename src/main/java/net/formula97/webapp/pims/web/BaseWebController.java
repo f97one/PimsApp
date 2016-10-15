@@ -3,21 +3,17 @@
  */
 package net.formula97.webapp.pims.web;
 
-import java.security.Principal;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.service.AuthorizedUsers;
 import net.formula97.webapp.pims.service.AuthorizedUsersService;
 import net.formula97.webapp.pims.service.SystemConfigService;
 import net.formula97.webapp.pims.web.forms.HeaderForm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 /**
  * @author f97one
@@ -36,14 +32,14 @@ public class BaseWebController {
         return new HeaderForm();
     }
 
-    protected Users getUserState(Model model, Principal principal) {
+    protected Users getUserState() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         Users users = null;
         
-        if (principal != null) {
-            Authentication auth = (Authentication) principal;
-            AuthorizedUsers authUsers = (AuthorizedUsers) auth.getPrincipal();
-            
-            users = authUsers.getUsers();
+        if (principal instanceof UserDetails) {
+            String username = ((UserDetails) principal).getUsername();
+            users = ((AuthorizedUsers) authorizedUsersSvc.loadUserByUsername(username)).getUsers();
         }
         
         return users;

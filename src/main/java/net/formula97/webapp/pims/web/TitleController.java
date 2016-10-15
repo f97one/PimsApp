@@ -3,24 +3,23 @@
  */
 package net.formula97.webapp.pims.web;
 
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
 import net.formula97.webapp.pims.domain.IssueLedger;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.misc.AppConstants;
 import net.formula97.webapp.pims.service.IssueLedgerService;
 import net.formula97.webapp.pims.service.StatusMasterService;
 import net.formula97.webapp.pims.web.forms.DispLedgerForm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author f97one
@@ -38,7 +37,7 @@ public class TitleController extends BaseWebController {
 	@RequestMapping(method = RequestMethod.GET)
 	public String createTitle(Model model, Principal principal) {
 	    // ログイン中ユーザーを取得
-	    Users users = getUserState(model, principal);
+	    Users users = getUserState();
 	    
 	    // タイトル
 	    String title = sysConfSvc.getConfig(AppConstants.SysConfig.APP_TITLE);
