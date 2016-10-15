@@ -15,7 +15,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,8 +34,8 @@ public class TitleController extends BaseWebController {
     StatusMasterService statusMasterSvc;
     
 	@RequestMapping(method = RequestMethod.GET)
-	public String createTitle(Model model, Principal principal) {
-	    // ログイン中ユーザーを取得
+    public String createTitle(Model model) {
+        // ログイン中ユーザーを取得
 	    Users users = getUserState();
 	    
 	    // タイトル

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.security.Principal;
 import java.util.List;
 
 /**
@@ -38,7 +37,7 @@ public class LedgerController extends BaseWebController {
     }
     
     @RequestMapping(name = "{ledgerId}", method = RequestMethod.GET)
-    public List<IssueItems> getLedgerItems(@PathVariable Integer ledgerId, Model model, Principal principal) {
+    public List<IssueItems> getLedgerItems(@PathVariable Integer ledgerId, Model model) {
         Users users = getUserState();
         
         if (users == null) {
@@ -52,7 +51,7 @@ public class LedgerController extends BaseWebController {
     }
 
     @RequestMapping(value = "create", method = RequestMethod.GET)
-    public String showLedger(NewLedgerForm form, Model model, Principal principal) {
+    public String showLedger(NewLedgerForm form, Model model) {
         Users users = getUserState();
         model.addAttribute("newLedgerForm", form);
 
@@ -60,12 +59,12 @@ public class LedgerController extends BaseWebController {
     }
 
     @RequestMapping(value = "create", params = "addLedgerBtn", method = RequestMethod.POST)
-    public String addLedger(@Validated NewLedgerForm form, BindingResult result, Model model, Principal principal) {
+    public String addLedger(@Validated NewLedgerForm form, BindingResult result, Model model) {
         Users users = getUserState();
 
         String dest = null;
         if (result.hasErrors()) {
-            return showLedger(form, model, principal);
+            return showLedger(form, model);
         }
 
         if (users == null) {
