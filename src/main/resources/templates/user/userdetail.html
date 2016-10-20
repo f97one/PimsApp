@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css"
+          href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css"
+          href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap-theme.min.css}"/>
+    <title>User details | PIMS</title>
+</head>
+<body>
+<div class="container">
+
+    <div th:replace="/common/common_header::common_header"></div>
+
+    <h2>ユーザー設定</h2>
+
+    <div class="form-group">
+        <form th:action="@{/user/config}" th:object="userConfigForm" class="form-horizontal" method="POST">
+            <div class="row">
+                <div class="col-lg-2 col-sm-2">ユーザーID</div>
+                <div class="col-lg-4 col-sm-4">
+                    <input type="text" maxlength="32" id="username" name="username" value="mockuser1"
+                           class="form-control" th:field="*{username}" th:errorClass="form-control"/>
+                </div>
+                <div class="col-lg-6 col-sm-6">
+                    <span th:if="${#fields.hasErrors('username')}" th:errors="*{username}"
+                          class="help-block">Error</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2 col-sm-2">パスワード</div>
+                <div class="col-lg-4 col-sm-4">
+                    <input type="password" maxlength="32" id="password" name="password" value="mockuserpasswd1"
+                           class="form-control" th:field="*{password}" th:errorClass="form-control"/>
+                </div>
+                <div class="col-lg-6 col-sm-6">
+                    <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"
+                          class="help-block">Error</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2 col-sm-2">パスワード（再入力）</div>
+                <div class="col-lg-4 col-sm-4">
+                    <input type="password" maxlength="32" id="passwordConfirm" name="passwordConfirm"
+                           value="mockuserpasswd1"
+                           class="form-control" th:field="*{passwordConfirm}" th:errorClass="form-control"/>
+                </div>
+                <div class="col-lg-6 col-sm-6">
+                    <span th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}"
+                          class="help-block">Error</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2 col-sm-2">表示名</div>
+                <div class="col-lg-4 col-sm-4">
+                    <input type="text" maxlength="128" id="displayName" name="displayName" value="Mock User 1"
+                           class="form-control" th:field="*{displayName}" th:errorClass="form-control"/>
+                </div>
+                <div class="col-lg-6 col-sm-6">
+                    <span th:if="${#fields.hasErrors('displayName')}" th:errors="*{displayName}" class="help-block">Error</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2 col-sm-2"></div>
+                <div class="col-lg-1 col-sm-1　checkbox-inline">
+                    <input type="checkbox" id="enableUser" name="enableUser"
+                           class="form-control input-sm" th:field="*{enableUser}" th:errorClass="form-control"/>
+                </div>
+                <div class="col-lg-9 col-sm-9">
+                    <label for="enableUser" class="control-label">有効にする</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2 col-sm-2"></div>
+                <div class="col-lg-1 col-sm-1 radio-inline">
+                    <input type="radio" id="userRole" name="assignedRole" th:field="*{assignedRole}"
+                           class="form-control" value="ROLE_USER"/>
+                </div>
+                <div class="col-lg-2 col-sm-3 radio-inline">
+                    <label for="userRole" class="control-label">一般ユーザー</label>
+                </div>
+                <div class="col-lg-1 col-sm-1 radio-inline">
+                    <input type="radio" id="adminRole" name="assignedRole" th:field="*{assignedRole}"
+                           class="form-control" value="ROLE_ADMIN"/>
+                </div>
+                <div class="col-lg-2 col-sm-3 radio-inline">
+                    <label for="adminRole" class="control-label">管理者ユーザー</label>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 16px;">
+                <div class="col-lg-2 col-sm-2"></div>
+                <div class="col-lg-2 col-sm-4">
+                    <input type="submit" id="cancelBtn" name="cancelBtn" class="btn btn-default btn-block"
+                           value="キャンセル"/>
+                </div>
+                <div class="col-lg-2 col-sm-4">
+                    <input type="submit" id="updateBtn" name="updateBtn" class="btn btn-primary btn-block"
+                           value="保存"/>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>
