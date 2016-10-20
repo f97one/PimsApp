@@ -94,7 +94,7 @@ public class LedgerControllerTest extends BaseTestCase {
         user1.setPassword("P@ssw0rd");
         user1.setDisplayName("JUnit test11");
         user1.setMailAddress("test@example.com");
-        user1.setAuthority(AppConstants.AUTHORITY_USER);
+        user1.setAuthority(AppConstants.ROLE_USER);
         userRepo.save(user1);
 
         IssueLedger l1 = new IssueLedger();

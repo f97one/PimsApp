@@ -3,18 +3,18 @@
  */
 package net.formula97.webapp.pims.web;
 
-import static org.junit.Assert.assertThat;
-
-import java.net.URI;
-import java.util.List;
-import java.util.Locale;
-
+import net.formula97.webapp.pims.BaseTestCase;
+import net.formula97.webapp.pims.domain.IssueLedger;
+import net.formula97.webapp.pims.domain.LedgerRefUser;
+import net.formula97.webapp.pims.domain.Users;
+import net.formula97.webapp.pims.misc.AppConstants;
+import net.formula97.webapp.pims.repository.IssueLedgerRepository;
+import net.formula97.webapp.pims.repository.LedgerRefUserRepository;
+import net.formula97.webapp.pims.repository.UserRepository;
+import net.formula97.webapp.pims.service.IssueLedgerService;
+import net.formula97.webapp.pims.service.IssueLedgerService.IssueLedgerSpecifications;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,16 +32,11 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import net.formula97.webapp.pims.BaseTestCase;
-import net.formula97.webapp.pims.domain.IssueLedger;
-import net.formula97.webapp.pims.domain.LedgerRefUser;
-import net.formula97.webapp.pims.domain.Users;
-import net.formula97.webapp.pims.misc.AppConstants;
-import net.formula97.webapp.pims.repository.IssueLedgerRepository;
-import net.formula97.webapp.pims.repository.LedgerRefUserRepository;
-import net.formula97.webapp.pims.repository.UserRepository;
-import net.formula97.webapp.pims.service.IssueLedgerService;
-import net.formula97.webapp.pims.service.IssueLedgerService.IssueLedgerSpecifications;
+import java.net.URI;
+import java.util.List;
+import java.util.Locale;
+
+import static org.junit.Assert.assertThat;
 
 /**
  * タイトル画面Controllerのテストケース。
@@ -99,7 +94,7 @@ public class TitleControllerTest extends BaseTestCase {
         user1.setPassword(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
         user1.setDisplayName("JUnit test");
         user1.setMailAddress("test@example.com");
-        user1.setAuthority(AppConstants.AUTHORITY_USER);
+        user1.setAuthority(AppConstants.ROLE_USER);
         userRepo.save(user1);
         
         Users user2 = new Users();
@@ -107,7 +102,7 @@ public class TitleControllerTest extends BaseTestCase {
         user2.setPassword(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
         user2.setDisplayName("JUnit test 2");
         user2.setMailAddress("test2@example.com");
-        user2.setAuthority(AppConstants.AUTHORITY_ADMIN);
+        user2.setAuthority(AppConstants.ROLE_ADMIN);
         userRepo.save(user2);
         
         IssueLedger l1 = new IssueLedger();
