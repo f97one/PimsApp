@@ -16,10 +16,10 @@ public class AppConstants {
     /**
      * ユーザー権限：一般ユーザー
      */
-    public static final String ROLE_USER = "ROLE_USER";
+    public static final String ROLE_USER = "USER";
 
     /**
      * ユーザー権限：管理者ユーザー
      */
-    public static final String ROLE_ADMIN = "ROLE_ADMIN";
+    public static final String ROLE_ADMIN = "ADMIN";
 }
