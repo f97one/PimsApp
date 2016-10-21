@@ -7,4 +7,12 @@ and open the template in the editor.
     Created on : 2016/09/20, 23:56:31
     Author     : f97one
 */
+.vertical-margin {
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
 
+.horizontal-margin {
+    margin-right: 16px;
+    margin-left: 16px;
+}
