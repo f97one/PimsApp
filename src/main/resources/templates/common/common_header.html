@@ -4,32 +4,37 @@ To change this license header, choose License Headers in Project Properties.
 To change this template file, choose Tools | Templates
 and open the template in the editor.
 -->
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-      th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}" />
-    <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
-      th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap-theme.min.css}" />
-  </head>
-  <body>
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css"
+          href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap-theme.min.css}"/>
+</head>
+<body>
+<div class="container">
     <div th:fragment="common_header">
-      <span class="col-lg-8 col-sm-8">
-        <a id="toHomeLink" class="btn btn-link" th:href="@{/}">ホーム</a>
-        <a id="projectsBtn" class="btn btn-link">プロジェクト</a>
-        <a id="configBtn" class="btn btn-link">設定</a>
-      </span>
-      <span class="col-lg-4 col-sm-4 right">
-        <span th:if="${#httpServletRequest.remoteUser == null}">
-          <a id="loginLink" class="btn btn-link" th:href="@{/loginFomr}">ログイン</a>
-        </span>
-        <span th:if="${#httpServletRequest.remoteUser != null}">
-          <span th:inline="text">[[${#httpServletRequest.remoteUser}]]</span>
-          <a id="logoutLink" class="btn btn-link" th:href="@{/logout}">ログアウト</a>
-        </span>
-      </span>
+        <div class="row">
+            <div class="col-lg-9 col-sm-9">
+                <a id="toHomeLink" class="btn btn-link" th:href="@{/}">ホーム</a>
+                <a id="projectsBtn" class="btn btn-link">プロジェクト</a>
+                <a id="configBtn" class="btn btn-link">設定</a>
+            </div>
+            <div class="col-lg-3 col-sm-3 pull-right">
+                            <span th:if="${#httpServletRequest.remoteUser == null}">
+                                <a id="loginLink" class="btn btn-link" th:href="@{/loginFomr}">ログイン</a>
+                            </span>
+                <span th:if="${#httpServletRequest.remoteUser != null}">
+                                <span th:inline="text" th:text="${headerForm.users.displayName}">HAJIME Fukuna</span>
+                                <a id="logoutLink" class="btn btn-link" th:href="@{/logout}">ログアウト</a>
+                            </span>
+            </div>
+        </div>
     </div>
-  </body>
+</div>
+</body>
 </html>

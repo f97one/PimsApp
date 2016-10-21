@@ -7,6 +7,7 @@ import net.formula97.webapp.pims.domain.IssueItems;
 import net.formula97.webapp.pims.domain.IssueLedger;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.service.IssueLedgerService;
+import net.formula97.webapp.pims.web.forms.HeaderForm;
 import net.formula97.webapp.pims.web.forms.NewLedgerForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,8 +38,8 @@ public class LedgerController extends BaseWebController {
     }
     
     @RequestMapping(name = "{ledgerId}", method = RequestMethod.GET)
-    public List<IssueItems> getLedgerItems(@PathVariable Integer ledgerId, Model model) {
-        Users users = getUserState();
+    public List<IssueItems> getLedgerItems(@PathVariable Integer ledgerId, Model model, HeaderForm form) {
+        Users users = getUserState(model, form);
         
         if (users == null) {
 
@@ -51,20 +52,20 @@ public class LedgerController extends BaseWebController {
     }
 
     @RequestMapping(value = "create", method = RequestMethod.GET)
-    public String showLedger(NewLedgerForm form, Model model) {
-        Users users = getUserState();
+    public String showLedger(NewLedgerForm form, Model model, HeaderForm headerForm) {
+        Users users = getUserState(model, headerForm);
         model.addAttribute("newLedgerForm", form);
 
         return "ledger/addLedger";
     }
 
     @RequestMapping(value = "create", params = "addLedgerBtn", method = RequestMethod.POST)
-    public String addLedger(@Validated NewLedgerForm form, BindingResult result, Model model) {
-        Users users = getUserState();
+    public String addLedger(@Validated NewLedgerForm form, BindingResult result, Model model, HeaderForm headerForm) {
+        Users users = getUserState(model, headerForm);
 
         String dest = null;
         if (result.hasErrors()) {
-            return showLedger(form, model);
+            return showLedger(form, model, headerForm);
         }
 
         if (users == null) {

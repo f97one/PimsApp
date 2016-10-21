@@ -28,11 +28,11 @@ public class BaseWebController {
     SystemConfigService sysConfSvc;
 
     @ModelAttribute
-    HeaderForm setUpForm() {
+    HeaderForm setUpHeaderForm() {
         return new HeaderForm();
     }
 
-    protected Users getUserState() {
+    protected Users getUserState(Model model, HeaderForm form) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Users users = null;
@@ -40,6 +40,9 @@ public class BaseWebController {
         if (principal instanceof UserDetails) {
             String username = ((UserDetails) principal).getUsername();
             users = ((AuthorizedUsers) authorizedUsersSvc.loadUserByUsername(username)).getUsers();
+
+            form.setUsers(users);
+            model.addAttribute(form);
         }
         
         return users;

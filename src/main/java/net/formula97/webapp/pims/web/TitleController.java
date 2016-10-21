@@ -9,6 +9,7 @@ import net.formula97.webapp.pims.misc.AppConstants;
 import net.formula97.webapp.pims.service.IssueLedgerService;
 import net.formula97.webapp.pims.service.StatusMasterService;
 import net.formula97.webapp.pims.web.forms.DispLedgerForm;
+import net.formula97.webapp.pims.web.forms.HeaderForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,11 +35,11 @@ public class TitleController extends BaseWebController {
     StatusMasterService statusMasterSvc;
     
 	@RequestMapping(method = RequestMethod.GET)
-    public String createTitle(Model model) {
+    public String createTitle(Model model, HeaderForm form) {
         // ログイン中ユーザーを取得
-	    Users users = getUserState();
-	    
-	    // タイトル
+        Users users = getUserState(model, form);
+
+        // タイトル
 	    String title = sysConfSvc.getConfig(AppConstants.SysConfig.APP_TITLE);
 	    model.addAttribute("title", title);
 	    
