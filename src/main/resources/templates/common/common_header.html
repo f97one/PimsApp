@@ -21,8 +21,9 @@ and open the template in the editor.
         <div class="row">
             <div class="col-lg-9 col-sm-9">
                 <a id="toHomeLink" class="btn btn-link" th:href="@{/}">ホーム</a>
-                <a id="projectsBtn" class="btn btn-link">プロジェクト</a>
-                <a id="configBtn" class="btn btn-link">設定</a>
+                <span th:if="${#httpServletRequest.remoteUser != null}">
+                    <a id="configBtn" class="btn btn-link" th:if="${headerForm.users.authority == 'ROLE_ADMIN'}">設定</a>
+                </span>
             </div>
             <div class="col-lg-3 col-sm-3 pull-right">
                             <span th:if="${#httpServletRequest.remoteUser == null}">
