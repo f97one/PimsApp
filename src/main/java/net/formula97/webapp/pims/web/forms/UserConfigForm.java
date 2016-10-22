@@ -35,4 +35,12 @@ public class UserConfigForm implements Serializable {
     private Boolean enableUser;
 
     private String assignedRole;
+
+    private boolean disableUsernameModify;
+
+    private boolean disableDisplayNameModify;
+
+    private boolean disableUserEnableModify;
+
+    private boolean disableRoleModify;
 }

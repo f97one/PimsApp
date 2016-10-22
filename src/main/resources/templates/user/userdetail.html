@@ -19,15 +19,16 @@
     <h2>ユーザー設定</h2>
 
     <div class="form-group">
-        <form th:action="@{/user/config}" th:object="userConfigForm" class="form-horizontal" method="POST">
+        <form th:action="@{/user/config}" class="form-horizontal" method="POST">
             <div class="row">
                 <div class="col-lg-2 col-sm-2">ユーザーID</div>
                 <div class="col-lg-4 col-sm-4">
                     <input type="text" maxlength="32" id="username" name="username" value="mockuser1"
-                           class="form-control" th:field="*{username}" th:errorClass="form-control"/>
+                           class="form-control" th:field="${userConfigForm.username}" th:errorClass="form-control"
+                           th:disabled="${userConfigForm.disableUsernameModify}"/>
                 </div>
                 <div class="col-lg-6 col-sm-6">
-                    <span th:if="${#fields.hasErrors('username')}" th:errors="*{username}"
+                    <span th:if="${#fields.hasErrors('userConfigForm.username')}" th:errors="${userConfigForm.username}"
                           class="help-block">Error</span>
                 </div>
             </div>
@@ -35,10 +36,10 @@
                 <div class="col-lg-2 col-sm-2">パスワード</div>
                 <div class="col-lg-4 col-sm-4">
                     <input type="password" maxlength="32" id="password" name="password" value="mockuserpasswd1"
-                           class="form-control" th:field="*{password}" th:errorClass="form-control"/>
+                           class="form-control" th:field="${userConfigForm.password}" th:errorClass="form-control"/>
                 </div>
                 <div class="col-lg-6 col-sm-6">
-                    <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"
+                    <span th:if="${#fields.hasErrors('userConfigForm.password')}" th:errors="${userConfigForm.password}"
                           class="help-block">Error</span>
                 </div>
             </div>
@@ -47,10 +48,12 @@
                 <div class="col-lg-4 col-sm-4">
                     <input type="password" maxlength="32" id="passwordConfirm" name="passwordConfirm"
                            value="mockuserpasswd1"
-                           class="form-control" th:field="*{passwordConfirm}" th:errorClass="form-control"/>
+                           class="form-control" th:field="${userConfigForm.passwordConfirm}"
+                           th:errorClass="form-control"/>
                 </div>
                 <div class="col-lg-6 col-sm-6">
-                    <span th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}"
+                    <span th:if="${#fields.hasErrors('userConfigForm.passwordConfirm')}"
+                          th:errors="${userConfigForm.passwordConfirm}"
                           class="help-block">Error</span>
                 </div>
             </div>
@@ -58,17 +61,20 @@
                 <div class="col-lg-2 col-sm-2">表示名</div>
                 <div class="col-lg-4 col-sm-4">
                     <input type="text" maxlength="128" id="displayName" name="displayName" value="Mock User 1"
-                           class="form-control" th:field="*{displayName}" th:errorClass="form-control"/>
+                           class="form-control" th:field="${userConfigForm.displayName}" th:errorClass="form-control"
+                           th:disabled="${userConfigForm.disableDisplayNameModify}"/>
                 </div>
                 <div class="col-lg-6 col-sm-6">
-                    <span th:if="${#fields.hasErrors('displayName')}" th:errors="*{displayName}" class="help-block">Error</span>
+                    <span th:if="${#fields.hasErrors('userConfigForm.displayName')}"
+                          th:errors="${userConfigForm.displayName}" class="help-block">Error</span>
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-2 col-sm-2"></div>
                 <div class="col-lg-1 col-sm-1　checkbox-inline">
                     <input type="checkbox" id="enableUser" name="enableUser"
-                           class="form-control input-sm" th:field="*{enableUser}" th:errorClass="form-control"/>
+                           class="form-control input-sm" th:field="${userConfigForm.enableUser}"
+                           th:errorClass="form-control" th:disabled="${userConfigForm.disableUserEnableModify}"/>
                 </div>
                 <div class="col-lg-9 col-sm-9">
                     <label for="enableUser" class="control-label">有効にする</label>
@@ -77,15 +83,15 @@
             <div class="row">
                 <div class="col-lg-2 col-sm-2"></div>
                 <div class="col-lg-1 col-sm-1 radio-inline">
-                    <input type="radio" id="userRole" name="assignedRole" th:field="*{assignedRole}"
-                           class="form-control" value="ROLE_USER"/>
+                    <input type="radio" id="userRole" name="assignedRole" th:field="${userConfigForm.assignedRole}"
+                           class="form-control" value="ROLE_USER" th:disabled="${userConfigForm.disableRoleModify}"/>
                 </div>
                 <div class="col-lg-2 col-sm-3 radio-inline">
                     <label for="userRole" class="control-label">一般ユーザー</label>
                 </div>
                 <div class="col-lg-1 col-sm-1 radio-inline">
-                    <input type="radio" id="adminRole" name="assignedRole" th:field="*{assignedRole}"
-                           class="form-control" value="ROLE_ADMIN"/>
+                    <input type="radio" id="adminRole" name="assignedRole" th:field="${userConfigForm.assignedRole}"
+                           class="form-control" value="ROLE_ADMIN" th:disabled="${userConfigForm.disableRoleModify}"/>
                 </div>
                 <div class="col-lg-2 col-sm-3 radio-inline">
                     <label for="adminRole" class="control-label">管理者ユーザー</label>
