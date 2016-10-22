@@ -29,7 +29,8 @@ and open the template in the editor.
                                 <a id="loginLink" class="btn btn-link" th:href="@{/loginFomr}">ログイン</a>
                             </span>
                 <span th:if="${#httpServletRequest.remoteUser != null}">
-                                <span th:inline="text" th:text="${headerForm.users.displayName}">HAJIME Fukuna</span>
+                                <a th:href="@{'/user/config/' + ${headerForm.users.username}}" th:inline="text"
+                                   th:text="${headerForm.users.displayName}">HAJIME Fukuna</a>
                                 <a id="logoutLink" class="btn btn-link" th:href="@{/logout}">ログアウト</a>
                             </span>
             </div>

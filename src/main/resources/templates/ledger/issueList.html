@@ -45,7 +45,7 @@
     <div class="clearfix"></div>
 
     <div class="col-lg-2 col-sm-2 vertical-margin">
-        <a th:href="${/ledger/${ledgerId}/add}" class="btn btn-primary btn-block">課題追加</a>
+        <a th:href="@{'/ledger/' + ${ledgerId} + '/add'}" class="btn btn-primary btn-block">課題追加</a>
     </div>
 
     <div class="clearfix"></div>
@@ -90,7 +90,8 @@
                 <td th:text="${issue.correspondingEndDate}" th:class="small text-center">2016/10/22</td>
                 <td th:text="${issue.confirmedUser}" th:class="small text-center">HAJIME Fukuna</td>
                 <td th:text="${issue.confirmedDate}" th:class="small text-center">2016/10/23</td>
-                <td><a th:href="${/ledger/${ledgerId}/${issue.issueId}}" class="btn btn-default btn-block">編集</a></td>
+                <td><a th:href="@{'/ledger/' + ${ledgerId} + '/' + ${issue.issueId}}" class="btn btn-default btn-block">編集</a>
+                </td>
             </tr>
             </tbody>
         </table>
