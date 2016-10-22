@@ -22,6 +22,10 @@ public class UserConfigForm implements Serializable {
 
     @NotNull
     @Length(min = 1, max = 32)
+    private String orgPassword;
+
+    @NotNull
+    @Length(min = 1, max = 32)
     private String password;
 
     @NotNull
@@ -43,4 +47,16 @@ public class UserConfigForm implements Serializable {
     private boolean disableUserEnableModify;
 
     private boolean disableRoleModify;
+
+    public boolean isPasswdMatches() {
+        if (password == null && passwordConfirm == null) {
+            return true;
+        } else {
+            if (password == null || passwordConfirm == null) {
+                return false;
+            } else {
+                return password.equals(passwordConfirm);
+            }
+        }
+    }
 }

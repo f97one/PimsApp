@@ -3,16 +3,16 @@
  */
 package net.formula97.webapp.pims.service;
 
-import java.util.Locale;
-
+import net.formula97.webapp.pims.domain.Users;
+import net.formula97.webapp.pims.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import net.formula97.webapp.pims.domain.Users;
-import net.formula97.webapp.pims.repository.UserRepository;
+import java.util.Locale;
 
 /**
  * @author f97one
@@ -37,6 +37,11 @@ public class AuthorizedUsersService implements UserDetailsService {
         }
         
         return new AuthorizedUsers(users);
+    }
+
+    @Transactional
+    public void saveUsers(Users users) {
+        userRepository.save(users);
     }
 
 }

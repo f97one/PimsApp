@@ -18,8 +18,20 @@
 
     <h2>ユーザー設定</h2>
 
+    <div th:if="${infoMsg ne ''}">
+        <p class="col-lg-12 col-sm-12 alert alert-success" th:text="${infoMsg}">パスワードを更新しました。</p>
+    </div>
+    <div th:if="${errMsg ne ''}">
+        <p class="col-lg-12 col-sm-12 alert alert-danger" th:text="${errMsg}">パスワードが一致しません。</p>
+    </div>
+
     <div class="form-group">
         <form th:action="@{/user/config}" class="form-horizontal" method="POST">
+            <input type="hidden" th:field="${userConfigForm.disableUsernameModify}"/>
+            <input type="hidden" th:field="${userConfigForm.disableDisplayNameModify}"/>
+            <input type="hidden" th:field="${userConfigForm.disableRoleModify}"/>
+            <input type="hidden" th:field="${userConfigForm.disableUserEnableModify}"/>
+
             <div class="row">
                 <div class="col-lg-2 col-sm-2">ユーザーID</div>
                 <div class="col-lg-4 col-sm-4">
@@ -29,22 +41,34 @@
                 </div>
                 <div class="col-lg-6 col-sm-6">
                     <span th:if="${#fields.hasErrors('userConfigForm.username')}" th:errors="${userConfigForm.username}"
-                          class="help-block">Error</span>
+                          class="help-block text-warning">Error</span>
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-2 col-sm-2">パスワード</div>
+                <div class="col-lg-2 col-sm-2">現パスワード</div>
+                <div class="col-lg-4 col-sm-4">
+                    <input type="password" maxlength="32" id="orgPassword" name="orgPassword" value="mockuserpasswd1"
+                           class="form-control" th:field="${userConfigForm.orgPassword}" th:errorClass="form-control"/>
+                </div>
+                <div class="col-lg-6 col-sm-6">
+                    <span th:if="${#fields.hasErrors('userConfigForm.orgPassword')}"
+                          th:errors="${userConfigForm.orgPassword}"
+                          class="help-block text-warning">Error</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2 col-sm-2">新パスワード</div>
                 <div class="col-lg-4 col-sm-4">
                     <input type="password" maxlength="32" id="password" name="password" value="mockuserpasswd1"
                            class="form-control" th:field="${userConfigForm.password}" th:errorClass="form-control"/>
                 </div>
                 <div class="col-lg-6 col-sm-6">
                     <span th:if="${#fields.hasErrors('userConfigForm.password')}" th:errors="${userConfigForm.password}"
-                          class="help-block">Error</span>
+                          class="help-block text-warning">Error</span>
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-2 col-sm-2">パスワード（再入力）</div>
+                <div class="col-lg-2 col-sm-2">新パスワード（再入力）</div>
                 <div class="col-lg-4 col-sm-4">
                     <input type="password" maxlength="32" id="passwordConfirm" name="passwordConfirm"
                            value="mockuserpasswd1"
@@ -54,7 +78,7 @@
                 <div class="col-lg-6 col-sm-6">
                     <span th:if="${#fields.hasErrors('userConfigForm.passwordConfirm')}"
                           th:errors="${userConfigForm.passwordConfirm}"
-                          class="help-block">Error</span>
+                          class="help-block text-warning">Error</span>
                 </div>
             </div>
             <div class="row">
@@ -66,7 +90,7 @@
                 </div>
                 <div class="col-lg-6 col-sm-6">
                     <span th:if="${#fields.hasErrors('userConfigForm.displayName')}"
-                          th:errors="${userConfigForm.displayName}" class="help-block">Error</span>
+                          th:errors="${userConfigForm.displayName}" class="help-block text-warning">Error</span>
                 </div>
             </div>
             <div class="row">
