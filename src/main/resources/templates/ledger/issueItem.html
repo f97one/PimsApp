@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Issue Item | PIMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <link rel="stylesheet" type="text/css"
+          href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css"
+          href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap-theme.min.css}"/>
+
+    <link rel="stylesheet" type="text/css"
+          href="../../../static/css/pimsmain.css" th:href="@{/static/css/pimsmain.css}"/>
+
+    <!-- jQuery -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"
+            th:src="@{/webjars/jquery/2.2.4/jquery.min.js}"></script>
+    <!-- jQuery-ui -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"
+            th:src="@{/webjars/jquery-ui/1.12.1/jquery-ui.min.js}"></script>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css"
+          th:href="@{/webjars/jquery-ui/1.12.1/jquery-ui.min.css}">
+
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            th:src="@{/webjars/bootstrap/3.3.7-1/js/bootstrap.min.js}"></script>
+
+    <script type="text/javascript">
+            $(function () {
+                $('.datepicker').datepicker({
+                    showOn: 'both',
+                    changeYear: true,
+                    changeMonth: true,
+                    dateFormat: 'yy/mm/dd',
+                    showButtonPanel: true
+                });
+            });
+            $('.ui-datepicker-trigger').addClass('btn btn-default').html('<i class="glyphicon glyphicon-calendar"></i>').wrap('<span class="input-group-btn"></span>');
+
+    </script>
+
+</head>
+<body>
+
+<div class="container">
+    <div th:replace="/common/common_header::common_header"></div>
+
+    <p class="issue_breadcomb">
+        <span th:text="${issueItem.currentLedgerName}">Hogeシステム改修</span> &gt; <span
+            th:text="${issueItem.issueNumberLabel}">新規</span>
+    </p>
+
+    <h2 class="h2">課題</h2>
+
+    <div class="form-group">
+        <form th:action="@{'/ledger/' + ${issueId}}" th:object="${issueItem}" class="form-horizontal" method="POST">
+            <!-- そのまま返却が必要なメンバー -->
+            <input type="hidden" id="opeMode" name="opeMode" th:field="*{opeMode}"/>
+            <input type="hidden" id="currentLedgerName" name="currentLedgerName" th:field="*{currentLedgerName}"/>
+            <input type="hidden" id="issueNumberLabel" name="issueNumberLabel" th:field="*{issueNumberLabel}"/>
+
+            <div class="row">
+                <div class="col-lg-1 col-sm-2">発生日</div>
+                <div class="input-group col-lg-3 col-sm-6 col-xs-12">
+                    <input type="text" id="foundDate" name="foundDate" th:field="*{foundDate}"
+                           class="form-control datepicker" maxlength="12"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-sm-2"></div>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>

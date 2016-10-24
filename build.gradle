@@ -40,7 +40,11 @@ dependencies {
     compile('org.flywaydb:flyway-core')
     compile('org.thymeleaf.extras:thymeleaf-extras-springsecurity4')
     compile('org.webjars:bootstrap:3.3.7-1')
-	compile('org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16')
+    compile('org.webjars:jquery:2.2.4')
+    compile('org.webjars:jquery-ui:1.12.1')
+    compile('org.webjars:jquery-ui-themes:1.12.1')
+
+    compile('org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16')
     runtime('org.postgresql:postgresql')
     runtime('com.h2database:h2')
     providedCompile('org.projectlombok:lombok:1.16.10')
