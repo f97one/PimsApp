@@ -50,5 +50,11 @@ public class BaseWebController {
 
     protected void putErrMsg(Model model, String errMessage) {
         model.addAttribute("errMsg", errMessage);
+        model.addAttribute("infoMsg", "");
+    }
+
+    protected void putInfoMsg(Model model, String infoMessage) {
+        model.addAttribute("errMsg", "");
+        model.addAttribute("infoMsg", infoMessage);
     }
 }
