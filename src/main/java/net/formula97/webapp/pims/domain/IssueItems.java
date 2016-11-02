@@ -7,16 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * 課題項目
@@ -80,13 +73,13 @@ public class IssueItems implements Serializable {
     @Column(name = COLUMN_CATEGORY_ID)
     private Integer categoryId;
 
-    @Column(name = COLUMN_ISSUE_DETAIL, length = 16384)
+    @Column(name = COLUMN_ISSUE_DETAIL, length = 32768)
     private String issueDetail;
 
-    @Column(name = COLUMN_CAUSED, length = 16384)
+    @Column(name = COLUMN_CAUSED, length = 32768)
     private String caused;
 
-    @Column(name = COLUMN_COUNTERMEASURES)
+    @Column(name = COLUMN_COUNTERMEASURES, length = 32768)
     private String countermeasures;
 
     @Column(name = COLUMN_CORRESPONDING_USER_ID, length = 32)
