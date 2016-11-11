@@ -10,6 +10,7 @@ import net.formula97.webapp.pims.repository.LedgerRefUserRepository;
 import net.formula97.webapp.pims.repository.UserRepository;
 import net.formula97.webapp.pims.service.IssueLedgerService;
 import net.formula97.webapp.pims.web.forms.NewLedgerForm;
+import org.hamcrest.Matchers;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -17,8 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -38,6 +40,7 @@ import java.util.Set;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 /**
  * Created by f97one on 2016/10/10.
@@ -91,7 +94,7 @@ public class LedgerControllerTest extends BaseTestCase {
 
         Users user1 = new Users();
         user1.setUsername("user11");
-        user1.setPassword("P@ssw0rd");
+        user1.setPassword(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
         user1.setDisplayName("JUnit test11");
         user1.setMailAddress("test@example.com");
         user1.setAuthority(AppConstants.ROLE_USER);
@@ -158,30 +161,49 @@ public class LedgerControllerTest extends BaseTestCase {
         }
     }
 
-    @Ignore
     @Test
     @WithAnonymousUser
     public void ログインしていないユーザーには台帳が追加できない() throws Exception {
+        int beforeLedgerCount = issueLedgerRepo.findAll().size();
+        int beforeRefCount = ledgerRefUserRepo.findAll().size();
+
         ResultActions actions = mMvcMock.perform(MockMvcRequestBuilders.post("/ledger/create")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .with(csrf())
                 .param("newLedgerForm.ledgerName", "ユーザーあり追加テスト用台帳")
-                .param("newLedgerForm.publicLedger", "checked")
+                .param("newLedgerForm.publicLedger", "true")
                 .param("newLedgerForm.openStatus", "1")
+                .param("addLedgerBtn", "")
         );
 
         actions.andExpect(MockMvcResultMatchers.status().isOk());
+
+        int afterLedgerCount = issueLedgerRepo.findAll().size();
+        int afterRefCount = ledgerRefUserRepo.findAll().size();
+
+        assertThat("台帳の数は同じ", beforeLedgerCount, Matchers.is(afterLedgerCount));
+        assertThat("台帳割り当て数も同じ", beforeRefCount, Matchers.is(afterRefCount));
     }
 
     @Ignore
     @Test
-    @WithMockUser("user1")
+    @WithUserDetails(value = "user11", userDetailsServiceBeanName = "authorizedUsersService")
     public void ログインしている場合台帳が作成できる() throws Exception {
+        int beforeLedgerCount = issueLedgerRepo.findAll().size();
+        int beforeRefCount = ledgerRefUserRepo.findAll().size();
+
         ResultActions actions = mMvcMock.perform(MockMvcRequestBuilders.post("/ledger/create")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .with(csrf())
                 .param("newLedgerForm.ledgerName", "ユーザーあり追加テスト用台帳")
-                .param("newLedgerForm.publicLedger", "checked")
+                .param("newLedgerForm.publicLedger", "true")
                 .param("newLedgerForm.openStatus", "1")
+                .param("addLedgerBtn", "")
+
         );
+
+        int afterLedgerCount = issueLedgerRepo.findAll().size();
+        int afterRefCount = ledgerRefUserRepo.findAll().size();
 
         actions.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.model().hasNoErrors());
@@ -190,5 +212,8 @@ public class LedgerControllerTest extends BaseTestCase {
         NewLedgerForm resultForm = (NewLedgerForm) modelMap.get("newLedgerForm");
         assertThat("台帳名は「ユーザーあり追加テスト用台帳」", resultForm.getLedgerName(), is("ユーザーあり追加テスト用台帳"));
         assertThat("公開台帳になっている", resultForm.isPublicLedger(), is(true));
+
+        assertThat("台帳の数は1増えている", beforeLedgerCount, Matchers.is(afterLedgerCount - 1));
+        assertThat("台帳割り当て数も1増えている", beforeRefCount, Matchers.is(afterRefCount - 1));
     }
 }

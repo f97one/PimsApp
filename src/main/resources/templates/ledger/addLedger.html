@@ -20,7 +20,8 @@
 
     <div th:if="${errMsg}" class="alert alert-danger">ユーザー名、またはパスワードが正しくありません。</div>
 
-    <form th:action="@{/ledger/create}" th:object="${newLedgerForm}" class="form-horizontal" method="POST">
+    <form id="newLedgerForm" name="newLedgerForm" th:action="@{/ledger/create}" th:object="${newLedgerForm}"
+          class="form-horizontal" method="POST">
         <!-- tableでインデントを強制、枠線はインラインスタイルで強制消去 -->
         <table class="table table-condensed">
             <tr>
