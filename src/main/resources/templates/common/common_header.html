@@ -16,27 +16,46 @@ and open the template in the editor.
           th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap-theme.min.css}"/>
 </head>
 <body>
-<div class="container">
-    <div th:fragment="common_header">
-        <div class="row">
-            <div class="col-lg-9 col-sm-9">
-                <a id="toHomeLink" class="btn btn-link" th:href="@{/}">ホーム</a>
-                <span th:if="${#httpServletRequest.remoteUser != null}">
-                    <a id="configBtn" class="btn btn-link" th:if="${headerForm.users.authority == 'ROLE_ADMIN'}">設定</a>
-                </span>
+<div th:fragment="common_header">
+
+    <nav class="navbar navbar-default" role="navigation">
+
+        <div class="container-fluid">
+
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#pims-navbar-menu">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+
+                <a class="navbar-brand" href="#">PIMS</a>
             </div>
-            <div class="col-lg-3 col-sm-3 pull-right">
-                            <span th:if="${#httpServletRequest.remoteUser == null}">
-                                <a id="loginLink" class="btn btn-link" th:href="@{/loginFomr}">ログイン</a>
-                            </span>
-                <span th:if="${#httpServletRequest.remoteUser != null}">
-                                <a th:href="@{'/user/config'}" th:inline="text"
-                                   th:text="${headerForm.users.displayName}">HAJIME Fukuna</a>
-                                <a id="logoutLink" class="btn btn-link" th:href="@{/logout}">ログアウト</a>
-                            </span>
+
+            <div class="navbar-collapse collapse" id="pims-navbar-menu">
+
+                <ul class="nav navbar-nav">
+                    <li><a id="toHomeLink" class="btn btn-link navbar-link" th:href="@{/}">ホーム</a></li>
+                    <li th:if="${#httpServletRequest.remoteUser != null}">
+                        <a id="configBtn" class="btn btn-link navbar-link"
+                           th:if="${headerForm.users.authority == 'ROLE_ADMIN'}">設定</a>
+                    </li>
+                </ul>
+
+                <p class="navbar-text navbar-right" th:if="${#httpServletRequest.remoteUser == null}">
+                    <a id="loginLink" class="btn btn-link navbar-link" th:href="@{/loginFomr}">ログイン</a>
+                </p>
+                <p class="navbar-text navbar-right" th:if="${#httpServletRequest.remoteUser != null}">
+                    <a class="btn btn-link navbar-link" th:href="@{'/user/config'}" th:inline="text"
+                       th:text="${headerForm.users.displayName}">HAJIME Fukuna</a>
+                    <a id="logoutLink" class="btn btn-link navbar-link" th:href="@{/logout}">ログアウト</a>
+                </p>
+
             </div>
         </div>
-    </div>
+
+    </nav>
 </div>
 </body>
 </html>
