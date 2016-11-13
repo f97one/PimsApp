@@ -64,8 +64,8 @@ public class TitleController extends BaseWebController {
 	    }
 	    
 	    model.addAttribute("dispIssueLedgers", frm);
-	    
-		return "title";
+
+		return "/title";
 	}
 	
 	
