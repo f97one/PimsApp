@@ -44,7 +44,7 @@ and open the template in the editor.
                 </ul>
 
                 <p class="navbar-text navbar-right" th:if="${#httpServletRequest.remoteUser == null}">
-                    <a id="loginLink" class="btn btn-link navbar-link" th:href="@{/loginFomr}">ログイン</a>
+                    <a id="loginLink" class="btn btn-link navbar-link" th:href="@{/loginForm}">ログイン</a>
                 </p>
                 <p class="navbar-text navbar-right" th:if="${#httpServletRequest.remoteUser != null}">
                     <a class="btn btn-link navbar-link" th:href="@{'/user/config'}" th:inline="text"
