@@ -32,7 +32,7 @@ and open the template in the editor.
                         <a th:href="@{'/ledger/create'}" class="btn btn-primary btn-block">台帳追加</a>
                     </span>
             </div>
-        </div>
+            </div>
 
         <div class="table-responsive vertical-margin">
             <table class="table table-striped table-bordered table-condensed">
@@ -45,7 +45,8 @@ and open the template in the editor.
                 </thead>
                 <tbody>
                 <tr th:each="ledger : ${dispIssueLedgers}">
-                    <td th:text="${ledger.ledgerName}"><a th:href="@{'/ledger/' + ${ledger.ledgerId}">hoge改造</a></td>
+                    <td><a th:href="@{'/ledger/' + ${ledger.ledgerId}}"><span
+                            th:text="${ledger.ledgerName}">hoge改造</span></a></td>
                     <td th:text="${ledger.status}" class="text-center">進行中</td>
                     <td th:text="${ledger.lastUpdatedAt}" class="text-center">2016/10/01 12:34:56</td>
                 </tr>
