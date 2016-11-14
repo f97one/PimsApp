@@ -18,28 +18,45 @@
     <!-- jQuery -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"
             th:src="@{/webjars/jquery/2.2.4/jquery.min.js}"></script>
-    <!-- jQuery-ui -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"
-            th:src="@{/webjars/jquery-ui/1.12.1/jquery-ui.min.js}"></script>
+
+    <!-- Bootstrap Datepicker -->
     <link rel="stylesheet" type="text/css"
-          href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css"
-          th:href="@{/webjars/jquery-ui/1.12.1/jquery-ui.min.css}">
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.min.css"
+          th;href="@{/webjars/bootstrap-3-datepicker/1.6.4/dist/css/bootstrap-datepicker.min.css}"/>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"
+            th:src="@{/bootstrap-3-datepicker/1.6.4/dist/js/bootstrap-datepicker.min.js}"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/locales/bootstrap-datepicker.ja.min.js"
+            th:src="@{/webjars/bootstrap-3-datepicker/1.6.4/dist/locales/bootstrap-datepicker.ja.min.js}"></script>
 
     <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
             th:src="@{/webjars/bootstrap/3.3.7-1/js/bootstrap.min.js}"></script>
 
     <script type="text/javascript">
             $(function () {
-                $('.datepicker').datepicker({
-                    showOn: 'both',
-                    changeYear: true,
-                    changeMonth: true,
-                    dateFormat: 'yy/mm/dd',
-                    showButtonPanel: true
+                $('.datePickerBox').datepicker({
+                    locale: 'ja',
+                    format: 'yyyy/mm/dd',
+                    autoclose: true,
+                    todayBtn: 'linked',
+                    todayHighlight: true
                 });
             });
-            $('.ui-datepicker-trigger').addClass('btn btn-default').html('<i class="glyphicon glyphicon-calendar"></i>').wrap('<span class="input-group-btn"></span>');
 
+            function getRemainLength(srcTextBox, targetId) {
+                var len = srcTextBox.value.length;
+
+                var target = document.getElementById(targetId);
+                if (target != 'undefined') {
+                    target.innerHTML = len;
+                }
+                if (len / 32768 > 0.9) {
+                    target.style.color = 'red';
+                } else {
+                    target.style.color = 'black';
+                }
+            }
     </script>
 
 </head>
@@ -55,22 +72,200 @@
 
     <h2 class="h2">課題</h2>
 
+    <div th:replace="/common/info_block::info_block"></div>
+
     <div class="form-group">
         <form th:action="@{'/ledger/' + ${issueId}}" th:object="${issueItem}" class="form-horizontal" method="POST">
             <!-- そのまま返却が必要なメンバー -->
             <input type="hidden" id="opeMode" name="opeMode" th:field="*{opeMode}"/>
             <input type="hidden" id="currentLedgerName" name="currentLedgerName" th:field="*{currentLedgerName}"/>
             <input type="hidden" id="issueNumberLabel" name="issueNumberLabel" th:field="*{issueNumberLabel}"/>
+            <input type="hidden" id="recordTimestamp" name="recordTimestamp" th:field="*{recordTimestamp}"/>
 
             <div class="row">
                 <div class="col-lg-1 col-sm-2">発生日</div>
-                <div class="input-group col-lg-3 col-sm-6 col-xs-12">
-                    <input type="text" id="foundDate" name="foundDate" th:field="*{foundDate}"
-                           class="form-control datepicker" maxlength="12"/>
+                <div class="col-lg-11 col-sm-10">
+                    <div class="input-group date col-lg-3 col-sm-6 col-xs-12 datePickerBox" data-provide="datepicker">
+                        <input type="text" id="foundDate" name="foundDate" th:field="*{foundDate}"
+                               class="form-control" maxlength="12"/>
+                        <div class="input-group-addon">
+                            <span class="glyphicon glyphicon-th"></span>
+                        </div>
+                    </div>
+                    <span th:if="${#fields.hasErrors('foundDate')}" th:errors="*{foundDate}"
+                          class="help-block">Error</span>
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-1 col-sm-2"></div>
+                <div class="col-lg-1 col-sm-2">緊急度</div>
+                <div class="col-lg-11 col-sm-10">
+                    <div class="input-group col-lg-2 col-sm-4 col-xs-12">
+                        <select class="form-control" id="severitySelector" name="severitySelector">
+                            <option value="">---</option>
+                            <option th:each="severityItem : ${severityList}" th:value="${severityItem.value}"
+                                    th:text="${severityItem.key}" th:selected="${severityItem.value} == *{severity}">
+                                pulldown
+                            </option>
+                        </select>
+                    </div>
+                    <span th:if="${#fields.hasErrors('severity')}" th:errors="*{severity}"
+                          class="help-block">error!</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-sm-2">発見者</div>
+                <div class="col-lg-11 col-sm-10">
+                    <div class="input-group col-lg-2 col-sm-4 col-xs-12">
+                        <select class="form-control" id="foundUserSelector" name="foundUserSelector">
+                            <option value="">---</option>
+                            <option th:each="foundUserItem : ${joinedUsers}" th:value="${foundUserItem.value}"
+                                    th:text="${foundUserItem.key}"
+                                    th:selected="${foundUserItem.value} == *{foundUserId}">found user
+                            </option>
+                        </select>
+                    </div>
+                    <span th:if="${#fields.hasErors('foundUserId')}" th:errors="*{foundUserId}" class="help-block">error!</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-sm-2">機能種別</div>
+                <div class="col-lg-11 col-sm-10">
+                    <div class="input-group col-lg-2 col-sm-4 col-xs-12">
+                        <select class="form-control" id="moduleKind" name="moduleKind">
+                            <option value="">---</option>
+                            <option th:each="module : ${moduleCategoryList}" th:value="${module.value}"
+                                    th:text="${module.key}" th:selected="${module.value} == *{categoryId}">found user
+                            </option>
+                        </select>
+                    </div>
+                    <span th:if="${#fields.hasErors('categoryId')}" th:errors="*{categoryId}"
+                          class="help-block">error!</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-sm-2">原因工程</div>
+                <div class="col-lg-11 col-sm-10">
+                    <div class="input-group col-lg-2 col-sm-4 col-xs-12">
+                        <select class="form-control" id="causedProcess" name="causedProcess">
+                            <option value="">---</option>
+                            <option th:each="processItem : ${causedProcessList}" th:value="${processItem.value}"
+                                    th:text="${processItem.key}" th:selected="${processItem.value} == *{processId}">
+                                found user
+                            </option>
+                        </select>
+                    </div>
+                    <span th:if="${#fields.hasErors('processId')}" th:errors="*{processId}"
+                          class="help-block">error!</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-sm-2">障害内容</div>
+                <div class="col-lg-11 col-sm-10">
+                    <textarea id="issueDetail" name="issueDetail" class="form-control" rows="4" cols="60"
+                              th:field="*{issueDetail}" maxlength="32768"
+                              onkeydown="getRemainLength(this, 'issueDetailCount')"
+                              onchange="getRemainLength(this, 'issueDetailCount')"
+                              onblur="getRemainLength(this, 'issueDetailCount')"></textarea>
+                    <div class="col-lg-1 col-sm1 pull-right"><span id="issueDetailCount">0</span>/32768</div>
+                    <span th:if="${#fields.hasErors('issueDetail')}" th:errors="*{issueDetail}" class="help-block">error!</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-sm-2">原因</div>
+                <div class="col-lg-11 col-sm-10">
+                    <textarea id="caused" name="caused" class="form-control" rows="4" cols="60"
+                              th:field="*{caused}" maxlength="32768"
+                              onkeydown="getRemainLength(this, 'causedCount')"
+                              onchange="getRemainLength(this, 'causedCount')"
+                              onblur="getRemainLength(this, 'causedCount')"></textarea>
+                    <div class="col-lg-1 col-sm1 pull-right"><span id="causedCount">0</span>/32768</div>
+                    <span th:if="${#fields.hasErors('caused')}" th:errors="*{caused}" class="help-block">error!</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-sm-2">対応内容</div>
+                <div class="col-lg-11 col-sm-10">
+                    <textarea id="countermeasures" name="countermeasures" class="form-control" rows="4" cols="60"
+                              th:field="*{countermeasures}" maxlength="32768"
+                              onkeydown="getRemainLength(this, 'countermeasuresCount')"
+                              onchange="getRemainLength(this, 'countermeasuresCount')"
+                              onblur="getRemainLength(this, 'countermeasuresCount')"></textarea>
+                    <div class="col-lg-1 col-sm1 pull-right"><span id="countermeasuresCount">0</span>/32768</div>
+                    <span th:if="${#fields.hasErors('countermeasures')}" th:errors="*{countermeasures}"
+                          class="help-block">error!</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-sm-2">対応者</div>
+                <div class="col-lg-11 col-sm-10">
+                    <div class="input-group col-lg-2 col-sm-4 col-xs-12">
+                        <select class="form-control" id="correspondingUserSelector" name="correspondingUserSelector">
+                            <option value="">---</option>
+                            <option th:each="correspondingUserItem : ${correspondingUsers}"
+                                    th:value="${correspondingUserItem.value}" th:text="${correspondingUserItem.key}"
+                                    th:selected="${correspondingUserItem.value} == *{correspondingUserId}">corresponding
+                                User
+                            </option>
+                        </select>
+                    </div>
+                    <span th:if="${#fields.hasErors('correspondingUserId')}" th:errors="*{correspondingUserId}"
+                          class="help-block">error!</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-sm-2">対応時間</div>
+                <div class="col-lg-11 col-sm-10">
+                    <div class="input-group col-lg-2 col-sm-4 col-xs-12">
+                        <input type="text" id="correspondingTime" name="correspondingTime"
+                               class="form-control text-right" th:field="*{correspondingTime}" maxlength="6"/>
+                        <span th:if="${#fields.hasErrors('correspondingTime')}" th:errors="*{correspondingTime}"
+                              class="help-block">error!</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-sm-2">対応終了日</div>
+                <div class="col-lg-11 col-sm-10">
+                    <div class="input-group date col-lg-3 col-sm-6 col-xs-12 datePickerBox" data-provide="datepicker">
+                        <input type="text" id="correspondingEndDate" name="correspondingEndDate"
+                               th:field="*{correspondingEndDate}"
+                               class="form-control" maxlength="12"/>
+                        <div class="input-group-addon">
+                            <span class="glyphicon glyphicon-th"></span>
+                        </div>
+                    </div>
+                    <span th:if="${#fields.hasErrors('correspondingEndDate')}" th:errors="*{correspondingEndDate}"
+                          class="help-block">Error</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-sm-2">確認者</div>
+                <div class="col-lg-11 col-sm-10">
+                    <div class="input-group col-lg-2 col-sm-4 col-xs-12">
+                        <select class="form-control" id="confirmedUserSelector" name="confirmedUserSelector">
+                            <option value="">---</option>
+                            <option th:each="confirmedUserItem : ${confirmedUsers}"
+                                    th:value="${confirmedUserItem.value}" th:text="${confirmedUserItem.key}"
+                                    th:selected="${confirmedUserItem.value} == *{confirmedUserId}">confirmed User
+                            </option>
+                        </select>
+                    </div>
+                    <span th:if="${#fields.hasErors('confirmedUserId')}" th:errors="*{confirmedUserId}"
+                          class="help-block">error!</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-sm-2">確認日</div>
+                <div class="col-lg-11 col-sm-10">
+                    <div class="input-group date col-lg-3 col-sm-6 col-xs-12 datePickerBox" data-provide="datepicker">
+                        <input type="text" id="confirmedDate" name="confirmedDate" th:field="*{confirmedDate}"
+                               class="form-control" maxlength="12"/>
+                        <div class="input-group-addon">
+                            <span class="glyphicon glyphicon-th"></span>
+                        </div>
+                    </div>
+                    <span th:if="${#fields.hasErrors('confirmedDate')}" th:errors="*{confirmedDate}" class="help-block">Error</span>
+                </div>
             </div>
         </form>
     </div>

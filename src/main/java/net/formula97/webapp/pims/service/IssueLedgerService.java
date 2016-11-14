@@ -64,6 +64,10 @@ public class IssueLedgerService {
         ledgerRefUserRepo.save(lru);
     }
 
+    public IssueLedger getLedgerById(int ledgerId) {
+        return issueLedgerRepo.findOne(ledgerId);
+    }
+
     public static class IssueLedgerSpecifications {
         
         public static Specification<IssueLedger> nameContains(String ledgerName) {

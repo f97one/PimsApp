@@ -2,7 +2,7 @@
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"/>
     <title>Issue List | PIMS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
@@ -28,7 +28,7 @@
             <tbody>
             <tr>
                 <td class="col-xs-1">総数</td>
-                <td class="col-xs-1 text-right" th:text="${issueItems.size}">25</td>
+                <td class="col-xs-1 text-right" th:text="${totalItems}">25</td>
             </tr>
             <tr>
                 <td class="col-xs-1">未完了</td>
@@ -44,7 +44,7 @@
 
     <div class="clearfix"></div>
 
-    <div class="col-lg-2 col-sm-2 vertical-margin">
+    <div class="col-lg-2 col-sm-2 vertical-margin" th:if="${#httpServletRequest.remoteUser != null}">
         <a th:href="@{'/ledger/' + ${ledgerId} + '/add'}" class="btn btn-primary btn-block"
            th:disabled="${#httpServletRequest.remoteUser == null}">課題追加</a>
     </div>
@@ -71,11 +71,11 @@
                 <th class="text-center">対応終了日</th>
                 <th class="text-center">確認者</th>
                 <th class="text-center">確認日</th>
-                <th></th>
+                <th th:if="${#httpServletRequest.remoteUser != null}"></th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="issue : ${issueItems}">
+            <tr th:each="issue : ${issueItems}" th:style="${issue.lineStyle}">
                 <td th:text="${issue.issueId}" th:class="small text-center">1</td>
                 <td th:text="${issue.severeLevel}" th:class="small text-center">中</td>
                 <td th:text="${issue.actionStatus}" th:class="small text-center">PG中</td>
