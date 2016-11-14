@@ -5,9 +5,11 @@ package net.formula97.webapp.pims.web;
 
 import net.formula97.webapp.pims.domain.IssueItems;
 import net.formula97.webapp.pims.domain.IssueLedger;
+import net.formula97.webapp.pims.domain.LedgerRefUser;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.service.IssueItemsService;
 import net.formula97.webapp.pims.service.IssueLedgerService;
+import net.formula97.webapp.pims.service.LedgerRefUserService;
 import net.formula97.webapp.pims.web.forms.HeaderForm;
 import net.formula97.webapp.pims.web.forms.IssueItemsLineForm;
 import net.formula97.webapp.pims.web.forms.NewLedgerForm;
@@ -36,6 +38,8 @@ public class LedgerController extends BaseWebController {
     IssueLedgerService issueLedgerSvc;
     @Autowired
     IssueItemsService issueItemsSvc;
+    @Autowired
+    LedgerRefUserService ledgerRefUserSvc;
 
     @ModelAttribute
     NewLedgerForm setUpNewLedgerForm() {
@@ -57,9 +61,31 @@ public class LedgerController extends BaseWebController {
             putErrMsg(model, "台帳が見つかりません。");
             ledger = new IssueLedger(-1, "", 1, true);
         } else {
-            if (users == null && !ledger.getPublicLedger()) {
-                putErrMsg(model, "この台帳は公開されていません。");
-                ledger = new IssueLedger(-1, "", 1, true);
+            if (!ledger.getPublicLedger()) {
+                boolean badDisp = false;
+                if (users == null) {
+                    badDisp = true;
+                } else {
+                    LedgerRefUser refUser = ledgerRefUserSvc.findReferenceForUser(users.getUsername(), ledger.getLedgerId());
+                    if (refUser == null) {
+                        badDisp = true;
+                    }
+                }
+
+                if (badDisp) {
+                    putErrMsg(model, "この台帳は公開されていません。");
+                    ledger = new IssueLedger(-1, "", 1, true);
+                } else {
+                    List<IssueItems> issueItems = issueItemsSvc.getIssueItemsByLedgerId(ledgerId);
+                    if (issueItems.size() > 0) {
+                        itemForms = issueItemsSvc.getIssueItemsForDisplay(ledgerId);
+
+                        // 完了、未完了の数
+                        totalItems = itemForms.size();
+                        incompleteItems = itemForms.stream().filter((r) -> r.getConfirmedDate() == null).count();
+                        completeItems = totalItems - incompleteItems;
+                    }
+                }
             } else {
                 List<IssueItems> issueItems = issueItemsSvc.getIssueItemsByLedgerId(ledgerId);
                 if (issueItems.size() > 0) {
