@@ -53,20 +53,27 @@ public class LedgerController extends BaseWebController {
         long completeItems = 0;
         long totalItems = 0;
 
-        if (ledger != null) {
-            model.addAttribute("issueLedger", ledger);
+        if (ledger == null) {
+            putErrMsg(model, "台帳が見つかりません。");
+            ledger = new IssueLedger(-1, "", 1, true);
+        } else {
+            if (users == null && !ledger.getPublicLedger()) {
+                putErrMsg(model, "この台帳は公開されていません。");
+                ledger = new IssueLedger(-1, "", 1, true);
+            } else {
+                List<IssueItems> issueItems = issueItemsSvc.getIssueItemsByLedgerId(ledgerId);
+                if (issueItems.size() > 0) {
+                    itemForms = issueItemsSvc.getIssueItemsForDisplay(ledgerId);
 
-            List<IssueItems> issueItems = issueItemsSvc.getIssueItemsByLedgerId(ledgerId);
-            if (issueItems.size() > 0) {
-                itemForms = issueItemsSvc.getIssueItemsForDisplay(ledgerId);
-
-                // 完了、未完了の数
-                totalItems = itemForms.size();
-                incompleteItems = itemForms.stream().filter((r) -> r.getConfirmedDate() == null).count();
-                completeItems = totalItems - incompleteItems;
+                    // 完了、未完了の数
+                    totalItems = itemForms.size();
+                    incompleteItems = itemForms.stream().filter((r) -> r.getConfirmedDate() == null).count();
+                    completeItems = totalItems - incompleteItems;
+                }
             }
         }
 
+        model.addAttribute("issueLedger", ledger);
         model.addAttribute("issueItems", itemForms);
         model.addAttribute("incompleteItems", incompleteItems);
         model.addAttribute("completeItems", completeItems);
