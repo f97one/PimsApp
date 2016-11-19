@@ -18,12 +18,7 @@
 
     <h2>ユーザー設定</h2>
 
-    <div th:if="${infoMsg ne ''}">
-        <p class="col-lg-12 col-sm-12 alert alert-success" th:text="${infoMsg}">パスワードを更新しました。</p>
-    </div>
-    <div th:if="${errMsg ne ''}">
-        <p class="col-lg-12 col-sm-12 alert alert-danger" th:text="${errMsg}">パスワードが一致しません。</p>
-    </div>
+    <div th:replace="/common/info_block::info_block"></div>
 
     <div class="form-group">
         <form th:action="@{/user/config}" class="form-horizontal" method="POST">
