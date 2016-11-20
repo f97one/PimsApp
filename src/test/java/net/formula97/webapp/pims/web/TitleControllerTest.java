@@ -169,7 +169,7 @@ public class TitleControllerTest extends BaseTestCase {
         this.mMvcMock.perform(MockMvcRequestBuilders.get(uri))
             .andDo(MockMvcResultHandlers.print())
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.view().name("title"))
+                .andExpect(MockMvcResultMatchers.view().name("/title"))
             .andExpect(MockMvcResultMatchers.model().attribute("title", "PIMS Beta"));
     }
 
@@ -183,7 +183,7 @@ public class TitleControllerTest extends BaseTestCase {
         this.mMvcMock.perform(MockMvcRequestBuilders.get(uri))
             .andDo(MockMvcResultHandlers.print())
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.view().name("title"))
+                .andExpect(MockMvcResultMatchers.view().name("/title"))
             .andExpect(MockMvcResultMatchers.model().attribute("title", "PIMS Beta"));
     }
     
