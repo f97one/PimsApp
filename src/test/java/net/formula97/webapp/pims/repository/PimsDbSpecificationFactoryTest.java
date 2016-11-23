@@ -1,5 +1,6 @@
 package net.formula97.webapp.pims.repository;
 
+import net.formula97.webapp.pims.domain.StatusMaster;
 import net.formula97.webapp.pims.domain.SystemConfig;
 import org.junit.After;
 import org.junit.Before;
@@ -26,6 +27,8 @@ public class PimsDbSpecificationFactoryTest {
 
     @Autowired
     SystemConfigRepository sysConfigRepo;
+    @Autowired
+    StatusMasterRepository statusMasterRepo;
 
     @Before
     public void setUp() {
@@ -117,5 +120,61 @@ public class PimsDbSpecificationFactoryTest {
         assertThat("１件取得できる", scList1.size(), is(1));
         Optional<SystemConfig> scOpt1 = scList1.stream().filter((r) -> r.getConfigKey().equals("RegHoge2")).findFirst();
         assertTrue("RegHoge2が取得できる", scOpt1.isPresent());
+    }
+
+    @Test
+    public void gtのテスト() throws Exception {
+        PimsDbSpecificationFactory<StatusMaster> statusMasterSpecificationFactory = new PimsDbSpecificationFactory<>(StatusMaster.class);
+        List<StatusMaster> smList1 = statusMasterRepo.findAll(statusMasterSpecificationFactory.gt("statusId", 3));
+
+        assertThat("2件取得できる", smList1.size(), is(2));
+//        Optional<StatusMaster> smOpt1 = smList1.stream().filter((r) -> r.getStatusId() == 3).findFirst();
+//        assertTrue("「解決」のアイテムが取れる", smOpt1.isPresent());
+        Optional<StatusMaster> smOpt2 = smList1.stream().filter((r) -> r.getStatusId() == 4).findFirst();
+        assertTrue("「終了」のアイテムが取れる", smOpt2.isPresent());
+        Optional<StatusMaster> smOpt3 = smList1.stream().filter((r) -> r.getStatusId() == 5).findFirst();
+        assertTrue("「却下」のアイテムが取れる", smOpt3.isPresent());
+    }
+
+    @Test
+    public void geのテスト() throws Exception {
+        PimsDbSpecificationFactory<StatusMaster> statusMasterSpecificationFactory = new PimsDbSpecificationFactory<>(StatusMaster.class);
+        List<StatusMaster> smList1 = statusMasterRepo.findAll(statusMasterSpecificationFactory.ge("statusId", 3));
+
+        assertThat("3件取得できる", smList1.size(), is(3));
+        Optional<StatusMaster> smOpt1 = smList1.stream().filter((r) -> r.getStatusId() == 3).findFirst();
+        assertTrue("「解決」のアイテムが取れる", smOpt1.isPresent());
+        Optional<StatusMaster> smOpt2 = smList1.stream().filter((r) -> r.getStatusId() == 4).findFirst();
+        assertTrue("「終了」のアイテムが取れる", smOpt2.isPresent());
+        Optional<StatusMaster> smOpt3 = smList1.stream().filter((r) -> r.getStatusId() == 5).findFirst();
+        assertTrue("「却下」のアイテムが取れる", smOpt3.isPresent());
+    }
+
+    @Test
+    public void ltのテスト() throws Exception {
+        PimsDbSpecificationFactory<StatusMaster> statusMasterSpecificationFactory = new PimsDbSpecificationFactory<>(StatusMaster.class);
+        List<StatusMaster> smList1 = statusMasterRepo.findAll(statusMasterSpecificationFactory.lt("statusId", 3));
+
+        assertThat("2件取得できる", smList1.size(), is(2));
+        Optional<StatusMaster> smOpt1 = smList1.stream().filter((r) -> r.getStatusId() == 1).findFirst();
+        assertTrue("「新規」のアイテムが取れる", smOpt1.isPresent());
+        Optional<StatusMaster> smOpt2 = smList1.stream().filter((r) -> r.getStatusId() == 2).findFirst();
+        assertTrue("「進行中」のアイテムが取れる", smOpt2.isPresent());
+//        Optional<StatusMaster> smOpt3 = smList1.stream().filter((r) -> r.getStatusId() == 3).findFirst();
+//        assertTrue("「解決」のアイテムが取れる", smOpt3.isPresent());
+    }
+
+    @Test
+    public void leのテスト() throws Exception {
+        PimsDbSpecificationFactory<StatusMaster> statusMasterSpecificationFactory = new PimsDbSpecificationFactory<>(StatusMaster.class);
+        List<StatusMaster> smList1 = statusMasterRepo.findAll(statusMasterSpecificationFactory.le("statusId", 3));
+
+        assertThat("3件取得できる", smList1.size(), is(3));
+        Optional<StatusMaster> smOpt1 = smList1.stream().filter((r) -> r.getStatusId() == 1).findFirst();
+        assertTrue("「新規」のアイテムが取れる", smOpt1.isPresent());
+        Optional<StatusMaster> smOpt2 = smList1.stream().filter((r) -> r.getStatusId() == 2).findFirst();
+        assertTrue("「進行中」のアイテムが取れる", smOpt2.isPresent());
+        Optional<StatusMaster> smOpt3 = smList1.stream().filter((r) -> r.getStatusId() == 3).findFirst();
+        assertTrue("「解決」のアイテムが取れる", smOpt3.isPresent());
     }
 }
