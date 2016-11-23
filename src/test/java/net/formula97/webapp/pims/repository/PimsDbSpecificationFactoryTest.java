@@ -22,7 +22,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {"server.port:0", "spring.profiles.active:test"})
-public class PimsDbSpecificationTest {
+public class PimsDbSpecificationFactoryTest {
 
     @Autowired
     SystemConfigRepository sysConfigRepo;
