@@ -2,10 +2,11 @@ package net.formula97.webapp.pims.service;
 
 import net.formula97.webapp.pims.domain.*;
 import net.formula97.webapp.pims.repository.IssueItemsRepository;
+import net.formula97.webapp.pims.repository.IssueLedgerRepository;
 import net.formula97.webapp.pims.repository.LedgerRefUserRepository;
+import net.formula97.webapp.pims.repository.MySpecificationAdapter;
 import net.formula97.webapp.pims.web.forms.IssueItemsLineForm;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,8 @@ import java.util.Map;
 public class IssueItemsService extends BaseService {
 
     @Autowired
+    IssueLedgerRepository issueLedgerRepo;
+    @Autowired
     IssueItemsRepository issueItemsRepo;
     @Autowired
     LedgerRefUserRepository ledgerRefUserRepo;
@@ -29,7 +32,8 @@ public class IssueItemsService extends BaseService {
     }
 
     public List<IssueItems> getIssueItemsByLedgerId(Integer ledgerId) {
-        return issueItemsRepo.findAll(IssueItemsSpecifications.ledgerIdEquals(ledgerId));
+        MySpecificationAdapter<IssueItems> issueItemsSpecification = new MySpecificationAdapter<>(IssueItems.class);
+        return issueItemsRepo.findAll(issueItemsSpecification.eq("ledgerId", ledgerId));
     }
 
     public List<IssueItemsLineForm> getIssueItemsForDisplay(Integer ledgerId) {
@@ -109,10 +113,21 @@ public class IssueItemsService extends BaseService {
         issueItemsRepo.save(item);
     }
 
-    public static class IssueItemsSpecifications {
-
-        public static Specification<IssueItems> ledgerIdEquals(Integer ledgerId) {
-            return ledgerId == null ? null : (root, query, cb) -> cb.equal(root.get("ledgerId"), ledgerId);
+    public boolean hasEditPrivilege(int ledgerId, Users users) {
+        if (users == null) {
+            return false;
         }
+
+        IssueLedger ledger = issueLedgerRepo.findOne(ledgerId);
+        if (ledger == null) {
+            return false;
+        } else {
+            LedgerRefUser ledgerRefUser = ledgerRefUserRepo.findOne(new LedgerRefUserPK(ledgerId, users.getUsername()));
+            if (ledgerRefUser == null) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

@@ -8,12 +8,10 @@ import net.formula97.webapp.pims.domain.LedgerRefUser;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.repository.IssueLedgerRepository;
 import net.formula97.webapp.pims.repository.LedgerRefUserRepository;
+import net.formula97.webapp.pims.repository.MySpecificationAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +30,8 @@ public class IssueLedgerService {
     LedgerRefUserRepository ledgerRefUserRepo;
     
     public List<IssueLedger> getPublicLedgers() {
-        return issueLedgerRepo.findAll(Specifications.where(IssueLedgerSpecifications.isPublicSpecified(true)));
+        MySpecificationAdapter<IssueLedger> issueLedgerSpecification = new MySpecificationAdapter<>(IssueLedger.class);
+        return issueLedgerRepo.findAll(issueLedgerSpecification.eq("publicLedger", true));
     }
     
     public List<IssueLedger> getLedgersForUser(String userId) {
@@ -47,13 +46,19 @@ public class IssueLedgerService {
         return new ArrayList<>(Arrays.asList(retArray));
     }
 
+    public IssueLedger getLedgerById(Integer ledgerId) {
+        MySpecificationAdapter<IssueLedger> issueLedgerSpecification = new MySpecificationAdapter<>(IssueLedger.class);
+        return issueLedgerRepo.findOne(issueLedgerSpecification.eq("ledgerId", ledgerId));
+    }
+
     @Transactional
     public void saveLedger(IssueLedger ledger, Users users) {
         issueLedgerRepo.save(ledger);
+        MySpecificationAdapter<IssueLedger> issueLedgerSpecification = new MySpecificationAdapter<>(IssueLedger.class);
 
         IssueLedger ledger1;
         if (ledger.getLedgerId() == null) {
-            ledger1 = issueLedgerRepo.findOne(Specifications.where(IssueLedgerSpecifications.nameEquals(ledger.getLedgerName())));
+            ledger1 = issueLedgerRepo.findOne(issueLedgerSpecification.eq("ledgerName", ledger.getLedgerName()));
         } else {
             ledger1 = ledger;
         }
@@ -66,24 +71,5 @@ public class IssueLedgerService {
 
     public IssueLedger getLedgerById(int ledgerId) {
         return issueLedgerRepo.findOne(ledgerId);
-    }
-
-    public static class IssueLedgerSpecifications {
-        
-        public static Specification<IssueLedger> nameContains(String ledgerName) {
-            return StringUtils.isEmpty(ledgerName) ? null : (root, query, cb) -> cb.like(root.get("ledgerName"), "%" + ledgerName + "%");
-        }
-
-        public static Specification<IssueLedger> nameEquals(String ledgerName) {
-            return StringUtils.isEmpty(ledgerName) ? null : (root, query, cb) -> cb.equal(root.get("ledgerName"), ledgerName);
-        }
-        
-        public static Specification<IssueLedger> openStatusSpecified(Integer openStatusId) {
-            return openStatusId == null ? null : (root, query, cb) -> cb.equal(root.get("openStatus"), openStatusId);
-        }
-        
-        public static Specification<IssueLedger> isPublicSpecified(Boolean isPublic) {
-            return isPublic == null ? null : (root, query, cb) -> cb.equal(root.get("publicLedger"), isPublic);
-        }
     }
 }

@@ -10,9 +10,9 @@ import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.misc.AppConstants;
 import net.formula97.webapp.pims.repository.IssueLedgerRepository;
 import net.formula97.webapp.pims.repository.LedgerRefUserRepository;
+import net.formula97.webapp.pims.repository.MySpecificationAdapter;
 import net.formula97.webapp.pims.repository.UserRepository;
 import net.formula97.webapp.pims.service.IssueLedgerService;
-import net.formula97.webapp.pims.service.IssueLedgerService.IssueLedgerSpecifications;
 import org.hamcrest.Matchers;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -20,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
@@ -128,18 +127,20 @@ public class TitleControllerTest extends BaseTestCase {
         l4.setLedgerName("テスト用台帳２");
         l4.setOpenStatus(1);
         issueLedgerRepo.save(l4);
-        
-        IssueLedger ledger = issueLedgerRepo.findOne(Specifications.where(IssueLedgerSpecifications.nameContains(l1.getLedgerName())));
+
+        MySpecificationAdapter<IssueLedger> issueLedgerSpecification = new MySpecificationAdapter<>(IssueLedger.class);
+
+        IssueLedger ledger = issueLedgerRepo.findOne(issueLedgerSpecification.contains("ledgerName", l1.getLedgerName()));
         LedgerRefUser lru1 = new LedgerRefUser();
         lru1.setUserId(user1.getUsername());
         lru1.setLedgerId(ledger.getLedgerId());
-        
-        IssueLedger ledger2 = issueLedgerRepo.findOne(Specifications.where(IssueLedgerSpecifications.nameContains(l2.getLedgerName())));
+
+        IssueLedger ledger2 = issueLedgerRepo.findOne(issueLedgerSpecification.contains("ledgerName", l2.getLedgerName()));
         LedgerRefUser lru2 = new LedgerRefUser();
         lru2.setUserId(user1.getUsername());
         lru2.setLedgerId(ledger2.getLedgerId());
-        
-        IssueLedger ledger3 = issueLedgerRepo.findOne(Specifications.where(IssueLedgerSpecifications.nameContains(l3.getLedgerName())));
+
+        IssueLedger ledger3 = issueLedgerRepo.findOne(issueLedgerSpecification.contains("ledgerName", l3.getLedgerName()));
         LedgerRefUser lru3 = new LedgerRefUser();
         lru3.setUserId(user2.getUsername());
         lru3.setLedgerId(ledger3.getLedgerId());

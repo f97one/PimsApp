@@ -7,6 +7,7 @@ import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.misc.AppConstants;
 import net.formula97.webapp.pims.repository.IssueLedgerRepository;
 import net.formula97.webapp.pims.repository.LedgerRefUserRepository;
+import net.formula97.webapp.pims.repository.MySpecificationAdapter;
 import net.formula97.webapp.pims.repository.UserRepository;
 import net.formula97.webapp.pims.service.IssueLedgerService;
 import net.formula97.webapp.pims.web.forms.NewLedgerForm;
@@ -16,7 +17,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -106,7 +106,9 @@ public class LedgerControllerTest extends BaseTestCase {
         l1.setOpenStatus(2);
         issueLedgerRepo.save(l1);
 
-        IssueLedger ledger = issueLedgerRepo.findOne(Specifications.where(IssueLedgerService.IssueLedgerSpecifications.nameEquals(l1.getLedgerName())));
+        MySpecificationAdapter<IssueLedger> issueLedgerSpecification = new MySpecificationAdapter<>(IssueLedger.class);
+
+        IssueLedger ledger = issueLedgerRepo.findOne(issueLedgerSpecification.eq("ledgerName", l1.getLedgerName()));
         LedgerRefUser lru1 = new LedgerRefUser();
         lru1.setUserId(user1.getUsername());
         lru1.setLedgerId(ledger.getLedgerId());
