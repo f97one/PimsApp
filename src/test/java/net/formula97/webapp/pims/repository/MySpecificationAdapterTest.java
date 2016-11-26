@@ -23,7 +23,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {"server.port:0", "spring.profiles.active:test"})
-public class PimsDbSpecificationFactoryTest {
+public class MySpecificationAdapterTest {
 
     @Autowired
     SystemConfigRepository sysConfigRepo;
@@ -47,7 +47,7 @@ public class PimsDbSpecificationFactoryTest {
 
     @Test
     public void containsのテスト() throws Exception {
-        PimsDbSpecificationFactory<SystemConfig> sysConfigSpecification = new PimsDbSpecificationFactory<>(SystemConfig.class);
+        MySpecificationAdapter<SystemConfig> sysConfigSpecification = new MySpecificationAdapter<>(SystemConfig.class);
         List<SystemConfig> scList1 = sysConfigRepo.findAll(sysConfigSpecification.contains("configKey", "Hoge"));
 
         assertThat("３件取得できる", scList1.size(), is(3));
@@ -64,7 +64,7 @@ public class PimsDbSpecificationFactoryTest {
 
     @Test
     public void notContainsのテスト() throws Exception {
-        PimsDbSpecificationFactory<SystemConfig> sysConfigSpecification = new PimsDbSpecificationFactory<>(SystemConfig.class);
+        MySpecificationAdapter<SystemConfig> sysConfigSpecification = new MySpecificationAdapter<>(SystemConfig.class);
         List<SystemConfig> scList1 = sysConfigRepo.findAll(sysConfigSpecification.notContains("configKey", "Hoge"));
 
         assertThat("１件取得できる", scList1.size(), is(2));
@@ -76,7 +76,7 @@ public class PimsDbSpecificationFactoryTest {
 
     @Test
     public void eqのテスト() throws Exception {
-        PimsDbSpecificationFactory<SystemConfig> sysConfigSpecification = new PimsDbSpecificationFactory<>(SystemConfig.class);
+        MySpecificationAdapter<SystemConfig> sysConfigSpecification = new MySpecificationAdapter<>(SystemConfig.class);
         List<SystemConfig> scList1 = sysConfigRepo.findAll(sysConfigSpecification.eq("configKey", "RegHoge1"));
 
         assertThat("１件取得できる", scList1.size(), is(1));
@@ -86,7 +86,7 @@ public class PimsDbSpecificationFactoryTest {
 
     @Test
     public void neqのテスト() throws Exception {
-        PimsDbSpecificationFactory<SystemConfig> sysConfigSpecification = new PimsDbSpecificationFactory<>(SystemConfig.class);
+        MySpecificationAdapter<SystemConfig> sysConfigSpecification = new MySpecificationAdapter<>(SystemConfig.class);
         List<SystemConfig> scList1 = sysConfigRepo.findAll(sysConfigSpecification.neq("configKey", "RegHoge1"));
 
         assertThat("４件取得できる", scList1.size(), is(4));
@@ -102,7 +102,7 @@ public class PimsDbSpecificationFactoryTest {
 
     @Test
     public void startsWithのテスト() throws Exception {
-        PimsDbSpecificationFactory<SystemConfig> sysConfigSpecification = new PimsDbSpecificationFactory<>(SystemConfig.class);
+        MySpecificationAdapter<SystemConfig> sysConfigSpecification = new MySpecificationAdapter<>(SystemConfig.class);
         List<SystemConfig> scList1 = sysConfigRepo.findAll(sysConfigSpecification.startsWith("configKey", "Reg"));
 
         assertThat("２件取得できる", scList1.size(), is(2));
@@ -114,7 +114,7 @@ public class PimsDbSpecificationFactoryTest {
 
     @Test
     public void endsWithのテスト() throws Exception {
-        PimsDbSpecificationFactory<SystemConfig> sysConfigSpecification = new PimsDbSpecificationFactory<>(SystemConfig.class);
+        MySpecificationAdapter<SystemConfig> sysConfigSpecification = new MySpecificationAdapter<>(SystemConfig.class);
         List<SystemConfig> scList1 = sysConfigRepo.findAll(sysConfigSpecification.endsWith("configKey", "2"));
 
         assertThat("１件取得できる", scList1.size(), is(1));
@@ -124,7 +124,7 @@ public class PimsDbSpecificationFactoryTest {
 
     @Test
     public void gtのテスト() throws Exception {
-        PimsDbSpecificationFactory<StatusMaster> statusMasterSpecificationFactory = new PimsDbSpecificationFactory<>(StatusMaster.class);
+        MySpecificationAdapter<StatusMaster> statusMasterSpecificationFactory = new MySpecificationAdapter<>(StatusMaster.class);
         List<StatusMaster> smList1 = statusMasterRepo.findAll(statusMasterSpecificationFactory.gt("statusId", 3));
 
         assertThat("2件取得できる", smList1.size(), is(2));
@@ -138,7 +138,7 @@ public class PimsDbSpecificationFactoryTest {
 
     @Test
     public void geのテスト() throws Exception {
-        PimsDbSpecificationFactory<StatusMaster> statusMasterSpecificationFactory = new PimsDbSpecificationFactory<>(StatusMaster.class);
+        MySpecificationAdapter<StatusMaster> statusMasterSpecificationFactory = new MySpecificationAdapter<>(StatusMaster.class);
         List<StatusMaster> smList1 = statusMasterRepo.findAll(statusMasterSpecificationFactory.ge("statusId", 3));
 
         assertThat("3件取得できる", smList1.size(), is(3));
@@ -152,7 +152,7 @@ public class PimsDbSpecificationFactoryTest {
 
     @Test
     public void ltのテスト() throws Exception {
-        PimsDbSpecificationFactory<StatusMaster> statusMasterSpecificationFactory = new PimsDbSpecificationFactory<>(StatusMaster.class);
+        MySpecificationAdapter<StatusMaster> statusMasterSpecificationFactory = new MySpecificationAdapter<>(StatusMaster.class);
         List<StatusMaster> smList1 = statusMasterRepo.findAll(statusMasterSpecificationFactory.lt("statusId", 3));
 
         assertThat("2件取得できる", smList1.size(), is(2));
@@ -166,7 +166,7 @@ public class PimsDbSpecificationFactoryTest {
 
     @Test
     public void leのテスト() throws Exception {
-        PimsDbSpecificationFactory<StatusMaster> statusMasterSpecificationFactory = new PimsDbSpecificationFactory<>(StatusMaster.class);
+        MySpecificationAdapter<StatusMaster> statusMasterSpecificationFactory = new MySpecificationAdapter<>(StatusMaster.class);
         List<StatusMaster> smList1 = statusMasterRepo.findAll(statusMasterSpecificationFactory.le("statusId", 3));
 
         assertThat("3件取得できる", smList1.size(), is(3));

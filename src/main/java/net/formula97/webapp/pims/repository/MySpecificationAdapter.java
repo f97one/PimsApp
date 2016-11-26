@@ -8,7 +8,7 @@ import java.lang.reflect.Field;
  * Spring Data JPAのSpecificationを、ちょっと汎用的に扱えるようにしたSpecification組立クラス。<br />
  * Created by f97one on 2016/11/19.
  */
-public class PimsDbSpecificationFactory<T> {
+public class MySpecificationAdapter<T> {
 
     private final Class<T> mClass;
 
@@ -17,7 +17,7 @@ public class PimsDbSpecificationFactory<T> {
      *
      * @param clazz 対象クラス
      */
-    public PimsDbSpecificationFactory(Class<T> clazz) {
+    public MySpecificationAdapter(Class<T> clazz) {
         this.mClass = clazz;
     }
 
