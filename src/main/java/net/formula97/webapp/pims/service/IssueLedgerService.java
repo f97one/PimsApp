@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author f97one
@@ -40,10 +40,8 @@ public class IssueLedgerService {
         
         List<IssueLedger> retList = new ArrayList<>(joinedLedgers);
         retList.addAll(publicLedgers);
-        
-        IssueLedger[] retArray = retList.stream().distinct().toArray(IssueLedger[]::new);
-        
-        return new ArrayList<>(Arrays.asList(retArray));
+
+        return retList.stream().distinct().collect(Collectors.toList());
     }
 
     public IssueLedger getLedgerById(Integer ledgerId) {
