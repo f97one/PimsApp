@@ -7,31 +7,32 @@ import net.formula97.webapp.pims.domain.IssueItems;
 import net.formula97.webapp.pims.domain.IssueLedger;
 import net.formula97.webapp.pims.domain.LedgerRefUser;
 import net.formula97.webapp.pims.domain.Users;
+import net.formula97.webapp.pims.misc.AppConstants;
 import net.formula97.webapp.pims.service.IssueItemsService;
 import net.formula97.webapp.pims.service.IssueLedgerService;
 import net.formula97.webapp.pims.service.LedgerRefUserService;
 import net.formula97.webapp.pims.web.forms.HeaderForm;
+import net.formula97.webapp.pims.web.forms.IssueItemForm;
 import net.formula97.webapp.pims.web.forms.IssueItemsLineForm;
 import net.formula97.webapp.pims.web.forms.NewLedgerForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.validation.Valid;
+import java.util.*;
 
 /**
  * @author f97one
  *
  */
 @Controller
-@RequestMapping("ledger")
+@RequestMapping("/ledger")
 public class LedgerController extends BaseWebController {
 
     @Autowired
@@ -116,13 +117,13 @@ public class LedgerController extends BaseWebController {
         return "/ledger/addLedger";
     }
 
-    @RequestMapping(value = "create", params = "addLedgerBtn", method = RequestMethod.POST)
-    public String addLedger(@Validated NewLedgerForm form, BindingResult result, Model model, HeaderForm headerForm) {
+    @RequestMapping(value = "/create", params = "addLedgerBtn", method = RequestMethod.POST)
+    public String addLedger(@ModelAttribute("newLedgerForm") @Valid NewLedgerForm newLedgerForm, BindingResult result, Model model, HeaderForm headerForm) {
         Users users = getUserState(model, headerForm);
 
-        String dest = null;
+        String dest;
         if (result.hasErrors()) {
-            return showLedger(form, model, headerForm);
+            return showLedger(newLedgerForm, model, headerForm);
         }
 
         if (users == null) {
@@ -130,9 +131,9 @@ public class LedgerController extends BaseWebController {
             dest = "/ledger/addLedger";
         } else {
             IssueLedger ledger = new IssueLedger();
-            ledger.setLedgerName(form.getLedgerName());
+            ledger.setLedgerName(newLedgerForm.getLedgerName());
             ledger.setOpenStatus(1);
-            ledger.setPublicLedger(form.isPublicLedger());
+            ledger.setPublicLedger(newLedgerForm.isPublicLedger());
 
             issueLedgerSvc.saveLedger(ledger, users);
 
@@ -141,4 +142,43 @@ public class LedgerController extends BaseWebController {
 
         return dest;
     }
+
+    @RequestMapping(value = "{ledgerId}/add", method = RequestMethod.GET)
+    public String showIssueItemCreationView(@PathVariable Integer ledgerId, Model model, HeaderForm headerForm) {
+        Users users = getUserState(model, headerForm);
+
+        IssueItemForm issueItemForm = new IssueItemForm();
+
+        String dest;
+
+        // 指定番号の台帳がない場合はエラーにする
+        Optional<IssueLedger> ledgerOptional = Optional.ofNullable(issueLedgerSvc.getLedgerById(ledgerId));
+        if (ledgerOptional.isPresent()) {
+            putErrMsg(model, "台帳が見つかりません。");
+            dest = String.format(Locale.getDefault(), "/ledger/%d/add", ledgerId);
+            issueItemForm.setOpeMode(AppConstants.EDIT_MODE_READONLY);
+        } else {
+            if (users == null) {
+                putErrMsg(model, "台帳の追加にはログインが必要です。");
+                dest = String.format(Locale.getDefault(), "/ledger/%d/add", ledgerId);
+                issueItemForm.setOpeMode(AppConstants.EDIT_MODE_READONLY);
+            } else {
+                // 課題を編集できるかどうかを判断
+                if (issueItemsSvc.hasEditPrivilege(ledgerId, users)) {
+                    issueItemForm.setOpeMode(AppConstants.EDIT_MODE_ADD);
+                } else {
+                    issueItemForm.setOpeMode(AppConstants.EDIT_MODE_READONLY);
+                }
+
+                issueItemForm.setIssueNumberLabel("新規");
+                issueItemForm.setRecordTimestamp(new Date());
+
+                model.addAttribute("issueItem", issueItemForm);
+                dest = "/ledger/issueItem";
+            }
+        }
+
+        return dest;
+    }
+
 }

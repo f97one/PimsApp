@@ -22,4 +22,9 @@ public class AppConstants {
      * ユーザー権限：管理者ユーザー
      */
     public static final String ROLE_ADMIN = "ADMIN";
+
+    public static final String EDIT_MODE_ADD = "A";
+    public static final String EDIT_MODE_MODIFY = "M";
+    public static final String EDIT_MODE_REMOVE = "D";
+    public static final String EDIT_MODE_READONLY = "R";
 }

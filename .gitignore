@@ -47,3 +47,4 @@ gradle.properties
 .idea/*
 *.iml
 /.apt_generated/
+/.gradle/

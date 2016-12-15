@@ -83,11 +83,11 @@
             <input type="hidden" id="recordTimestamp" name="recordTimestamp" th:field="*{recordTimestamp}"/>
 
             <div class="row">
-                <div class="col-lg-1 col-sm-2">発生日</div>
-                <div class="col-lg-11 col-sm-10">
+                <div class="col-lg-2 col-sm-3">発生日</div>
+                <div class="col-lg-10 col-sm-9">
                     <div class="input-group date col-lg-3 col-sm-6 col-xs-12 datePickerBox" data-provide="datepicker">
                         <input type="text" id="foundDate" name="foundDate" th:field="*{foundDate}"
-                               class="form-control" maxlength="12"/>
+                               class="form-control" maxlength="12" th:disabled="${issueItems.opeMode == 'R'}"/>
                         <div class="input-group-addon">
                             <span class="glyphicon glyphicon-th"></span>
                         </div>
@@ -97,10 +97,11 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-1 col-sm-2">緊急度</div>
-                <div class="col-lg-11 col-sm-10">
+                <div class="col-lg-2 col-sm-3">緊急度</div>
+                <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
-                        <select class="form-control" id="severitySelector" name="severitySelector">
+                        <select class="form-control" id="severitySelector" name="severitySelector"
+                                th:disabled="${issueItems.opeMode == 'R'}">
                             <option value="">---</option>
                             <option th:each="severityItem : ${severityList}" th:value="${severityItem.value}"
                                     th:text="${severityItem.key}" th:selected="${severityItem.value} == *{severity}">
@@ -113,10 +114,11 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-1 col-sm-2">発見者</div>
-                <div class="col-lg-11 col-sm-10">
+                <div class="col-lg-2 col-sm-3">発見者</div>
+                <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
-                        <select class="form-control" id="foundUserSelector" name="foundUserSelector">
+                        <select class="form-control" id="foundUserSelector" name="foundUserSelector"
+                                th:disabled="${issueItems.opeMode == 'R'}">
                             <option value="">---</option>
                             <option th:each="foundUserItem : ${joinedUsers}" th:value="${foundUserItem.value}"
                                     th:text="${foundUserItem.key}"
@@ -128,10 +130,11 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-1 col-sm-2">機能種別</div>
-                <div class="col-lg-11 col-sm-10">
+                <div class="col-lg-2 col-sm-3">機能種別</div>
+                <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
-                        <select class="form-control" id="moduleKind" name="moduleKind">
+                        <select class="form-control" id="moduleKind" name="moduleKind"
+                                th:disabled="${issueItems.opeMode == 'R'}">
                             <option value="">---</option>
                             <option th:each="module : ${moduleCategoryList}" th:value="${module.value}"
                                     th:text="${module.key}" th:selected="${module.value} == *{categoryId}">found user
@@ -143,10 +146,11 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-1 col-sm-2">原因工程</div>
-                <div class="col-lg-11 col-sm-10">
+                <div class="col-lg-2 col-sm-3">原因工程</div>
+                <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
-                        <select class="form-control" id="causedProcess" name="causedProcess">
+                        <select class="form-control" id="causedProcess" name="causedProcess"
+                                th:disabled="${issueItems.opeMode == 'R'}">
                             <option value="">---</option>
                             <option th:each="processItem : ${causedProcessList}" th:value="${processItem.value}"
                                     th:text="${processItem.key}" th:selected="${processItem.value} == *{processId}">
@@ -159,47 +163,51 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-1 col-sm-2">障害内容</div>
-                <div class="col-lg-11 col-sm-10">
+                <div class="col-lg-2 col-sm-3">障害内容</div>
+                <div class="col-lg-10 col-sm-9">
                     <textarea id="issueDetail" name="issueDetail" class="form-control" rows="4" cols="60"
                               th:field="*{issueDetail}" maxlength="32768"
                               onkeydown="getRemainLength(this, 'issueDetailCount')"
                               onchange="getRemainLength(this, 'issueDetailCount')"
-                              onblur="getRemainLength(this, 'issueDetailCount')"></textarea>
+                              onblur="getRemainLength(this, 'issueDetailCount')"
+                              th:disabled="${issueItems.opeMode == 'R'}"></textarea>
                     <div class="col-lg-1 col-sm1 pull-right"><span id="issueDetailCount">0</span>/32768</div>
                     <span th:if="${#fields.hasErors('issueDetail')}" th:errors="*{issueDetail}" class="help-block">error!</span>
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-1 col-sm-2">原因</div>
-                <div class="col-lg-11 col-sm-10">
+                <div class="col-lg-2 col-sm-3">原因</div>
+                <div class="col-lg-10 col-sm-9">
                     <textarea id="caused" name="caused" class="form-control" rows="4" cols="60"
                               th:field="*{caused}" maxlength="32768"
                               onkeydown="getRemainLength(this, 'causedCount')"
                               onchange="getRemainLength(this, 'causedCount')"
-                              onblur="getRemainLength(this, 'causedCount')"></textarea>
+                              onblur="getRemainLength(this, 'causedCount')"
+                              th:disabled="${issueItems.opeMode == 'R'}"></textarea>
                     <div class="col-lg-1 col-sm1 pull-right"><span id="causedCount">0</span>/32768</div>
                     <span th:if="${#fields.hasErors('caused')}" th:errors="*{caused}" class="help-block">error!</span>
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-1 col-sm-2">対応内容</div>
-                <div class="col-lg-11 col-sm-10">
+                <div class="col-lg-2 col-sm-3">対応内容</div>
+                <div class="col-lg-10 col-sm-9">
                     <textarea id="countermeasures" name="countermeasures" class="form-control" rows="4" cols="60"
                               th:field="*{countermeasures}" maxlength="32768"
                               onkeydown="getRemainLength(this, 'countermeasuresCount')"
                               onchange="getRemainLength(this, 'countermeasuresCount')"
-                              onblur="getRemainLength(this, 'countermeasuresCount')"></textarea>
+                              onblur="getRemainLength(this, 'countermeasuresCount')"
+                              th:disabled="${issueItems.opeMode == 'R'}"></textarea>
                     <div class="col-lg-1 col-sm1 pull-right"><span id="countermeasuresCount">0</span>/32768</div>
                     <span th:if="${#fields.hasErors('countermeasures')}" th:errors="*{countermeasures}"
                           class="help-block">error!</span>
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-1 col-sm-2">対応者</div>
-                <div class="col-lg-11 col-sm-10">
+                <div class="col-lg-2 col-sm-3">対応者</div>
+                <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
-                        <select class="form-control" id="correspondingUserSelector" name="correspondingUserSelector">
+                        <select class="form-control" id="correspondingUserSelector" name="correspondingUserSelector"
+                                th:disabled="${issueItems.opeMode == 'R'}">
                             <option value="">---</option>
                             <option th:each="correspondingUserItem : ${correspondingUsers}"
                                     th:value="${correspondingUserItem.value}" th:text="${correspondingUserItem.key}"
@@ -213,22 +221,23 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-1 col-sm-2">対応時間</div>
-                <div class="col-lg-11 col-sm-10">
+                <div class="col-lg-2 col-sm-3">対応時間</div>
+                <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
                         <input type="text" id="correspondingTime" name="correspondingTime"
-                               class="form-control text-right" th:field="*{correspondingTime}" maxlength="6"/>
+                               class="form-control text-right" th:field="*{correspondingTime}" maxlength="6"
+                               th:disabled="${issueItems.opeMode == 'R'}"/>
                         <span th:if="${#fields.hasErrors('correspondingTime')}" th:errors="*{correspondingTime}"
                               class="help-block">error!</span>
                     </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-1 col-sm-2">対応終了日</div>
-                <div class="col-lg-11 col-sm-10">
+                <div class="col-lg-2 col-sm-3">対応終了日</div>
+                <div class="col-lg-10 col-sm-9">
                     <div class="input-group date col-lg-3 col-sm-6 col-xs-12 datePickerBox" data-provide="datepicker">
                         <input type="text" id="correspondingEndDate" name="correspondingEndDate"
-                               th:field="*{correspondingEndDate}"
+                               th:field="*{correspondingEndDate}" th:disabled="${issueItems.opeMode == 'R'}"
                                class="form-control" maxlength="12"/>
                         <div class="input-group-addon">
                             <span class="glyphicon glyphicon-th"></span>
@@ -239,10 +248,11 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-1 col-sm-2">確認者</div>
-                <div class="col-lg-11 col-sm-10">
+                <div class="col-lg-2 col-sm-3">確認者</div>
+                <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
-                        <select class="form-control" id="confirmedUserSelector" name="confirmedUserSelector">
+                        <select class="form-control" id="confirmedUserSelector" name="confirmedUserSelector"
+                                th:disabled="${issueItems.opeMode == 'R'}">
                             <option value="">---</option>
                             <option th:each="confirmedUserItem : ${confirmedUsers}"
                                     th:value="${confirmedUserItem.value}" th:text="${confirmedUserItem.key}"
@@ -255,17 +265,31 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-1 col-sm-2">確認日</div>
-                <div class="col-lg-11 col-sm-10">
+                <div class="col-lg-2 col-sm-3">確認日</div>
+                <div class="col-lg-10 col-sm-9">
                     <div class="input-group date col-lg-3 col-sm-6 col-xs-12 datePickerBox" data-provide="datepicker">
                         <input type="text" id="confirmedDate" name="confirmedDate" th:field="*{confirmedDate}"
-                               class="form-control" maxlength="12"/>
+                               class="form-control" maxlength="12" th:disabled="${issueItems.opeMode == 'R'}"/>
                         <div class="input-group-addon">
                             <span class="glyphicon glyphicon-th"></span>
                         </div>
                     </div>
                     <span th:if="${#fields.hasErrors('confirmedDate')}" th:errors="*{confirmedDate}" class="help-block">Error</span>
                 </div>
+            </div>
+            <div class="row">
+                <button type="reset" id="resetbtn" class="btn btn-default col-lg-1"
+                        th:disabled="${issueItems.opeMode == 'R'}">リセット
+                </button>
+                <input type="submit" id="fakeUpdateItemBtn" class="btn btn-primary col-lg-1 pull-right"
+                       th:if="${issueItem.opeMode == 'R'}" disabled th:disabled="${issueItem.opeMode == 'R'}"
+                       value="更新"/>
+                <input type="submit" id="updateItemBtn" class="btn btn-primary col-lg-1 pull-right"
+                       th:if="${issueItem.opeMode == 'M'}" value="更新"/>
+                <input type="submit" id="addItemBtn" class="btn btn-primary col-lg-1 pull-right"
+                       th:if="${issueItem.opeMode == 'A'}" value="追加"/>
+                <input type="submit" id="removeItemBtn" class="btn btn-danger col-lg-1 pull-right"
+                       th:if="${issueItem.opeMode == 'D'}" value="削除"/>
             </div>
         </form>
     </div>
