@@ -20,13 +20,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.context.WebApplicationContext;
@@ -38,9 +38,11 @@ import javax.validation.constraints.Size;
 import java.util.Locale;
 import java.util.Set;
 
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Created by f97one on 2016/10/10.
@@ -172,13 +174,14 @@ public class LedgerControllerTest extends BaseTestCase {
         ResultActions actions = mMvcMock.perform(MockMvcRequestBuilders.post("/ledger/create")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .with(csrf())
+                .param("newLedgerForm", "")
                 .param("newLedgerForm.ledgerName", "ユーザーあり追加テスト用台帳")
                 .param("newLedgerForm.publicLedger", "true")
                 .param("newLedgerForm.openStatus", "1")
                 .param("addLedgerBtn", "")
         );
 
-        actions.andExpect(MockMvcResultMatchers.status().isOk());
+        actions.andExpect(status().isOk());
 
         int afterLedgerCount = issueLedgerRepo.findAll().size();
         int afterRefCount = ledgerRefUserRepo.findAll().size();
@@ -189,33 +192,45 @@ public class LedgerControllerTest extends BaseTestCase {
 
     @Ignore
     @Test
-    @WithUserDetails(value = "user11", userDetailsServiceBeanName = "authorizedUsersService")
+    @WithMockUser(value = "user11")
     public void ログインしている場合台帳が作成できる() throws Exception {
         int beforeLedgerCount = issueLedgerRepo.findAll().size();
         int beforeRefCount = ledgerRefUserRepo.findAll().size();
 
+        NewLedgerForm frm = new NewLedgerForm("ユーザーあり追加テスト用台帳", 1, true);
+
         ResultActions actions = mMvcMock.perform(MockMvcRequestBuilders.post("/ledger/create")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .with(csrf())
+//                        .requestAttr("newLedgerForm", frm)
+                        .param("newLedgerForm", "")
                 .param("newLedgerForm.ledgerName", "ユーザーあり追加テスト用台帳")
                 .param("newLedgerForm.publicLedger", "true")
-                .param("newLedgerForm.openStatus", "1")
+                        .param("newLedgerForm.openStatus", "")
                 .param("addLedgerBtn", "")
-
         );
 
         int afterLedgerCount = issueLedgerRepo.findAll().size();
         int afterRefCount = ledgerRefUserRepo.findAll().size();
 
-        actions.andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.model().hasNoErrors());
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/addLedger")))
+//                .andExpect(model().attributeExists("newLedgerForm"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().attribute("newLedgerForm", hasProperty("ledgerName", is("ユーザーあり追加テスト用台帳"))))
+                .andExpect(model().attribute("newLedgerForm", hasProperty("publicledger", is("true"))))
+                .andExpect(model().attribute("newLedgerForm", hasProperty("openStatus", is("1"))))
+                .andReturn();
 
-        ModelMap modelMap = actions.andReturn().getModelAndView().getModelMap();
+        assertThat("台帳の数は1増えている", afterLedgerCount, is(beforeLedgerCount + 1));
+        assertThat("台帳割り当て数も1増えている", afterRefCount, is(beforeRefCount + 1));
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        assertThat(modelMap.containsAttribute("newLedgerForm"), is(true));
+
         NewLedgerForm resultForm = (NewLedgerForm) modelMap.get("newLedgerForm");
         assertThat("台帳名は「ユーザーあり追加テスト用台帳」", resultForm.getLedgerName(), is("ユーザーあり追加テスト用台帳"));
         assertThat("公開台帳になっている", resultForm.isPublicLedger(), is(true));
-
-        assertThat("台帳の数は1増えている", beforeLedgerCount, Matchers.is(afterLedgerCount - 1));
-        assertThat("台帳割り当て数も1増えている", beforeRefCount, Matchers.is(afterRefCount - 1));
     }
 }
