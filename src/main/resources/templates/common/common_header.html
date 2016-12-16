@@ -39,6 +39,7 @@ and open the template in the editor.
                     <li><a id="toHomeLink" class="btn btn-link navbar-link" th:href="@{/}">ホーム</a></li>
                     <li th:if="${#httpServletRequest.remoteUser != null}">
                         <a id="configBtn" class="btn btn-link navbar-link"
+                           th:href="@{'/admin'}"
                            th:if="${headerForm.users.authority == 'ROLE_ADMIN'}">設定</a>
                     </li>
                 </ul>

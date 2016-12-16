@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Admin Menu | PIMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css"
+          href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap-theme.min.css}"/>
+    <link rel="stylesheet" type="text/css"
+          href="../../../static/css/pimsmain.css" th:href="@{/static/css/pimsmain.css}"/>
+</head>
+<body>
+<div class="container">
+    <div th:replace="/common/common_header::common_header"></div>
+
+    <h2 class="h2">管理者メニュー</h2>
+
+    <div class="row vertical-margin">
+        <div class="col-lg-push-3 col-sm-push-3 col-lg-6 col-sm-6 col-xs-12">
+            <a th:href="@{/admin/system}" class="btn btn-default btn-block">システム管理</a>
+        </div>
+    </div>
+
+    <div class="row vertical-margin">
+        <div class="col-lg-push-3 col-sm-push-3 col-lg-6 col-sm-6 col-xs-12">
+            <a th:href="@{/admin/userManagement}" class="btn btn-default btn-block">ユーザー管理</a>
+        </div>
+    </div>
+
+    <div class="row vertical-margin">
+        <div class="col-lg-push-3 col-sm-push-3 col-lg-6 col-sm-6 col-xs-12">
+            <a th:href="@{/admin/ledgerManagement}" class="btn btn-default btn-block">台帳管理</a>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
