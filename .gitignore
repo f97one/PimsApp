@@ -46,5 +46,7 @@ gradle.properties
 # for IntelliJ IDEA
 .idea/*
 *.iml
+*.ipr
+*.iws
 /.apt_generated/
 /.gradle/
