@@ -2,8 +2,11 @@ package net.formula97.webapp.pims.web;
 
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.web.forms.HeaderForm;
+import net.formula97.webapp.pims.web.forms.UserSearchConditionForm;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -39,5 +42,18 @@ public class AdminController extends BaseWebController {
         Users users = getUserState(model, headerForm);
 
         return "/admin/ledgerManagement";
+    }
+
+    @RequestMapping(value = "searchUser", method = RequestMethod.POST, name = "searchBtn")
+    public String searchUserByCondition(@ModelAttribute("userSearchConditionForm") UserSearchConditionForm userSearchConditionForm,
+                                        BindingResult result, Model model, HeaderForm headerForm) {
+        Users users = getUserState(model, headerForm);
+
+        if (result.hasErrors()) {
+            // TODO: バリデーション失敗の処理を書く
+        }
+
+
+        return null;
     }
 }
