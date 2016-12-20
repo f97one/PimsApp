@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by f97one on 2016/10/22.
  */
@@ -35,7 +38,13 @@ public class AdminController extends BaseWebController {
     public String showUserManagement(Model model, HeaderForm headerForm) {
         Users users = getUserState(model, headerForm);
 
-        return "/admin/userManagement";
+        UserSearchConditionForm frm = new UserSearchConditionForm();
+        model.addAttribute("userSearchConditionForm", frm);
+        model.addAttribute("matchUserCount", 0);
+        model.addAttribute("dispUserList", new ArrayList<Users>());
+        model.addAttribute("searchExecuted", false);
+
+        return "/admin/user_list";
     }
 
     public String showLedgerManagement(Model model, HeaderForm headerForm) {
@@ -44,16 +53,21 @@ public class AdminController extends BaseWebController {
         return "/admin/ledgerManagement";
     }
 
-    @RequestMapping(value = "searchUser", method = RequestMethod.POST, name = "searchBtn")
+    @RequestMapping(value = "userManagement/searchUser", method = RequestMethod.GET, name = "searchBtn")
     public String searchUserByCondition(@ModelAttribute("userSearchConditionForm") UserSearchConditionForm userSearchConditionForm,
                                         BindingResult result, Model model, HeaderForm headerForm) {
         Users users = getUserState(model, headerForm);
 
         if (result.hasErrors()) {
-            // TODO: バリデーション失敗の処理を書く
+            model.addAttribute("matchUserCount", 0);
+            return "/admin/user_list";
         }
+        model.addAttribute("searchExecuted", true);
 
+        List<Users> searchResult = authorizedUsersSvc.findUsers(userSearchConditionForm);
+        model.addAttribute("matchUserCount", searchResult.size());
+        model.addAttribute("dispUserList", searchResult);
 
-        return null;
+        return "/admin/user_list";
     }
 }
