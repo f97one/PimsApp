@@ -36,9 +36,9 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.constraints.Size;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -174,14 +174,16 @@ public class LedgerControllerTest extends BaseTestCase {
         ResultActions actions = mMvcMock.perform(MockMvcRequestBuilders.post("/ledger/create")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .with(csrf())
-                .param("newLedgerForm", "")
-                .param("newLedgerForm.ledgerName", "ユーザーあり追加テスト用台帳")
-                .param("newLedgerForm.publicLedger", "true")
-                .param("newLedgerForm.openStatus", "1")
-                .param("addLedgerBtn", "")
+                .param("ledgerName", "ユーザーあり追加テスト用台帳")
+                .param("publicLedger", "true")
+                .param("openStatus", "1")
+                .param("addLedgerBtn", "追加")
         );
 
-        actions.andExpect(status().isOk());
+        actions.andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/addLedger")))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
 
         int afterLedgerCount = issueLedgerRepo.findAll().size();
         int afterRefCount = ledgerRefUserRepo.findAll().size();
@@ -190,7 +192,6 @@ public class LedgerControllerTest extends BaseTestCase {
         assertThat("台帳割り当て数も同じ", beforeRefCount, Matchers.is(afterRefCount));
     }
 
-    @Ignore
     @Test
     @WithMockUser(value = "user11")
     public void ログインしている場合台帳が作成できる() throws Exception {
@@ -202,35 +203,29 @@ public class LedgerControllerTest extends BaseTestCase {
         ResultActions actions = mMvcMock.perform(MockMvcRequestBuilders.post("/ledger/create")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .with(csrf())
-//                        .requestAttr("newLedgerForm", frm)
-                        .param("newLedgerForm", "")
-                .param("newLedgerForm.ledgerName", "ユーザーあり追加テスト用台帳")
-                .param("newLedgerForm.publicLedger", "true")
-                        .param("newLedgerForm.openStatus", "")
-                .param("addLedgerBtn", "")
+                .param("ledgerName", "ユーザーあり追加テスト用台帳")
+                .param("publicLedger", "true")
+                .param("openStatus", "1")
+                .param("addLedgerBtn", "追加")
         );
 
         int afterLedgerCount = issueLedgerRepo.findAll().size();
         int afterRefCount = ledgerRefUserRepo.findAll().size();
 
         MvcResult mvcResult = actions
-                .andExpect(status().isOk())
-                .andExpect(view().name(is("/ledger/addLedger")))
-//                .andExpect(model().attributeExists("newLedgerForm"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(is("redirect:/")))
                 .andExpect(model().hasNoErrors())
-                .andExpect(model().attribute("newLedgerForm", hasProperty("ledgerName", is("ユーザーあり追加テスト用台帳"))))
-                .andExpect(model().attribute("newLedgerForm", hasProperty("publicledger", is("true"))))
-                .andExpect(model().attribute("newLedgerForm", hasProperty("openStatus", is("1"))))
                 .andReturn();
 
         assertThat("台帳の数は1増えている", afterLedgerCount, is(beforeLedgerCount + 1));
         assertThat("台帳割り当て数も1増えている", afterRefCount, is(beforeRefCount + 1));
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
-        assertThat(modelMap.containsAttribute("newLedgerForm"), is(true));
 
-        NewLedgerForm resultForm = (NewLedgerForm) modelMap.get("newLedgerForm");
-        assertThat("台帳名は「ユーザーあり追加テスト用台帳」", resultForm.getLedgerName(), is("ユーザーあり追加テスト用台帳"));
-        assertThat("公開台帳になっている", resultForm.isPublicLedger(), is(true));
+        Optional<IssueLedger> ledgerOptional = issueLedgerRepo.findAll().stream().filter((r) -> r.getLedgerName().equals("ユーザーあり追加テスト用台帳")).findFirst();
+
+        assertThat("追加した台帳が入っている", ledgerOptional.isPresent(), is(true));
+        assertThat("台帳は公開台帳", ledgerOptional.get().getPublicLedger(), is(true));
     }
 }
