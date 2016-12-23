@@ -78,6 +78,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
             validator = Validation.buildDefaultValidatorFactory().getValidator();
         }
 
+        // 初期状態で存在する管理者ユーザーをとりあえず消す
         Optional<Users> adminOptional = Optional.ofNullable(userRepo.findOne("admin"));
         adminOptional.ifPresent(users -> userRepo.delete("admin"));
 
@@ -148,6 +149,12 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
     @WithMockUser(value = "user1", roles = {"ADMIN"})
     public void 何も指定しないときはすべてのユーザーが検索できる() throws Exception {
         ResultActions actions = mMvcMock.perform(get("/admin/userManagement/searchUser")
+                /*
+                   「何も指定していないとき」とはしているが、
+                   1. limitEnabledUserは空にできないため、チェックを外している状態をfalseと仮定
+                   2. searchUserBtnは、ボタンを押すと「検索」が必ず付加される
+                   以下同様。
+                 */
                 .param("username", "")
                 .param("displayName", "")
                 .param("mailAddress", "")
