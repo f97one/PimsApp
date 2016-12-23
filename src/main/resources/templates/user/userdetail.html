@@ -90,30 +90,24 @@
             </div>
             <div class="row">
                 <div class="col-lg-2 col-sm-2"></div>
-                <div class="col-lg-1 col-sm-1　checkbox-inline">
-                    <input type="checkbox" id="enableUser" name="enableUser"
-                           class="form-control input-sm" th:field="${userConfigForm.enableUser}"
-                           th:errorClass="form-control" th:disabled="${userConfigForm.disableUserEnableModify}"/>
-                </div>
-                <div class="col-lg-9 col-sm-9">
-                    <label for="enableUser" class="control-label">有効にする</label>
+                <div class="col-lg-10 col-sm-10">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="enableUser" name="enableUser" th:field="${userConfigForm.enableUser}"
+                               th:errorClass="form-control" th:disabled="${userConfigForm.disableUserEnableModify}"/>有効にする
+                    </label>
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-2 col-sm-2"></div>
-                <div class="col-lg-1 col-sm-1 radio-inline">
-                    <input type="radio" id="userRole" name="assignedRole" th:field="${userConfigForm.assignedRole}"
-                           class="form-control" value="ROLE_USER" th:disabled="${userConfigForm.disableRoleModify}"/>
-                </div>
-                <div class="col-lg-2 col-sm-3 radio-inline">
-                    <label for="userRole" class="control-label">一般ユーザー</label>
-                </div>
-                <div class="col-lg-1 col-sm-1 radio-inline">
-                    <input type="radio" id="adminRole" name="assignedRole" th:field="${userConfigForm.assignedRole}"
-                           class="form-control" value="ROLE_ADMIN" th:disabled="${userConfigForm.disableRoleModify}"/>
-                </div>
-                <div class="col-lg-2 col-sm-3 radio-inline">
-                    <label for="adminRole" class="control-label">管理者ユーザー</label>
+                <div class="col-lg-4 col-sm-4 radio-inline">
+                    <label class="control-label radio-inline">
+                        <input type="radio" id="userRole" name="assignedRole" th:field="${userConfigForm.assignedRole}"
+                               value="ROLE_USER" th:disabled="${userConfigForm.disableRoleModify}"/>一般ユーザー
+                    </label>
+                    <label class="control-label radio-inline">
+                        <input type="radio" id="adminRole" name="assignedRole" th:field="${userConfigForm.assignedRole}"
+                               value="ROLE_ADMIN" th:disabled="${userConfigForm.disableRoleModify}"/>管理者ユーザー
+                    </label>
                 </div>
             </div>
             <div class="row" style="margin-top: 16px;">
