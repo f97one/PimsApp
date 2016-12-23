@@ -1,7 +1,9 @@
 package net.formula97.webapp.pims.web;
 
 import net.formula97.webapp.pims.domain.Users;
+import net.formula97.webapp.pims.misc.AppConstants;
 import net.formula97.webapp.pims.web.forms.HeaderForm;
+import net.formula97.webapp.pims.web.forms.UserConfigForm;
 import net.formula97.webapp.pims.web.forms.UserSearchConditionForm;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,4 +39,16 @@ public class AdminUserManagementController extends BaseWebController {
         return "/admin/user_list";
     }
 
+    @RequestMapping(value = "add", method = RequestMethod.GET)
+    public String showUserAddView(Model model, HeaderForm headerForm) {
+        Users users = getUserState(model, headerForm);
+
+        UserConfigForm userConfigForm = new UserConfigForm();
+        userConfigForm.setAssignedRole(AppConstants.ROLE_USER);
+        model.addAttribute("userConfigForm", userConfigForm);
+
+        model.addAttribute("modeTag", AppConstants.EDIT_MODE_ADD);
+
+        return "/admin/user_detail";
+    }
 }

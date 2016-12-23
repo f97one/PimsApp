@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css"
+          href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css"
+          href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap-theme.min.css}"/>
+    <title>User details | PIMS</title>
+</head>
+<body>
+<div class="container">
+
+    <div th:replace="/common/common_header::common_header"></div>
+
+    <h2>ユーザー設定</h2>
+
+    <div th:replace="/common/info_block::info_block"></div>
+
+    <div class="form-group">
+        <form th:action="@{/admin/userManagement/add}" class="form-horizontal" method="POST"
+              th:object="${userConfigForm}">
+            <input type="hidden" th:field="${userConfigForm.disableUsernameModify}"/>
+            <input type="hidden" th:field="${userConfigForm.disableDisplayNameModify}"/>
+            <input type="hidden" th:field="${userConfigForm.disableRoleModify}"/>
+            <input type="hidden" th:field="${userConfigForm.disableUserEnableModify}"/>
+
+            <div class="row">
+                <div class="col-lg-2 col-sm-2">ユーザーID</div>
+                <div class="col-lg-4 col-sm-4">
+                    <input type="text" maxlength="32" id="username" name="username" value="mockuser1"
+                           class="form-control" th:field="*{username}" th:errorClass="form-control"
+                           th:disabled="${modeTag ne 'A'}"/>
+                </div>
+                <div class="col-lg-6 col-sm-6">
+                    <span th:if="${#fields.hasErrors('username')}" th:errors="*{username}"
+                          class="help-block text-warning">Error</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2 col-sm-2">現パスワード</div>
+                <div class="col-lg-4 col-sm-4">
+                    <input type="password" maxlength="32" id="orgPassword" name="orgPassword" value="mockuserpasswd1"
+                           class="form-control" th:field="*{orgPassword}" th:errorClass="form-control"/>
+                </div>
+                <div class="col-lg-6 col-sm-6">
+                    <span th:if="${#fields.hasErrors('orgPassword')}"
+                          th:errors="*{orgPassword}"
+                          class="help-block text-warning">Error</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2 col-sm-2">新パスワード</div>
+                <div class="col-lg-4 col-sm-4">
+                    <input type="password" maxlength="32" id="password" name="password" value="mockuserpasswd1"
+                           class="form-control" th:field="*{password}" th:errorClass="form-control"/>
+                </div>
+                <div class="col-lg-6 col-sm-6">
+                    <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"
+                          class="help-block text-warning">Error</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2 col-sm-2">新パスワード（再入力）</div>
+                <div class="col-lg-4 col-sm-4">
+                    <input type="password" maxlength="32" id="passwordConfirm" name="passwordConfirm"
+                           value="mockuserpasswd1"
+                           class="form-control" th:field="*{passwordConfirm}"
+                           th:errorClass="form-control"/>
+                </div>
+                <div class="col-lg-6 col-sm-6">
+                    <span th:if="${#fields.hasErrors('passwordConfirm')}"
+                          th:errors="*{passwordConfirm}"
+                          class="help-block text-warning">Error</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2 col-sm-2">表示名</div>
+                <div class="col-lg-4 col-sm-4">
+                    <input type="text" maxlength="128" id="displayName" name="displayName" value="Mock User 1"
+                           class="form-control" th:field="*{displayName}" th:errorClass="form-control"
+                           th:disabled="${modeTag eq 'R'}"/>
+                </div>
+                <div class="col-lg-6 col-sm-6">
+                    <span th:if="${#fields.hasErrors('displayName')}"
+                          th:errors="*{displayName}" class="help-block text-warning">Error</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2 col-sm-2"></div>
+                <div class="col-lg-10 col-sm-10">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="enableUser" name="enableUser" th:field="*{enableUser}"
+                               th:errorClass="form-control" th:disabled="${modeTag eq 'R'}"/>有効にする
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2 col-sm-2"></div>
+                <div class="col-lg-4 col-sm-4 radio-inline">
+                    <label class="control-label radio-inline">
+                        <input type="radio" id="userRole" name="assignedRole" th:field="*{assignedRole}"
+                               value="USER" th:disabled="${modeTag eq 'R'}"/>一般ユーザー
+                    </label>
+                    <label class="control-label radio-inline">
+                        <input type="radio" id="adminRole" name="assignedRole" th:field="*{assignedRole}"
+                               value="ADMIN" th:disabled="${modeTag eq 'R'}"/>管理者ユーザー
+                    </label>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 16px;">
+                <div class="col-lg-2 col-sm-3">
+                    <input type="submit" id="cancelBtn" name="cancelBtn" class="btn btn-default btn-block"
+                           value="キャンセル"/>
+                </div>
+                <div class="col-lg-1 col-sm-2 pull-right">
+                    <input type="submit" id="updateBtn" name="updateBtn" class="btn btn-primary btn-block"
+                           th:if="${modeTag eq 'M'}" value="保存"/>
+                </div>
+                <div class="col-lg-1 col-sm-2 pull-right">
+                    <input type="submit" id="addBtn" name="addBtn" class="btn btn-primary btn-block"
+                           th:if="${modeTag eq 'A'}" value="追加"/>
+                </div>
+                <div class="col-lg-1 col-sm-2 pull-right">
+                    <input type="submit" id="deleteBtn" name="deleteBtn" class="btn btn-danger btn-block"
+                           th:if="${modeTag eq 'D'}" value="削除"/>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

@@ -51,6 +51,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
     private Validator validator;
     private MockMvc mMvcMock;
 
+    private final String userManagementUrlTemplate = "/admin/userManagement";
 
     /**
      * @throws java.lang.Exception
@@ -119,7 +120,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
     @Test
     @WithAnonymousUser
     public void ログインしていないときはページを表示できない() throws Exception {
-        ResultActions actions = mMvcMock.perform(get("/admin/userManagement")).andDo(print());
+        ResultActions actions = mMvcMock.perform(get(userManagementUrlTemplate)).andDo(print());
 
         actions.andExpect(status().is3xxRedirection())
                 .andReturn();
@@ -128,7 +129,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
     @Test
     @WithMockUser(value = "user1", roles = {"USER"})
     public void 一般ユーザーでログインしているときもページを表示できない() throws Exception {
-        ResultActions actions = mMvcMock.perform(get("/admin/userManagement")).andDo(print());
+        ResultActions actions = mMvcMock.perform(get(userManagementUrlTemplate)).andDo(print());
 
         actions.andExpect(status().isForbidden())
                 .andReturn();
@@ -137,7 +138,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
     @Test
     @WithMockUser(value = "user1", roles = {"ADMIN"})
     public void 管理者ユーザーでログインしているときならページを表示できる() throws Exception {
-        ResultActions actions = mMvcMock.perform(get("/admin/userManagement")).andDo(print());
+        ResultActions actions = mMvcMock.perform(get(userManagementUrlTemplate)).andDo(print());
 
         actions.andExpect(status().isOk())
                 .andExpect(model().hasNoErrors())
@@ -148,7 +149,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
     @Test
     @WithMockUser(value = "user1", roles = {"ADMIN"})
     public void 何も指定しないときはすべてのユーザーが検索できる() throws Exception {
-        ResultActions actions = mMvcMock.perform(get("/admin/userManagement/searchUser")
+        ResultActions actions = mMvcMock.perform(get(userManagementUrlTemplate + "/searchUser")
                 /*
                    「何も指定していないとき」とはしているが、
                    1. limitEnabledUserは空にできないため、チェックを外している状態をfalseと仮定
@@ -179,7 +180,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
     @Test
     @WithMockUser(value = "user1", roles = {"ADMIN"})
     public void 有効ユーザーだけ検索できる() throws Exception {
-        ResultActions actions = mMvcMock.perform(get("/admin/userManagement/searchUser")
+        ResultActions actions = mMvcMock.perform(get(userManagementUrlTemplate + "/searchUser")
                 .param("username", "")
                 .param("displayName", "")
                 .param("mailAddress", "")
@@ -209,7 +210,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
     @Test
     @WithMockUser(value = "user1", roles = {"ADMIN"})
     public void ユーザーIDで検索できる() throws Exception {
-        ResultActions actions = mMvcMock.perform(get("/admin/userManagement/searchUser")
+        ResultActions actions = mMvcMock.perform(get(userManagementUrlTemplate + "/searchUser")
                 .param("username", "user")
                 .param("displayName", "")
                 .param("mailAddress", "")
@@ -239,7 +240,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
     @Test
     @WithMockUser(value = "user1", roles = {"ADMIN"})
     public void 表示名で検索できる() throws Exception {
-        ResultActions actions = mMvcMock.perform(get("/admin/userManagement/searchUser")
+        ResultActions actions = mMvcMock.perform(get(userManagementUrlTemplate + "/searchUser")
                 .param("username", "")
                 .param("displayName", "kanrisha")
                 .param("mailAddress", "")
@@ -267,7 +268,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
     @Test
     @WithMockUser(value = "user1", roles = {"ADMIN"})
     public void メアドで検索できる() throws Exception {
-        ResultActions actions = mMvcMock.perform(get("/admin/userManagement/searchUser")
+        ResultActions actions = mMvcMock.perform(get(userManagementUrlTemplate + "/searchUser")
                 .param("username", "")
                 .param("displayName", "")
                 .param("mailAddress", ".com")
@@ -297,7 +298,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
     @Test
     @WithMockUser(value = "user1", roles = {"ADMIN"})
     public void 条件に外れた検索だと結果欄がない() throws Exception {
-        ResultActions actions = mMvcMock.perform(get("/admin/userManagement/searchUser")
+        ResultActions actions = mMvcMock.perform(get(userManagementUrlTemplate + "/searchUser")
                 .param("username", "kanri")
                 .param("displayName", "")
                 .param("mailAddress", ".com")
@@ -315,5 +316,39 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
         List<Users> searchResult = (List<Users>) modelMap.get("dispUserList");
 
         assertThat("検索できたユーザーは0", searchResult.size(), is(0));
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void 非ログイン時はユーザー追加画面を表示できない() throws Exception {
+        mMvcMock.perform(get(userManagementUrlTemplate + "/searchUser").param("addUserBtn", "ユーザー追加"))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection())
+                .andReturn();
+    }
+
+    @Test
+    @WithMockUser(value = "user1", roles = {"USER"})
+    public void 一般ユーザーでもユーザー追加画面を表示できない() throws Exception {
+        mMvcMock.perform(get(userManagementUrlTemplate + "/searchUser").param("addUserBtn", "ユーザー追加"))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andReturn();
+    }
+
+    @Test
+    @WithMockUser(value = "user1", roles = {"ADMIN"})
+    public void 管理者ユーザーならユーザー追加画面を表示できる() throws Exception {
+        ResultActions actions = mMvcMock.perform(get(userManagementUrlTemplate + "/add")
+                .param("addUserBtn", "ユーザー追加")).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("/admin/user_detail")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("新規追加モードで表示している", modeTag, is(AppConstants.EDIT_MODE_ADD));
     }
 }
