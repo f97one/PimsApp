@@ -4,6 +4,7 @@ import net.formula97.webapp.pims.BaseTestCase;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.misc.AppConstants;
 import net.formula97.webapp.pims.repository.UserRepository;
+import net.formula97.webapp.pims.web.forms.UserModForm;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -21,11 +22,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -350,5 +353,39 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
         String modeTag = (String) modelMap.get("modeTag");
         assertThat("新規追加モードで表示している", modeTag, is(AppConstants.EDIT_MODE_ADD));
+    }
+
+    @Test
+    @WithMockUser(value = "user1", roles = {"ADMIN"})
+    public void ユーザー追加のバリデーションが働いている() throws Exception {
+        UserModForm frm = new UserModForm();
+        frm.setUsername("A");
+        frm.setPassword("観自在菩薩行深般若波羅蜜多時照見五蘊皆空度一切苦厄舎利子色不異空");
+        frm.setOrgPassword("空不異色色即是空空即是色受想行識亦復如是舎利子是諸法空相不生不滅");
+        frm.setPasswordConfirm("不垢不浄不増不減是故空中無色無受想行識無眼耳鼻舌身意無色声香味触");
+        frm.setDisplayName("法無眼界乃至無意識界無無明亦無無明尽乃至無老死亦無老死尽無苦集滅");
+        frm.setAssignedRole("");
+        frm.setEnableUser(true);
+
+        Set<ConstraintViolation<UserModForm>> violationsSet = validator.validate(frm);
+        assertThat("エラーは1件", violationsSet.size(), is(1));
+
+        frm.setUsername("あ");
+        frm.setAssignedRole("A");
+
+        violationsSet = validator.validate(frm);
+        assertThat("エラーは1件", violationsSet.size(), is(1));
+
+        frm.setUsername("A");
+        frm.setAssignedRole("B");
+
+        violationsSet = validator.validate(frm);
+        assertThat("エラーは1件", violationsSet.size(), is(1));
+
+        frm.setAssignedRole("U");
+
+        violationsSet = validator.validate(frm);
+        assertThat("エラーは0件", violationsSet.size(), is(0));
+
     }
 }

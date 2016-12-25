@@ -22,11 +22,8 @@
 
     <div class="form-group">
         <form th:action="@{/admin/userManagement/add}" class="form-horizontal" method="POST"
-              th:object="${userConfigForm}">
-            <input type="hidden" th:field="${userConfigForm.disableUsernameModify}"/>
-            <input type="hidden" th:field="${userConfigForm.disableDisplayNameModify}"/>
-            <input type="hidden" th:field="${userConfigForm.disableRoleModify}"/>
-            <input type="hidden" th:field="${userConfigForm.disableUserEnableModify}"/>
+              th:object="${userModForm}">
+            <input type="hidden" th:field="*{searchUsername}"/>
 
             <div class="row">
                 <div class="col-lg-2 col-sm-2">ユーザーID</div>
@@ -103,11 +100,11 @@
                 <div class="col-lg-4 col-sm-4 radio-inline">
                     <label class="control-label radio-inline">
                         <input type="radio" id="userRole" name="assignedRole" th:field="*{assignedRole}"
-                               value="USER" th:disabled="${modeTag eq 'R'}"/>一般ユーザー
+                               value="U" th:disabled="${modeTag eq 'R'}"/>一般ユーザー
                     </label>
                     <label class="control-label radio-inline">
                         <input type="radio" id="adminRole" name="assignedRole" th:field="*{assignedRole}"
-                               value="ADMIN" th:disabled="${modeTag eq 'R'}"/>管理者ユーザー
+                               value="A" th:disabled="${modeTag eq 'R'}"/>管理者ユーザー
                     </label>
                 </div>
             </div>
