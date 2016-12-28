@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -32,7 +33,9 @@ import java.util.Set;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -387,5 +390,103 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
         violationsSet = validator.validate(frm);
         assertThat("エラーは0件", violationsSet.size(), is(0));
 
+    }
+
+    @Test
+    @WithMockUser(value = "user1", roles = {"ADMIN"})
+    public void ユーザーが追加できる() throws Exception {
+        int beforeUserCount = userRepo.findAll().size();
+
+        ResultActions actions = mMvcMock.perform(post(userManagementUrlTemplate + "/add")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .with(csrf())
+                .param("addBtn", "追加")
+                .param("username", "reguser1")
+                .param("password", "abcdefgh")
+                .param("passwordConfirm", "abcdefgh")
+                .param("displayName", "追加するユーザー１")
+                .param("enableUser", "true")
+                .param("assignedRole", "U")
+                .param("mailAddress", "reguser@example.com"))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(view().name(is("/admin/user_detail")))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        List<Users> currentUsers = userRepo.findAll();
+
+        assertThat("ユーザーが１増えている", currentUsers.size(), is(beforeUserCount + 1));
+        Optional<Users> usersOpt = currentUsers.stream().filter((r) -> r.getUsername().equals("reguser1")).findFirst();
+        assertThat("reguser1が追加されている", usersOpt.isPresent(), is(true));
+        Users u1 = usersOpt.get();
+        assertThat("入力したパスワードと一致している", BCrypt.checkpw("abcdefgh", u1.getPassword()), is(true));
+        assertThat("一般ユーザーになっている", u1.getAuthority(), is(AppConstants.ROLE_USER));
+    }
+
+    @Test
+    @WithMockUser(value = "user1", roles = {"ADMIN"})
+    public void 重複するユーザーは拒否される() throws Exception {
+        int beforeUserCount = userRepo.findAll().size();
+
+        ResultActions actions = mMvcMock.perform(post(userManagementUrlTemplate + "/add")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .with(csrf())
+                .param("addBtn", "追加")
+                .param("username", "user2")
+                .param("password", "P@ssw0rd")
+                .param("passwordConfirm", "P@ssw0rd")
+                .param("displayName", "追加するユーザー１")
+                .param("enableUser", "true")
+                .param("assignedRole", "U")
+                .param("mailAddress", "user2@example.com"))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(view().name(is("/admin/user_detail")))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        List<Users> currentUsers = userRepo.findAll();
+
+        assertThat("ユーザーの数は同じ", currentUsers.size(), is(beforeUserCount));
+
+        String errMsg = (String) mvcResult.getModelAndView().getModelMap().get("errMsg");
+        assertThat(errMsg, is("このユーザーはすでに追加されています。"));
+    }
+
+    @Test
+    @WithMockUser(value = "user1", roles = {"ADMIN"})
+    public void パスワードが一致しない場合は拒否される() throws Exception {
+        int beforeUserCount = userRepo.findAll().size();
+
+        ResultActions actions = mMvcMock.perform(post(userManagementUrlTemplate + "/add")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .with(csrf())
+                .param("addBtn", "追加")
+                .param("username", "user2")
+                .param("password", "P@ssw0rd")
+                .param("passwordConfirm", "p@ssw0rd")
+                .param("displayName", "追加するユーザー１")
+                .param("enableUser", "true")
+                .param("assignedRole", "U")
+                .param("mailAddress", "user2@example.com"))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(view().name(is("/admin/user_detail")))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        List<Users> currentUsers = userRepo.findAll();
+
+        assertThat("ユーザーの数は同じ", currentUsers.size(), is(beforeUserCount));
+
+        String errMsg = (String) mvcResult.getModelAndView().getModelMap().get("errMsg");
+        assertThat(errMsg, is("パスワードが一致しません。"));
     }
 }

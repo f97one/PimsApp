@@ -62,4 +62,8 @@ public class AuthorizedUsersService implements UserDetailsService {
                 .and(saUsers.contains("mailAddress", mailAddress))
                 .and(saUsers.eq("enabled", enabledUser)));
     }
+
+    public Users findUserById(String username) {
+        return userRepo.findOne(username);
+    }
 }
