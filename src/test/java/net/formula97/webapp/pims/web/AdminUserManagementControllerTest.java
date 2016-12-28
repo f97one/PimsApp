@@ -520,4 +520,86 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
         assertThat("変更パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getOrgPassword()), is(true));
         assertThat("確認用パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPasswordConfirm()), is(true));
     }
+
+    @Test
+    @WithMockUser(value = "user1", roles = {"ADMIN"})
+    public void 空のパスワードは拒否される() throws Exception {
+        int beforeUserCount = userRepo.findAll().size();
+
+        ResultActions actions = mMvcMock.perform(post(userManagementUrlTemplate + "/add")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .with(csrf())
+                .param("addBtn", "追加")
+                .param("username", "reguser2")
+                .param("password", "")
+                .param("passwordConfirm", "")
+                .param("displayName", "追加するユーザー１")
+                .param("enableUser", "true")
+                .param("assignedRole", "U")
+                .param("mailAddress", "reguser2@example.com"))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(view().name(is("/admin/user_detail")))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+
+        List<Users> currentUsers = userRepo.findAll();
+
+        assertThat("ユーザーの数は同じ", currentUsers.size(), is(beforeUserCount));
+
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("空のパスワードは許可されていません。"));
+
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("追加モードのまま", modeTag, is(AppConstants.EDIT_MODE_ADD));
+
+        UserModForm resultForm = (UserModForm) modelMap.get("userModForm");
+        assertThat("パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPassword()), is(true));
+        assertThat("変更パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getOrgPassword()), is(true));
+        assertThat("確認用パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPasswordConfirm()), is(true));
+    }
+
+    @Test
+    @WithMockUser(value = "user1", roles = {"ADMIN"})
+    public void 半角スペースだけのパスワードは拒否される() throws Exception {
+        int beforeUserCount = userRepo.findAll().size();
+
+        ResultActions actions = mMvcMock.perform(post(userManagementUrlTemplate + "/add")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .with(csrf())
+                .param("addBtn", "追加")
+                .param("username", "reguser2")
+                .param("password", "    ")
+                .param("passwordConfirm", "    ")
+                .param("displayName", "追加するユーザー１")
+                .param("enableUser", "true")
+                .param("assignedRole", "U")
+                .param("mailAddress", "reguser2@example.com"))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(view().name(is("/admin/user_detail")))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+
+        List<Users> currentUsers = userRepo.findAll();
+
+        assertThat("ユーザーの数は同じ", currentUsers.size(), is(beforeUserCount));
+
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("空のパスワードは許可されていません。"));
+
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("追加モードのまま", modeTag, is(AppConstants.EDIT_MODE_ADD));
+
+        UserModForm resultForm = (UserModForm) modelMap.get("userModForm");
+        assertThat("パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPassword()), is(true));
+        assertThat("変更パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getOrgPassword()), is(true));
+        assertThat("確認用パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPasswordConfirm()), is(true));
+    }
 }

@@ -2,6 +2,7 @@ package net.formula97.webapp.pims.web;
 
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.misc.AppConstants;
+import net.formula97.webapp.pims.misc.CommonsStringUtils;
 import net.formula97.webapp.pims.service.AuthorizedUsersService;
 import net.formula97.webapp.pims.web.forms.HeaderForm;
 import net.formula97.webapp.pims.web.forms.UserModForm;
@@ -72,26 +73,36 @@ public class AdminUserManagementController extends BaseWebController {
             model.addAttribute("modeTag", AppConstants.EDIT_MODE_ADD);
         } else {
             if (userModForm.isPasswdMatches()) {
-                Users existingUser = authUsersSvc.findUserById(userModForm.getUsername());
-
-                if (existingUser != null) {
-                    // すでにユーザーがいるのでユーザーが追加できない
-                    putErrMsg(model, "このユーザーはすでに追加されています。");
+                if (CommonsStringUtils.isNullOrWhiteSpace(userModForm.getPassword())) {
+                    // パスワードを空（半角スペースのみを含む）にした場合は拒否
+                    putErrMsg(model, "空のパスワードは許可されていません。");
 
                     erasePasswordElements(userModForm);
 
                     model.addAttribute("userModForm", userModForm);
                     model.addAttribute("modeTag", AppConstants.EDIT_MODE_ADD);
                 } else {
-                    Users users = userModForm.createDomain();
-                    authUsersSvc.saveUsers(users);
+                    Users existingUser = authUsersSvc.findUserById(userModForm.getUsername());
 
-                    putInfoMsg(model, String.format(Locale.getDefault(), "ユーザー %s を追加しました。", users.getUsername()));
+                    if (existingUser != null) {
+                        // すでに同じIDのユーザーがいる場合は拒否
+                        putErrMsg(model, "このユーザーはすでに追加されています。");
 
-                    erasePasswordElements(userModForm);
+                        erasePasswordElements(userModForm);
 
-                    model.addAttribute("userModForm", userModForm);
-                    model.addAttribute("modeTag", AppConstants.EDIT_MODE_MODIFY);
+                        model.addAttribute("userModForm", userModForm);
+                        model.addAttribute("modeTag", AppConstants.EDIT_MODE_ADD);
+                    } else {
+                        Users users = userModForm.createDomain();
+                        authUsersSvc.saveUsers(users);
+
+                        putInfoMsg(model, String.format(Locale.getDefault(), "ユーザー %s を追加しました。", users.getUsername()));
+
+                        erasePasswordElements(userModForm);
+
+                        model.addAttribute("userModForm", userModForm);
+                        model.addAttribute("modeTag", AppConstants.EDIT_MODE_MODIFY);
+                    }
                 }
             } else {
                 // パスワードが一致しない場合は拒否
