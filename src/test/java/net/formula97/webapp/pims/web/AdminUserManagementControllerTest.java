@@ -3,6 +3,7 @@ package net.formula97.webapp.pims.web;
 import net.formula97.webapp.pims.BaseTestCase;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.misc.AppConstants;
+import net.formula97.webapp.pims.misc.CommonsStringUtils;
 import net.formula97.webapp.pims.repository.UserRepository;
 import net.formula97.webapp.pims.web.forms.UserModForm;
 import org.junit.*;
@@ -415,6 +416,18 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
                 .andExpect(view().name(is("/admin/user_detail")))
                 .andExpect(model().hasNoErrors())
                 .andReturn();
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+
+        String infoMsg = (String) modelMap.get("infoMsg");
+        assertThat(infoMsg, is("ユーザー reguser1 を追加しました。"));
+
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("修正モードになっている", modeTag, is(AppConstants.EDIT_MODE_MODIFY));
+
+        UserModForm resultForm = (UserModForm) modelMap.get("userModForm");
+        assertThat("パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPassword()), is(true));
+        assertThat("変更パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getOrgPassword()), is(true));
+        assertThat("確認用パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPasswordConfirm()), is(true));
 
         List<Users> currentUsers = userRepo.findAll();
 
@@ -449,13 +462,22 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
                 .andExpect(view().name(is("/admin/user_detail")))
                 .andExpect(model().hasNoErrors())
                 .andReturn();
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
 
         List<Users> currentUsers = userRepo.findAll();
 
         assertThat("ユーザーの数は同じ", currentUsers.size(), is(beforeUserCount));
 
-        String errMsg = (String) mvcResult.getModelAndView().getModelMap().get("errMsg");
+        String errMsg = (String) modelMap.get("errMsg");
         assertThat(errMsg, is("このユーザーはすでに追加されています。"));
+
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("追加モードのまま", modeTag, is(AppConstants.EDIT_MODE_ADD));
+
+        UserModForm resultForm = (UserModForm) modelMap.get("userModForm");
+        assertThat("パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPassword()), is(true));
+        assertThat("変更パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getOrgPassword()), is(true));
+        assertThat("確認用パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPasswordConfirm()), is(true));
     }
 
     @Test
@@ -481,12 +503,21 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
                 .andExpect(view().name(is("/admin/user_detail")))
                 .andExpect(model().hasNoErrors())
                 .andReturn();
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
 
         List<Users> currentUsers = userRepo.findAll();
 
         assertThat("ユーザーの数は同じ", currentUsers.size(), is(beforeUserCount));
 
-        String errMsg = (String) mvcResult.getModelAndView().getModelMap().get("errMsg");
+        String errMsg = (String) modelMap.get("errMsg");
         assertThat(errMsg, is("パスワードが一致しません。"));
+
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("追加モードのまま", modeTag, is(AppConstants.EDIT_MODE_ADD));
+
+        UserModForm resultForm = (UserModForm) modelMap.get("userModForm");
+        assertThat("パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPassword()), is(true));
+        assertThat("変更パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getOrgPassword()), is(true));
+        assertThat("確認用パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPasswordConfirm()), is(true));
     }
 }

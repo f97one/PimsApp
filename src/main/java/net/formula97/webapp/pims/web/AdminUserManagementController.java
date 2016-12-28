@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by f97one on 2016/12/23.
@@ -64,6 +65,9 @@ public class AdminUserManagementController extends BaseWebController {
 
         if (result.hasErrors()) {
             putErrMsg(model, "ユーザーを追加できません。");
+
+            erasePasswordElements(userModForm);
+
             model.addAttribute("userModForm", userModForm);
             model.addAttribute("modeTag", AppConstants.EDIT_MODE_ADD);
         } else {
@@ -73,11 +77,18 @@ public class AdminUserManagementController extends BaseWebController {
                 if (existingUser != null) {
                     // すでにユーザーがいるのでユーザーが追加できない
                     putErrMsg(model, "このユーザーはすでに追加されています。");
+
+                    erasePasswordElements(userModForm);
+
                     model.addAttribute("userModForm", userModForm);
                     model.addAttribute("modeTag", AppConstants.EDIT_MODE_ADD);
                 } else {
                     Users users = userModForm.createDomain();
                     authUsersSvc.saveUsers(users);
+
+                    putInfoMsg(model, String.format(Locale.getDefault(), "ユーザー %s を追加しました。", users.getUsername()));
+
+                    erasePasswordElements(userModForm);
 
                     model.addAttribute("userModForm", userModForm);
                     model.addAttribute("modeTag", AppConstants.EDIT_MODE_MODIFY);
@@ -85,11 +96,25 @@ public class AdminUserManagementController extends BaseWebController {
             } else {
                 // パスワードが一致しない場合は拒否
                 putErrMsg(model, "パスワードが一致しません。");
+
+                erasePasswordElements(userModForm);
+
                 model.addAttribute("userModForm", userModForm);
                 model.addAttribute("modeTag", AppConstants.EDIT_MODE_ADD);
             }
         }
 
         return "/admin/user_detail";
+    }
+
+    /**
+     * 画面に返送する前に、パスワード入力値を消去する。
+     *
+     * @param form 画面入力値が入っているForm
+     */
+    private void erasePasswordElements(UserModForm form) {
+        form.setPassword("");
+        form.setOrgPassword("");
+        form.setPasswordConfirm("");
     }
 }
