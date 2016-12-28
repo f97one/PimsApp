@@ -37,7 +37,7 @@
                           class="help-block text-warning">Error</span>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" th:if="${modeTag eq 'M'}">
                 <div class="col-lg-2 col-sm-2">現パスワード</div>
                 <div class="col-lg-4 col-sm-4">
                     <input type="password" maxlength="32" id="orgPassword" name="orgPassword" value="mockuserpasswd1"
@@ -49,8 +49,8 @@
                           class="help-block text-warning">Error</span>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-lg-2 col-sm-2">新パスワード</div>
+            <div class="row" th:if="${modeTag eq 'A'}">
+                <div class="col-lg-2 col-sm-2"><span th:if="${modeTag eq 'M'}">新</span>パスワード</div>
                 <div class="col-lg-4 col-sm-4">
                     <input type="password" maxlength="32" id="password" name="password" value="mockuserpasswd1"
                            class="form-control" th:field="*{password}" th:errorClass="form-control"/>
@@ -60,8 +60,8 @@
                           class="help-block text-warning">Error</span>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-lg-2 col-sm-2">新パスワード（再入力）</div>
+            <div class="row" th:if="${modeTag eq 'A' || modeTag eq 'M'}">
+                <div class="col-lg-2 col-sm-2"><span th:if="${modeTag eq 'M'}">新</span>パスワード（再入力）</div>
                 <div class="col-lg-4 col-sm-4">
                     <input type="password" maxlength="32" id="passwordConfirm" name="passwordConfirm"
                            value="mockuserpasswd1"
@@ -84,6 +84,18 @@
                 <div class="col-lg-6 col-sm-6">
                     <span th:if="${#fields.hasErrors('displayName')}"
                           th:errors="*{displayName}" class="help-block text-warning">Error</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2 col-sm-2">メールアドレス</div>
+                <div class="col-lg-4 col-sm-4">
+                    <input type="text" maxlength="128" id="mailAddress" name="mailAddress" value="Mock User 1"
+                           class="form-control" th:field="*{mailAddress}" th:errorClass="form-control"
+                           th:disabled="${modeTag eq 'R'}"/>
+                </div>
+                <div class="col-lg-6 col-sm-6">
+                    <span th:if="${#fields.hasErrors('mailAddress')}"
+                          th:errors="*{mailAddress}" class="help-block text-warning">Error</span>
                 </div>
             </div>
             <div class="row">
