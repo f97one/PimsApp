@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"/>
     <title>Issue Item | PIMS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
@@ -21,13 +21,13 @@
 
     <!-- Bootstrap Datepicker -->
     <link rel="stylesheet" type="text/css"
-          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.min.css"
-          th;href="@{/webjars/bootstrap-3-datepicker/1.6.4/dist/css/bootstrap-datepicker.min.css}"/>
+          href="http://cdn.jsdelivr.net/webjars/org.webjars.bower/bootstrap-3-datepicker/1.6.4/dist/css/bootstrap-datepicker.min.css"
+          th:href="@{/webjars/bootstrap-3-datepicker/1.6.4/dist/css/bootstrap-datepicker.min.css}"/>
     <script type="text/javascript"
-            src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"
-            th:src="@{/bootstrap-3-datepicker/1.6.4/dist/js/bootstrap-datepicker.min.js}"></script>
+            src="http://cdn.jsdelivr.net/webjars/org.webjars.bower/bootstrap-3-datepicker/1.6.4/dist/js/bootstrap-datepicker.min.js"
+            th:src="@{/webjars/bootstrap-3-datepicker/1.6.4/dist/js/bootstrap-datepicker.min.js}"></script>
     <script type="text/javascript"
-            src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/locales/bootstrap-datepicker.ja.min.js"
+            src="http://cdn.jsdelivr.net/webjars/org.webjars.bower/bootstrap-3-datepicker/1.6.4/dist/locales/bootstrap-datepicker.ja.min.js"
             th:src="@{/webjars/bootstrap-3-datepicker/1.6.4/dist/locales/bootstrap-datepicker.ja.min.js}"></script>
 
     <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
@@ -77,7 +77,6 @@
     <div class="form-group">
         <form th:action="@{'/ledger/' + ${issueId}}" th:object="${issueItem}" class="form-horizontal" method="POST">
             <!-- そのまま返却が必要なメンバー -->
-            <input type="hidden" id="opeMode" name="opeMode" th:field="*{opeMode}"/>
             <input type="hidden" id="currentLedgerName" name="currentLedgerName" th:field="*{currentLedgerName}"/>
             <input type="hidden" id="issueNumberLabel" name="issueNumberLabel" th:field="*{issueNumberLabel}"/>
             <input type="hidden" id="recordTimestamp" name="recordTimestamp" th:field="*{recordTimestamp}"/>
@@ -87,7 +86,7 @@
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group date col-lg-3 col-sm-6 col-xs-12 datePickerBox" data-provide="datepicker">
                         <input type="text" id="foundDate" name="foundDate" th:field="*{foundDate}"
-                               class="form-control" maxlength="12" th:disabled="${issueItems.opeMode == 'R'}"/>
+                               class="form-control" maxlength="12" th:disabled="${modeTag == 'R'}"/>
                         <div class="input-group-addon">
                             <span class="glyphicon glyphicon-th"></span>
                         </div>
@@ -101,10 +100,10 @@
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
                         <select class="form-control" id="severitySelector" name="severitySelector"
-                                th:disabled="${issueItems.opeMode == 'R'}">
+                                th:disabled="${modeTag eq 'R'}">
                             <option value="">---</option>
-                            <option th:each="severityItem : ${severityList}" th:value="${severityItem.value}"
-                                    th:text="${severityItem.key}" th:selected="${severityItem.value} == *{severity}">
+                            <option th:each="severityItem : ${severityList}" th:value="${severityItem.key}"
+                                    th:text="${severityItem.value}" th:selected="${severityItem.key} eq *{severity}">
                                 pulldown
                             </option>
                         </select>
@@ -118,15 +117,15 @@
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
                         <select class="form-control" id="foundUserSelector" name="foundUserSelector"
-                                th:disabled="${issueItems.opeMode == 'R'}">
+                                th:disabled="${modeTag eq 'R'}">
                             <option value="">---</option>
-                            <option th:each="foundUserItem : ${joinedUsers}" th:value="${foundUserItem.value}"
-                                    th:text="${foundUserItem.key}"
-                                    th:selected="${foundUserItem.value} == *{foundUserId}">found user
+                            <option th:each="foundUserItem : ${joinedUsers}" th:value="${foundUserItem.key}"
+                                    th:text="${foundUserItem.value}"
+                                    th:selected="${foundUserItem.key} eq *{foundUserId}">found user
                             </option>
                         </select>
                     </div>
-                    <span th:if="${#fields.hasErors('foundUserId')}" th:errors="*{foundUserId}" class="help-block">error!</span>
+                    <span th:if="${#fields.hasErrors('foundUserId')}" th:errors="*{foundUserId}" class="help-block">error!</span>
                 </div>
             </div>
             <div class="row">
@@ -134,15 +133,13 @@
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
                         <select class="form-control" id="moduleKind" name="moduleKind"
-                                th:disabled="${issueItems.opeMode == 'R'}">
+                                th:disabled="${modeTag eq 'R'}">
                             <option value="">---</option>
-                            <option th:each="module : ${moduleCategoryList}" th:value="${module.value}"
-                                    th:text="${module.key}" th:selected="${module.value} == *{categoryId}">found user
+                            <option th:each="module : ${moduleCategoryList}" th:value="${module.key}"
+                                    th:text="${module.value}" th:selected="${module.key} eq *{categoryId}">found user
                             </option>
                         </select>
                     </div>
-                    <span th:if="${#fields.hasErors('categoryId')}" th:errors="*{categoryId}"
-                          class="help-block">error!</span>
                 </div>
             </div>
             <div class="row">
@@ -150,7 +147,7 @@
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
                         <select class="form-control" id="causedProcess" name="causedProcess"
-                                th:disabled="${issueItems.opeMode == 'R'}">
+                                th:disabled="${modeTag eq 'R'}">
                             <option value="">---</option>
                             <option th:each="processItem : ${causedProcessList}" th:value="${processItem.value}"
                                     th:text="${processItem.key}" th:selected="${processItem.value} == *{processId}">
@@ -158,7 +155,7 @@
                             </option>
                         </select>
                     </div>
-                    <span th:if="${#fields.hasErors('processId')}" th:errors="*{processId}"
+                    <span th:if="${#fields.hasErrors('processId')}" th:errors="*{processId}"
                           class="help-block">error!</span>
                 </div>
             </div>
@@ -170,9 +167,9 @@
                               onkeydown="getRemainLength(this, 'issueDetailCount')"
                               onchange="getRemainLength(this, 'issueDetailCount')"
                               onblur="getRemainLength(this, 'issueDetailCount')"
-                              th:disabled="${issueItems.opeMode == 'R'}"></textarea>
+                              th:disabled="${modeTag eq 'R'}"></textarea>
                     <div class="col-lg-1 col-sm1 pull-right"><span id="issueDetailCount">0</span>/32768</div>
-                    <span th:if="${#fields.hasErors('issueDetail')}" th:errors="*{issueDetail}" class="help-block">error!</span>
+                    <span th:if="${#fields.hasErrors('issueDetail')}" th:errors="*{issueDetail}" class="help-block">error!</span>
                 </div>
             </div>
             <div class="row">
@@ -183,9 +180,9 @@
                               onkeydown="getRemainLength(this, 'causedCount')"
                               onchange="getRemainLength(this, 'causedCount')"
                               onblur="getRemainLength(this, 'causedCount')"
-                              th:disabled="${issueItems.opeMode == 'R'}"></textarea>
+                              th:disabled="${modeTag eq 'R'}"></textarea>
                     <div class="col-lg-1 col-sm1 pull-right"><span id="causedCount">0</span>/32768</div>
-                    <span th:if="${#fields.hasErors('caused')}" th:errors="*{caused}" class="help-block">error!</span>
+                    <span th:if="${#fields.hasErrors('caused')}" th:errors="*{caused}" class="help-block">error!</span>
                 </div>
             </div>
             <div class="row">
@@ -196,9 +193,9 @@
                               onkeydown="getRemainLength(this, 'countermeasuresCount')"
                               onchange="getRemainLength(this, 'countermeasuresCount')"
                               onblur="getRemainLength(this, 'countermeasuresCount')"
-                              th:disabled="${issueItems.opeMode == 'R'}"></textarea>
+                              th:disabled="${modeTag eq 'R'}"></textarea>
                     <div class="col-lg-1 col-sm1 pull-right"><span id="countermeasuresCount">0</span>/32768</div>
-                    <span th:if="${#fields.hasErors('countermeasures')}" th:errors="*{countermeasures}"
+                    <span th:if="${#fields.hasErrors('countermeasures')}" th:errors="*{countermeasures}"
                           class="help-block">error!</span>
                 </div>
             </div>
@@ -207,16 +204,16 @@
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
                         <select class="form-control" id="correspondingUserSelector" name="correspondingUserSelector"
-                                th:disabled="${issueItems.opeMode == 'R'}">
+                                th:disabled="${modeTag eq 'R'}">
                             <option value="">---</option>
                             <option th:each="correspondingUserItem : ${correspondingUsers}"
-                                    th:value="${correspondingUserItem.value}" th:text="${correspondingUserItem.key}"
-                                    th:selected="${correspondingUserItem.value} == *{correspondingUserId}">corresponding
+                                    th:value="${correspondingUserItem.key}" th:text="${correspondingUserItem.value}"
+                                    th:selected="${correspondingUserItem.key} == *{correspondingUserId}">corresponding
                                 User
                             </option>
                         </select>
                     </div>
-                    <span th:if="${#fields.hasErors('correspondingUserId')}" th:errors="*{correspondingUserId}"
+                    <span th:if="${#fields.hasErrors('correspondingUserId')}" th:errors="*{correspondingUserId}"
                           class="help-block">error!</span>
                 </div>
             </div>
@@ -226,7 +223,7 @@
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
                         <input type="text" id="correspondingTime" name="correspondingTime"
                                class="form-control text-right" th:field="*{correspondingTime}" maxlength="6"
-                               th:disabled="${issueItems.opeMode == 'R'}"/>
+                               th:disabled="${modeTag eq 'R'}"/>
                         <span th:if="${#fields.hasErrors('correspondingTime')}" th:errors="*{correspondingTime}"
                               class="help-block">error!</span>
                     </div>
@@ -237,7 +234,7 @@
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group date col-lg-3 col-sm-6 col-xs-12 datePickerBox" data-provide="datepicker">
                         <input type="text" id="correspondingEndDate" name="correspondingEndDate"
-                               th:field="*{correspondingEndDate}" th:disabled="${issueItems.opeMode == 'R'}"
+                               th:field="*{correspondingEndDate}" th:disabled="${modeTag eq 'R'}"
                                class="form-control" maxlength="12"/>
                         <div class="input-group-addon">
                             <span class="glyphicon glyphicon-th"></span>
@@ -252,15 +249,15 @@
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
                         <select class="form-control" id="confirmedUserSelector" name="confirmedUserSelector"
-                                th:disabled="${issueItems.opeMode == 'R'}">
+                                th:disabled="${modeTag eq 'R'}">
                             <option value="">---</option>
                             <option th:each="confirmedUserItem : ${confirmedUsers}"
-                                    th:value="${confirmedUserItem.value}" th:text="${confirmedUserItem.key}"
-                                    th:selected="${confirmedUserItem.value} == *{confirmedUserId}">confirmed User
+                                    th:value="${confirmedUserItem.key}" th:text="${confirmedUserItem.value}"
+                                    th:selected="${confirmedUserItem.key} eq *{confirmedUserId}">confirmed User
                             </option>
                         </select>
                     </div>
-                    <span th:if="${#fields.hasErors('confirmedUserId')}" th:errors="*{confirmedUserId}"
+                    <span th:if="${#fields.hasErrors('confirmedUserId')}" th:errors="*{confirmedUserId}"
                           class="help-block">error!</span>
                 </div>
             </div>
@@ -269,7 +266,7 @@
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group date col-lg-3 col-sm-6 col-xs-12 datePickerBox" data-provide="datepicker">
                         <input type="text" id="confirmedDate" name="confirmedDate" th:field="*{confirmedDate}"
-                               class="form-control" maxlength="12" th:disabled="${issueItems.opeMode == 'R'}"/>
+                               class="form-control" maxlength="12" th:disabled="${modeTag eq 'R'}"/>
                         <div class="input-group-addon">
                             <span class="glyphicon glyphicon-th"></span>
                         </div>
@@ -278,18 +275,18 @@
                 </div>
             </div>
             <div class="row">
-                <button type="reset" id="resetbtn" class="btn btn-default col-lg-1"
-                        th:disabled="${issueItems.opeMode == 'R'}">リセット
+                <button type="reset" id="resetBtn" class="btn btn-default col-lg-1"
+                        th:disabled="${modeTag eq 'R'}">リセット
                 </button>
                 <input type="submit" id="fakeUpdateItemBtn" class="btn btn-primary col-lg-1 pull-right"
-                       th:if="${issueItem.opeMode == 'R'}" disabled th:disabled="${issueItem.opeMode == 'R'}"
+                       th:if="${modeTag eq 'R'}" th:disabled="${modeTag eq 'R'}"
                        value="更新"/>
                 <input type="submit" id="updateItemBtn" class="btn btn-primary col-lg-1 pull-right"
-                       th:if="${issueItem.opeMode == 'M'}" value="更新"/>
+                       th:if="${modeTag eq 'M'}" value="更新"/>
                 <input type="submit" id="addItemBtn" class="btn btn-primary col-lg-1 pull-right"
-                       th:if="${issueItem.opeMode == 'A'}" value="追加"/>
+                       th:if="${modeTag eq 'A'}" value="追加"/>
                 <input type="submit" id="removeItemBtn" class="btn btn-danger col-lg-1 pull-right"
-                       th:if="${issueItem.opeMode == 'D'}" value="削除"/>
+                       th:if="${modeTag eq 'D'}" value="削除"/>
             </div>
         </form>
     </div>

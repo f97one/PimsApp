@@ -27,4 +27,6 @@ public class AppConstants {
     public static final String EDIT_MODE_MODIFY = "M";
     public static final String EDIT_MODE_REMOVE = "D";
     public static final String EDIT_MODE_READONLY = "R";
+
+    public static final String STD_DATE_FORMAT = "yyyy/MM/dd";
 }

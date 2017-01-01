@@ -7,14 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 /**
  * カテゴリーマスタ
@@ -57,6 +51,9 @@ public class CategoryMaster implements Serializable {
     @Column(name = COLUMN_CATEGORY_NAME, length = 128)
     private String categoryName;
 
+    /**
+     * 表示順序
+     */
     @Column(name = COLUMN_DISP_ORDER)
     private Integer dispOrder;
 }

@@ -3,6 +3,7 @@ package net.formula97.webapp.pims.web.forms;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.formula97.webapp.pims.domain.IssueItems;
+import net.formula97.webapp.pims.misc.AppConstants;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Digits;
@@ -11,8 +12,11 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by f97one on 2016/10/23.
@@ -22,10 +26,6 @@ import java.util.Date;
 public class IssueItemForm implements Serializable {
 
     private static final long serialVersionUID = 5734607814996487082L;
-    /**
-     * 画面の操作モード
-     */
-    private String opeMode;
     /**
      * 現在の台帳名
      */
@@ -41,13 +41,13 @@ public class IssueItemForm implements Serializable {
     /**
      * 発生日
      */
-    @DateTimeFormat(pattern = "yyyy/MM/dd")
-    private Date foundDate;
+    @DateTimeFormat(pattern = AppConstants.STD_DATE_FORMAT)
+    private String foundDate;
     /**
      * 緊急度
      */
     @NotNull
-    private String severity;
+    private Integer severity;
     /**
      * 発見者のユーザーID
      */
@@ -92,8 +92,8 @@ public class IssueItemForm implements Serializable {
     /**
      * 対応終了日
      */
-    @DateTimeFormat(pattern = "yyyy/MM/dd")
-    private Date correspondingEndDate;
+    @DateTimeFormat(pattern = AppConstants.STD_DATE_FORMAT)
+    private String correspondingEndDate;
     /**
      * 確認者ID
      */
@@ -101,12 +101,14 @@ public class IssueItemForm implements Serializable {
     /**
      * 確認日
      */
-    @DateTimeFormat(pattern = "yyyy/MM/dd")
+    @DateTimeFormat(pattern = AppConstants.STD_DATE_FORMAT)
     private Date confirmedDate;
 
     public IssueItemForm convertToForm(IssueItems item) {
-        this.foundDate = item.getFoundDate();
-        this.severity = item.getSevereLevelId() == null ? null : String.valueOf(item.getSevereLevelId());
+        SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
+
+        this.foundDate = sdf.format(item.getFoundDate());
+        this.severity = item.getSevereLevelId();
         this.foundUserId = item.getFoundUser();
         this.categoryId = item.getCategoryId() == null ? null : String.valueOf(item.getCategoryId());
         this.processId = item.getFoundProcessId() == null ? null : String.valueOf(item.getFoundProcessId());
@@ -125,7 +127,7 @@ public class IssueItemForm implements Serializable {
             this.correspondingTime = String.valueOf(bd.setScale(2, BigDecimal.ROUND_HALF_UP));
         }
 
-        this.correspondingEndDate = item.getCorrespondingEndDate();
+        this.correspondingEndDate = sdf.format(item.getCorrespondingEndDate());
         this.confirmedUserId = item.getConfirmedId();
         this.confirmedDate = item.getConfirmedDate();
 
@@ -135,8 +137,15 @@ public class IssueItemForm implements Serializable {
     public IssueItems exportToEntity() {
         IssueItems items = new IssueItems();
 
-        items.setFoundDate(this.foundDate);
-        items.setSevereLevelId(Integer.parseInt(this.severity));
+        SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
+
+        try {
+            items.setFoundDate(sdf.parse(this.foundDate));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            items.setFoundDate(null);
+        }
+        items.setSevereLevelId(this.severity);
         items.setFoundUser(this.foundUserId);
         items.setCategoryId(Integer.parseInt(this.categoryId));
         items.setFoundProcessId(Integer.parseInt(this.processId));
@@ -152,7 +161,12 @@ public class IssueItemForm implements Serializable {
             items.setCorrespondingTime(calendar.getTime());
         }
 
-        items.setCorrespondingEndDate(this.correspondingEndDate);
+        try {
+            items.setCorrespondingEndDate(sdf.parse(this.correspondingEndDate));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            items.setCorrespondingEndDate(null);
+        }
         items.setCorrespondingUserId(this.correspondingUserId);
         items.setConfirmedDate(this.confirmedDate);
 

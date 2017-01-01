@@ -144,41 +144,41 @@ public class LedgerController extends BaseWebController {
     }
 
     @RequestMapping(value = "{ledgerId}/add", method = RequestMethod.GET)
-    public String showIssueItemCreationView(@PathVariable Integer ledgerId, Model model, HeaderForm headerForm) {
+    public String showIssueItemCreationView(@PathVariable("ledgerId") Integer ledgerId, Model model, HeaderForm headerForm) {
         Users users = getUserState(model, headerForm);
 
         IssueItemForm issueItemForm = new IssueItemForm();
 
-        String dest;
-
-        // 指定番号の台帳がない場合はエラーにする
+        // 指定された番号の台帳を検索する
         Optional<IssueLedger> ledgerOptional = Optional.ofNullable(issueLedgerSvc.getLedgerById(ledgerId));
         if (ledgerOptional.isPresent()) {
-            putErrMsg(model, "台帳が見つかりません。");
-            dest = String.format(Locale.getDefault(), "/ledger/%d/add", ledgerId);
-            issueItemForm.setOpeMode(AppConstants.EDIT_MODE_READONLY);
-        } else {
+            issueItemForm.setCurrentLedgerName(ledgerOptional.get().getLedgerName());
+
             if (users == null) {
-                putErrMsg(model, "台帳の追加にはログインが必要です。");
-                dest = String.format(Locale.getDefault(), "/ledger/%d/add", ledgerId);
-                issueItemForm.setOpeMode(AppConstants.EDIT_MODE_READONLY);
+                putErrMsg(model, "課題の追加にはログインが必要です。");
+                model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
             } else {
                 // 課題を編集できるかどうかを判断
                 if (issueItemsSvc.hasEditPrivilege(ledgerId, users)) {
-                    issueItemForm.setOpeMode(AppConstants.EDIT_MODE_ADD);
+                    model.addAttribute("modeTag", AppConstants.EDIT_MODE_ADD);
                 } else {
-                    issueItemForm.setOpeMode(AppConstants.EDIT_MODE_READONLY);
+                    model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
+                    putErrMsg(model, "課題を追加する権限がありません。");
                 }
-
-                issueItemForm.setIssueNumberLabel("新規");
-                issueItemForm.setRecordTimestamp(new Date());
-
-                model.addAttribute("issueItem", issueItemForm);
-                dest = "/ledger/issueItem";
             }
-        }
+        } else {
+            // 指定番号の台帳がない場合はエラーにする
+            putErrMsg(model, "台帳が見つかりません。");
+            model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
 
-        return dest;
+            issueItemForm.setCurrentLedgerName("※不明※");
+        }
+        issueItemForm.setIssueNumberLabel("新規");
+        issueItemForm.setRecordTimestamp(new Date());
+
+        model.addAttribute("issueItem", issueItemForm);
+
+        return "/ledger/issueItem";
     }
 
 }
