@@ -29,4 +29,9 @@ public class AppConstants {
     public static final String EDIT_MODE_READONLY = "R";
 
     public static final String STD_DATE_FORMAT = "yyyy/MM/dd";
+
+    /**
+     * ドロップダウンリストで何も選択していないときの値
+     */
+    public static final int SELECTION_NOT_SELECTED = -1;
 }
