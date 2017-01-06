@@ -1,10 +1,11 @@
 package net.formula97.webapp.pims.repository;
 
+import net.formula97.webapp.pims.domain.CategoryMaster;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-import net.formula97.webapp.pims.domain.CategoryMaster;
+import java.util.List;
 
 /**
  * @author f97one
@@ -13,4 +14,5 @@ import net.formula97.webapp.pims.domain.CategoryMaster;
 @Repository
 public interface CategoryMasterRepository extends JpaRepository<CategoryMaster, Integer>, JpaSpecificationExecutor<CategoryMaster> {
 
+    List<CategoryMaster> findAllOrderByDispOrder();
 }
