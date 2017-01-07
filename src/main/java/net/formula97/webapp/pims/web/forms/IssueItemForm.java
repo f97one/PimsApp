@@ -6,16 +6,12 @@ import net.formula97.webapp.pims.domain.IssueItems;
 import net.formula97.webapp.pims.misc.AppConstants;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -27,26 +23,19 @@ public class IssueItemForm implements Serializable {
 
     private static final long serialVersionUID = 5734607814996487082L;
     /**
-     * 現在の台帳名
+     * レコード更新日時(ミリ秒値)
      */
-    private String currentLedgerName;
-    /**
-     * 課題番号
-     */
-    private String issueNumberLabel;
-    /**
-     * レコード更新日時
-     */
-    private Date recordTimestamp;
+    private Long recordTimestamp;
     /**
      * 発生日
      */
-    @DateTimeFormat(pattern = AppConstants.STD_DATE_FORMAT)
+    @Pattern(regexp = "2\\d{3}/[01]\\d/[0123]\\d")
     private String foundDate;
     /**
      * 緊急度
      */
     @NotNull
+    @Min(0)
     private Integer severity;
     /**
      * 発見者のユーザーID
@@ -58,27 +47,27 @@ public class IssueItemForm implements Serializable {
      * 機能種別ID
      */
     @Digits(integer = 8, fraction = 0)
-    private String categoryId;
+    private Integer categoryId;
     /**
      * 原因工程ID
      */
     @Digits(integer = 8, fraction = 0)
-    private String processId;
+    private Integer processId;
     /**
      * 障害内容
      */
     @NotNull
-    @Max(32768)
+    @Size(max = 32768)
     private String issueDetail;
     /**
      * 原因
      */
-    @Max(32768)
+    @Size(max = 32768)
     private String caused;
     /**
      * 対応内容
      */
-    @Max(32768)
+    @Size(max = 32768)
     private String countermeasures;
     /**
      * 対応者ID
@@ -88,7 +77,7 @@ public class IssueItemForm implements Serializable {
      * 対応時間
      */
     @Digits(integer = 3, fraction = 2)
-    private String correspondingTime;
+    private Double correspondingTime;
     /**
      * 対応終了日
      */
@@ -102,7 +91,7 @@ public class IssueItemForm implements Serializable {
      * 確認日
      */
     @DateTimeFormat(pattern = AppConstants.STD_DATE_FORMAT)
-    private Date confirmedDate;
+    private String confirmedDate;
 
     public IssueItemForm convertToForm(IssueItems item) {
         SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
@@ -110,8 +99,8 @@ public class IssueItemForm implements Serializable {
         this.foundDate = sdf.format(item.getFoundDate());
         this.severity = item.getSevereLevelId();
         this.foundUserId = item.getFoundUser();
-        this.categoryId = item.getCategoryId() == null ? null : String.valueOf(item.getCategoryId());
-        this.processId = item.getFoundProcessId() == null ? null : String.valueOf(item.getFoundProcessId());
+        this.categoryId = item.getCategoryId() == null ? null : item.getCategoryId();
+        this.processId = item.getFoundProcessId() == null ? null : item.getFoundProcessId();
         this.issueDetail = item.getIssueDetail();
         this.caused = item.getCaused();
         this.countermeasures = item.getCountermeasures();
@@ -124,12 +113,12 @@ public class IssueItemForm implements Serializable {
             cal.setTime(item.getCorrespondingTime());
             float ct = (float) cal.get(Calendar.HOUR_OF_DAY) + (60.0f / (float) cal.get(Calendar.MINUTE));
             BigDecimal bd = new BigDecimal(ct);
-            this.correspondingTime = String.valueOf(bd.setScale(2, BigDecimal.ROUND_HALF_UP));
+            this.correspondingTime = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
         }
 
         this.correspondingEndDate = sdf.format(item.getCorrespondingEndDate());
         this.confirmedUserId = item.getConfirmedId();
-        this.confirmedDate = item.getConfirmedDate();
+        this.confirmedDate = sdf.format(item.getConfirmedDate());
 
         return this;
     }
@@ -145,17 +134,25 @@ public class IssueItemForm implements Serializable {
             e.printStackTrace();
             items.setFoundDate(null);
         }
-        items.setSevereLevelId(this.severity);
+        // 未選択アイテムだった場合はnullにする
+        Integer s = this.severity == AppConstants.SELECTION_NOT_SELECTED ? null : this.severity;
+        items.setSevereLevelId(s);
+
         items.setFoundUser(this.foundUserId);
-        items.setCategoryId(Integer.parseInt(this.categoryId));
-        items.setFoundProcessId(Integer.parseInt(this.processId));
+
+        Integer c = this.categoryId == AppConstants.SELECTION_NOT_SELECTED ? null : this.categoryId;
+        items.setCategoryId(c);
+
+        Integer p = this.processId == AppConstants.SELECTION_NOT_SELECTED ? null : this.processId;
+        items.setFoundProcessId(p);
+
         items.setIssueDetail(this.issueDetail);
         items.setCaused(this.caused);
         items.setCountermeasures(this.countermeasures);
         items.setCorrespondingUserId(this.correspondingUserId);
 
         if (this.correspondingTime != null) {
-            long ct = (long) (Double.parseDouble(this.correspondingTime) * 3.6 * 1000000);
+            long ct = (long) (this.correspondingTime * 3.6 * 1000000);
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(ct);
             items.setCorrespondingTime(calendar.getTime());
@@ -168,7 +165,11 @@ public class IssueItemForm implements Serializable {
             items.setCorrespondingEndDate(null);
         }
         items.setCorrespondingUserId(this.correspondingUserId);
-        items.setConfirmedDate(this.confirmedDate);
+        try {
+            items.setConfirmedDate(sdf.parse(this.confirmedDate));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         return items;
     }

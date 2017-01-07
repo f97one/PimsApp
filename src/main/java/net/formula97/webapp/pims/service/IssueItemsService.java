@@ -1,16 +1,15 @@
 package net.formula97.webapp.pims.service;
 
 import net.formula97.webapp.pims.domain.*;
-import net.formula97.webapp.pims.repository.IssueItemsRepository;
-import net.formula97.webapp.pims.repository.IssueLedgerRepository;
-import net.formula97.webapp.pims.repository.LedgerRefUserRepository;
-import net.formula97.webapp.pims.repository.MySpecificationAdapter;
+import net.formula97.webapp.pims.repository.*;
 import net.formula97.webapp.pims.web.forms.IssueItemsLineForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +25,16 @@ public class IssueItemsService extends BaseService {
     IssueItemsRepository issueItemsRepo;
     @Autowired
     LedgerRefUserRepository ledgerRefUserRepo;
+    @Autowired
+    CategoryMasterRepository categoryMasterRepo;
+    @Autowired
+    ProcessMasterRepository processMasterRepo;
+    @Autowired
+    SevereLevelMasterRepository severeLevelMasterRepo;
+    @Autowired
+    StatusMasterRepository statusMasterRepo;
+    @Autowired
+    UserRepository userRepo;
 
     public IssueItems getIssueItem(Integer issueId, Integer ledgerId) {
         return issueItemsRepo.findOne(new IssueItemsPK(ledgerId, issueId));
@@ -129,5 +138,57 @@ public class IssueItemsService extends BaseService {
         }
 
         return true;
+    }
+
+    public void mapMaster(Model model) {
+        // カテゴリーマスタ
+        List<CategoryMaster> categoryMasterList = categoryMasterRepo.findAllOrderByDispOrder();
+        Map<Integer, String> categoryItemMap = new LinkedHashMap<>();
+        for (CategoryMaster cm : categoryMasterList) {
+            categoryItemMap.put(cm.getCategoryId(), cm.getCategoryName());
+        }
+        model.addAttribute("moduleCategoryList", categoryItemMap);
+
+        // 工程マスタ
+        List<ProcessMaster> processMasterList = processMasterRepo.findAllOrderByDispOrder();
+        Map<Integer, String> processItemMap = new LinkedHashMap<>();
+        for (ProcessMaster pm : processMasterList) {
+            processItemMap.put(pm.getProcessId(), pm.getProcessName());
+        }
+        model.addAttribute("causedProcessList", processItemMap);
+
+        // 緊急度マスタ
+        List<SevereLevelMaster> severeLevelMasterList = severeLevelMasterRepo.findAllOrderByDispOrder();
+        Map<Integer, String> severityItemMap = new LinkedHashMap<>();
+        for (SevereLevelMaster slm : severeLevelMasterList) {
+            severityItemMap.put(slm.getSevereLevelId(), slm.getSevereLevel());
+        }
+        model.addAttribute("severityList", severityItemMap);
+    }
+
+    public void mapRelatedUsers(Model model, int ledgerId) {
+        List<Users> relatedUsers = userRepo.findRelatedUsers(ledgerId);
+        Map<String, String> joinedUsers = new LinkedHashMap<>();
+        for (Users u : relatedUsers) {
+            joinedUsers.put(u.getUsername(), u.getDisplayName());
+        }
+        model.addAttribute("joinedUsers", joinedUsers);
+
+        Map<String, String> correspondingUsers = new LinkedHashMap<>(joinedUsers);
+        model.addAttribute("correspondingUsers", correspondingUsers);
+
+        Map<String, String> confirmedUsers = new LinkedHashMap<>(joinedUsers);
+        model.addAttribute("confirmedUsers", confirmedUsers);
+    }
+
+    public void mapEmptyUsers(Model model) {
+        Map<String, String> empty1 = new LinkedHashMap<>();
+        model.addAttribute("joinedUsers", empty1);
+
+        Map<String, String> empty2 = new LinkedHashMap<>();
+        model.addAttribute("correspondingUsers", empty2);
+
+        Map<String, String> empty3 = new LinkedHashMap<>();
+        model.addAttribute("confirmedUsers", empty3);
     }
 }

@@ -1,15 +1,12 @@
 package net.formula97.webapp.pims.web;
 
 import net.formula97.webapp.pims.BaseTestCase;
+import net.formula97.webapp.pims.domain.IssueItems;
 import net.formula97.webapp.pims.domain.IssueLedger;
 import net.formula97.webapp.pims.domain.LedgerRefUser;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.misc.AppConstants;
-import net.formula97.webapp.pims.repository.IssueLedgerRepository;
-import net.formula97.webapp.pims.repository.LedgerRefUserRepository;
-import net.formula97.webapp.pims.repository.MySpecificationAdapter;
-import net.formula97.webapp.pims.repository.UserRepository;
-import net.formula97.webapp.pims.service.IssueLedgerService;
+import net.formula97.webapp.pims.repository.*;
 import net.formula97.webapp.pims.web.forms.IssueItemForm;
 import net.formula97.webapp.pims.web.forms.NewLedgerForm;
 import org.hamcrest.Matchers;
@@ -18,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -27,7 +25,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.context.WebApplicationContext;
@@ -35,19 +32,18 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 /**
  * Created by f97one on 2016/10/10.
@@ -68,11 +64,13 @@ public class LedgerControllerTest extends BaseTestCase {
     @Autowired
     private IssueLedgerRepository issueLedgerRepo;
     @Autowired
-    private IssueLedgerService issueLedgerSvc;
+    private IssueItemsRepository issueItemsRepo;
 
     private Validator validator;
     private MockMvc mMvcMock;
     private int existingLedgerId;
+    private int existingIssueId;
+    private String existingIssueTimestamp;
 
     /**
      * @throws java.lang.Exception
@@ -132,10 +130,29 @@ public class LedgerControllerTest extends BaseTestCase {
         lru1.setLedgerId(ledger.getLedgerId());
         ledgerRefUserRepo.save(lru1);
 
+        IssueItems items = new IssueItems();
+        items.setActionStatusId(1);
+        items.setSevereLevelId(2);
+        items.setLedgerId(this.existingLedgerId);
+        items.setFoundUser("user11");
+        items.setFoundDate(new Date());
+        items.setFoundProcessId(3);
+        items.setIssueDetail("Hoge処理が動かない。なんとかしろ");
+        items.setRowUpdatedAt(new Date());
+        issueItemsRepo.save(items);
+
+        MySpecificationAdapter<IssueItems> iiSpec = new MySpecificationAdapter<>(IssueItems.class);
+        Optional<IssueItems> itemsOpt = Optional.ofNullable(
+                issueItemsRepo.findOne(Specifications.where(iiSpec.eq("ledgerId", existingIssueId))
+                        .and(iiSpec.eq("foundUser", "user11"))
+                        .and(iiSpec.eq("issueDetail", "Hoge処理が動かない。なんとかしろ"))));
+        itemsOpt.ifPresent(items1 -> this.existingIssueId = items1.getIssueId());
+        this.existingIssueTimestamp = items.getRowUpdatedAt().toString();
     }
 
     @After
     public void tearDown() throws Exception {
+        issueItemsRepo.deleteAll();
         ledgerRefUserRepo.deleteAll();
         issueLedgerRepo.deleteAll();
         userRepo.deleteAll();
@@ -187,7 +204,7 @@ public class LedgerControllerTest extends BaseTestCase {
         int beforeLedgerCount = issueLedgerRepo.findAll().size();
         int beforeRefCount = ledgerRefUserRepo.findAll().size();
 
-        ResultActions actions = mMvcMock.perform(MockMvcRequestBuilders.post("/ledger/create")
+        ResultActions actions = mMvcMock.perform(post("/ledger/create")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .with(csrf())
                 .param("ledgerName", "ユーザーあり追加テスト用台帳")
@@ -216,7 +233,7 @@ public class LedgerControllerTest extends BaseTestCase {
 
         NewLedgerForm frm = new NewLedgerForm("ユーザーあり追加テスト用台帳", 1, true);
 
-        ResultActions actions = mMvcMock.perform(MockMvcRequestBuilders.post("/ledger/create")
+        ResultActions actions = mMvcMock.perform(post("/ledger/create")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .with(csrf())
                 .param("ledgerName", "ユーザーあり追加テスト用台帳")
@@ -260,9 +277,10 @@ public class LedgerControllerTest extends BaseTestCase {
         String errMsg = (String) modelMap.get("errMsg");
         assertThat(errMsg, is("課題の追加にはログインが必要です。"));
 
-        IssueItemForm form = (IssueItemForm) modelMap.get("issueItem");
-        assertThat("台帳名は「LCTest用台帳１」", form.getCurrentLedgerName(), is("LCTest用台帳１"));
-        assertThat("課題番号は「新規」", form.getIssueNumberLabel(), is("新規"));
+        String currentLedgerName = (String) modelMap.get("currentLedgerName");
+        String issueNumberLabel = (String) modelMap.get("issueNumberLabel");
+        assertThat("台帳名は「LCTest用台帳１」", currentLedgerName, is("LCTest用台帳１"));
+        assertThat("課題番号は「新規」", issueNumberLabel, is("新規"));
     }
 
     @Test
@@ -280,9 +298,10 @@ public class LedgerControllerTest extends BaseTestCase {
         String errMsg = (String) modelMap.get("errMsg");
         assertThat(errMsg, is("台帳が見つかりません。"));
 
-        IssueItemForm form = (IssueItemForm) modelMap.get("issueItem");
-        assertThat("台帳名は「※不明※」", form.getCurrentLedgerName(), is("※不明※"));
-        assertThat("課題番号は「新規」", form.getIssueNumberLabel(), is("新規"));
+        String currentLedgerName = (String) modelMap.get("currentLedgerName");
+        String issueNumberLabel = (String) modelMap.get("issueNumberLabel");
+        assertThat("台帳名は「※不明※」", currentLedgerName, is("※不明※"));
+        assertThat("課題番号は「新規」", issueNumberLabel, is("新規"));
     }
 
     @Test
@@ -300,9 +319,10 @@ public class LedgerControllerTest extends BaseTestCase {
         String errMsg = (String) modelMap.get("errMsg");
         assertThat(errMsg, is("課題を追加する権限がありません。"));
 
-        IssueItemForm form = (IssueItemForm) modelMap.get("issueItem");
-        assertThat("台帳名は「LCTest用台帳１」", form.getCurrentLedgerName(), is("LCTest用台帳１"));
-        assertThat("課題番号は「新規」", form.getIssueNumberLabel(), is("新規"));
+        String currentLedgerName = (String) modelMap.get("currentLedgerName");
+        String issueNumberLabel = (String) modelMap.get("issueNumberLabel");
+        assertThat("台帳名は「LCTest用台帳１」", currentLedgerName, is("LCTest用台帳１"));
+        assertThat("課題番号は「新規」", issueNumberLabel, is("新規"));
     }
 
     @Test
@@ -322,20 +342,162 @@ public class LedgerControllerTest extends BaseTestCase {
         String infoMsg = (String) modelMap.get("infoMsg");
         assertNull(infoMsg);
 
-        IssueItemForm form = (IssueItemForm) modelMap.get("issueItem");
-        assertThat("台帳名は「LCTest用台帳１」", form.getCurrentLedgerName(), is("LCTest用台帳１"));
-        assertThat("課題番号は「新規」", form.getIssueNumberLabel(), is("新規"));
+        String currentLedgerName = (String) modelMap.get("currentLedgerName");
+        String issueNumberLabel = (String) modelMap.get("issueNumberLabel");
+        assertThat("台帳名は「LCTest用台帳１」", currentLedgerName, is("LCTest用台帳１"));
+        assertThat("課題番号は「新規」", issueNumberLabel, is("新規"));
     }
 
-    @Ignore
     @Test
     public void 課題追加のフォームバリデーションがはたらいている() {
-        fail("まだ実装していない");
-
         IssueItemForm form = new IssueItemForm();
         form.setFoundDate("20161229");
-        form.setSeverity(null);
+        form.setSeverity(-1);
         form.setFoundUserId("");
-        form.setCategoryId("");
+        form.setCategoryId(-1);
+        form.setProcessId(-1);
+        form.setIssueDetail("");
+        form.setCaused("");
+        form.setCountermeasures("");
+        form.setConfirmedUserId("");
+        form.setCorrespondingTime(null);
+        form.setConfirmedUserId("");
+        form.setConfirmedDate("");
+
+        Set<ConstraintViolation<IssueItemForm>> violationsSet = validator.validate(form);
+        assertThat("エラーは3件", violationsSet.size(), is(3));
+        Optional<ConstraintViolation<IssueItemForm>> violationOpt = violationsSet.stream().filter((r) -> r.getConstraintDescriptor().getAnnotation() instanceof Min).findFirst();
+        if (violationOpt.isPresent()) {
+            ConstraintViolation<IssueItemForm> violation = violationOpt.get();
+            assertNotNull("最低値エラーが検知されている", violation);
+            assertThat("Severityのエラーが検知されている", violation.getPropertyPath().toString().toLowerCase(), is("severity"));
+        } else {
+            fail("最低値エラーが検知されていない");
+        }
+
+        violationOpt = violationsSet.stream().filter((r) -> r.getConstraintDescriptor().getAnnotation() instanceof Size).findFirst();
+        if (violationOpt.isPresent()) {
+            ConstraintViolation<IssueItemForm> violation = violationOpt.get();
+            assertNotNull("Sizeエラーが検知されている", violation);
+            assertThat("FoundUserIdのエラーが検知されている", violation.getPropertyPath().toString().toLowerCase(), is("founduserid"));
+        } else {
+            fail("Sizeエラーが検知されていない");
+        }
+
+        violationOpt = violationsSet.stream().filter((r) -> r.getConstraintDescriptor().getAnnotation() instanceof Pattern).findFirst();
+        if (violationOpt.isPresent()) {
+            ConstraintViolation<IssueItemForm> violation = violationOpt.get();
+            assertNotNull("Patternエラーが検知されている", violation);
+            assertThat("FoundDateのエラーが検知されている", violation.getPropertyPath().toString().toLowerCase(), is("founddate"));
+        } else {
+            fail("Patternエラーが検知されていない");
+        }
+    }
+
+    @Test
+    @WithMockUser("user11")
+    public void 課題を追加できる() throws Exception {
+        int beforeIssueCount = issueItemsRepo.findAll().size();
+
+        String template = String.format(Locale.getDefault(), "%s/%d/add", apiEndpoint, existingLedgerId);
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("addItemBtn", "追加")
+                .param("currentLedgerName", "LCTest用台帳１")
+                .param("issueNumberLabel", "新規")
+                .param("recordTimestamp", String.valueOf(Calendar.getInstance().getTimeInMillis()))
+                .param("foundDate", "2017/01/01")
+                .param("severity", "1")
+                .param("foundUserId", "user11")
+                .param("categoryId", String.valueOf(AppConstants.SELECTION_NOT_SELECTED))
+                .param("processId", String.valueOf(AppConstants.SELECTION_NOT_SELECTED))
+                .param("issueDetail", "いきなり落ちた")
+                .param("caused", "")
+                .param("countermeasures", "")
+                .param("correspondingUserId", "")
+                .param("correspondingTime", "")
+                .param("correspondingEndDate", "")
+                .param("confirmedUserId", "")
+                .param("confirmedDate", ""))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        List<IssueItems> issueItemsList = issueItemsRepo.findAll();
+        assertThat("課題が１増えている", issueItemsList.size(), is(beforeIssueCount + 1));
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String infoMsg = (String) modelMap.get("infoMsg");
+        assertThat(infoMsg, is("課題を追加しました。"));
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void 非ログインだと課題を更新できない() throws Exception {
+        fail("まだ実装していない");
+//        int beforeIssueCount = issueItemsRepo.findAll().size();
+//
+//        String template = String.format(Locale.getDefault(), "%s/%d/add", apiEndpoint, existingLedgerId);
+//        ResultActions actions = mMvcMock.perform(post(template)
+//                .with(csrf())
+//                .param("addItemBtn", "追加")
+//                .param("currentLedgerName", "LCTest用台帳１")
+//                .param("issueNumberLabel", "新規")
+//                .param("recordTimestamp", String.valueOf(Calendar.getInstance().getTimeInMillis()))
+//                .param("foundDate", "2017/01/01")
+//                .param("severity", "1")
+//                .param("foundUserId", "user11")
+//                .param("categoryId", String.valueOf(AppConstants.SELECTION_NOT_SELECTED))
+//                .param("processId", String.valueOf(AppConstants.SELECTION_NOT_SELECTED))
+//                .param("issueDetail", "いきなり落ちた")
+//                .param("caused", "")
+//                .param("countermeasures", "")
+//                .param("correspondingUserId", "")
+//                .param("correspondingTime", "")
+//                .param("correspondingEndDate", "")
+//                .param("confirmedUserId", "")
+//                .param("confirmedDate", ""))
+//                .andDo(print());
+//
+//        MvcResult mvcResult = actions
+//                .andExpect(status().isOk())
+//                .andExpect(view().name(is("/ledger/issueItem")))
+//                .andExpect(model().hasNoErrors())
+//                .andReturn();
+//
+//        List<IssueItems> issueItemsList = issueItemsRepo.findAll();
+//        assertThat("課題の増減はなし", issueItemsList.size(), is(beforeIssueCount));
+//
+//        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+//        String errMsg = modelMap.get("errMsg");
+//        assertThat(errMsg, is(""));
+    }
+
+    @Test
+    @WithMockUser("user11")
+    public void 存在しない台帳の課題は更新できない() throws Exception {
+        fail("まだ実装していない");
+    }
+
+    @Test
+    @WithMockUser("user11")
+    public void 存在しない課題は更新できない() throws Exception {
+        fail("まだ実装していない");
+    }
+
+    @Test
+    @WithMockUser("user22")
+    public void 台帳に関係ないユーザーでは課題を更新できない() throws Exception {
+        fail("まだ実装していない");
+    }
+
+    @Test
+    @WithMockUser("user11")
+    public void 課題を更新できる() throws Exception {
+        fail("まだ実装していない");
     }
 }

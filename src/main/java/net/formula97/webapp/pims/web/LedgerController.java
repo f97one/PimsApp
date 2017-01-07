@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -149,10 +150,12 @@ public class LedgerController extends BaseWebController {
 
         IssueItemForm issueItemForm = new IssueItemForm();
 
+        issueItemsSvc.mapEmptyUsers(model);
+
         // 指定された番号の台帳を検索する
         Optional<IssueLedger> ledgerOptional = Optional.ofNullable(issueLedgerSvc.getLedgerById(ledgerId));
         if (ledgerOptional.isPresent()) {
-            issueItemForm.setCurrentLedgerName(ledgerOptional.get().getLedgerName());
+            model.addAttribute("currentLedgerName", ledgerOptional.get().getLedgerName());
 
             if (users == null) {
                 putErrMsg(model, "課題の追加にはログインが必要です。");
@@ -161,6 +164,10 @@ public class LedgerController extends BaseWebController {
                 // 課題を編集できるかどうかを判断
                 if (issueItemsSvc.hasEditPrivilege(ledgerId, users)) {
                     model.addAttribute("modeTag", AppConstants.EDIT_MODE_ADD);
+//                    issueItemForm.setFoundUserId(users.getUsername());
+
+                    // 関係ユーザーをマップする
+//                    issueItemsSvc.mapRelatedUsers(model, ledgerId);
                 } else {
                     model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
                     putErrMsg(model, "課題を追加する権限がありません。");
@@ -171,12 +178,46 @@ public class LedgerController extends BaseWebController {
             putErrMsg(model, "台帳が見つかりません。");
             model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
 
-            issueItemForm.setCurrentLedgerName("※不明※");
+            model.addAttribute("currentLedgerName", "※不明※");
         }
-        issueItemForm.setIssueNumberLabel("新規");
-        issueItemForm.setRecordTimestamp(new Date());
+        model.addAttribute("issueNumberLabel", "新規");
+        issueItemForm.setRecordTimestamp(Calendar.getInstance().getTimeInMillis());
+
+//        issueItemsSvc.mapMaster(model);
 
         model.addAttribute("issueItem", issueItemForm);
+
+        return "/ledger/issueItem";
+    }
+
+    @RequestMapping(value = "{ledgerId}/add", method = RequestMethod.POST, params = "addItemBtn")
+    public String addIssueToLedger(@PathVariable("ledgerId") Integer ledgerId,
+                                   @ModelAttribute("issueItem") @Validated IssueItemForm issueItemForm,
+                                   BindingResult result, Model model, HeaderForm headerForm) {
+
+        Users users = getUserState(model, headerForm);
+        if (!result.hasErrors()) {
+            Optional<IssueLedger> ledgerOptional = Optional.ofNullable(issueLedgerSvc.getLedgerById(ledgerId));
+            if (ledgerOptional.isPresent()) {
+                if (users == null) {
+                    putErrMsg(model, "課題の追加にはログインが必要です。");
+                } else {
+                    if (issueItemsSvc.hasEditPrivilege(ledgerId, users)) {
+                        IssueItems issueItems = issueItemForm.exportToEntity();
+                        issueItems.setLedgerId(ledgerId);
+
+                        issueItemsSvc.saveItem(issueItems);
+                        putInfoMsg(model, "課題を追加しました。");
+                    } else {
+                        putErrMsg(model, "課題を追加する権限がありません。");
+                    }
+                }
+            } else {
+                // 指定番号の台帳がない場合はエラーにする
+                putErrMsg(model, "台帳が見つかりません。");
+                model.addAttribute("currentLedgerName", "※不明※");
+            }
+        }
 
         return "/ledger/issueItem";
     }

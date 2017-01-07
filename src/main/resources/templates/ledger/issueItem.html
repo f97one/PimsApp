@@ -66,8 +66,8 @@
     <div th:replace="/common/common_header::common_header"></div>
 
     <p class="issue_breadcomb">
-        <span th:text="${issueItem.currentLedgerName}">Hogeシステム改修</span> &gt; <span
-            th:text="${issueItem.issueNumberLabel}">新規</span>
+        <span th:text="${currentLedgerName}">Hogeシステム改修</span> &gt; <span
+            th:text="${issueNumberLabel}">新規</span>
     </p>
 
     <h2 class="h2">課題</h2>
@@ -77,11 +77,9 @@
     <div class="form-group">
         <form th:action="@{'/ledger/' + ${issueId}}" th:object="${issueItem}" class="form-horizontal" method="POST">
             <!-- そのまま返却が必要なメンバー -->
-            <input type="hidden" id="currentLedgerName" name="currentLedgerName" th:field="*{currentLedgerName}"/>
-            <input type="hidden" id="issueNumberLabel" name="issueNumberLabel" th:field="*{issueNumberLabel}"/>
             <input type="hidden" id="recordTimestamp" name="recordTimestamp" th:field="*{recordTimestamp}"/>
 
-            <div class="row">
+            <div class="row vertical-margin">
                 <div class="col-lg-2 col-sm-3">発生日</div>
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group date col-lg-3 col-sm-6 col-xs-12 datePickerBox" data-provide="datepicker">
@@ -95,13 +93,13 @@
                           class="help-block">Error</span>
                 </div>
             </div>
-            <div class="row">
+            <div class="row vertical-margin">
                 <div class="col-lg-2 col-sm-3">緊急度</div>
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
-                        <select class="form-control" id="severitySelector" name="severitySelector"
+                        <select class="form-control" id="severitySelector" name="severity"
                                 th:disabled="${modeTag eq 'R'}">
-                            <option value="">---</option>
+                            <option value="-1">---</option>
                             <option th:each="severityItem : ${severityList}" th:value="${severityItem.key}"
                                     th:text="${severityItem.value}" th:selected="${severityItem.key} eq *{severity}">
                                 pulldown
@@ -112,11 +110,11 @@
                           class="help-block">error!</span>
                 </div>
             </div>
-            <div class="row">
+            <div class="row vertical-margin">
                 <div class="col-lg-2 col-sm-3">発見者</div>
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
-                        <select class="form-control" id="foundUserSelector" name="foundUserSelector"
+                        <select class="form-control" id="foundUserSelector" name="foundUserId"
                                 th:disabled="${modeTag eq 'R'}">
                             <option value="">---</option>
                             <option th:each="foundUserItem : ${joinedUsers}" th:value="${foundUserItem.key}"
@@ -128,27 +126,27 @@
                     <span th:if="${#fields.hasErrors('foundUserId')}" th:errors="*{foundUserId}" class="help-block">error!</span>
                 </div>
             </div>
-            <div class="row">
+            <div class="row vertical-margin">
                 <div class="col-lg-2 col-sm-3">機能種別</div>
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
-                        <select class="form-control" id="moduleKind" name="moduleKind"
+                        <select class="form-control" id="moduleKind" name="categoryId"
                                 th:disabled="${modeTag eq 'R'}">
-                            <option value="">---</option>
+                            <option value="-1">---</option>
                             <option th:each="module : ${moduleCategoryList}" th:value="${module.key}"
-                                    th:text="${module.value}" th:selected="${module.key} eq *{categoryId}">found user
+                                    th:text="${module.value}" th:selected="${module.key} eq *{categoryId}">Category
                             </option>
                         </select>
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row vertical-margin">
                 <div class="col-lg-2 col-sm-3">原因工程</div>
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
-                        <select class="form-control" id="causedProcess" name="causedProcess"
+                        <select class="form-control" id="causedProcess" name="processId"
                                 th:disabled="${modeTag eq 'R'}">
-                            <option value="">---</option>
+                            <option value="-1">---</option>
                             <option th:each="processItem : ${causedProcessList}" th:value="${processItem.value}"
                                     th:text="${processItem.key}" th:selected="${processItem.value} == *{processId}">
                                 found user
@@ -159,7 +157,7 @@
                           class="help-block">error!</span>
                 </div>
             </div>
-            <div class="row">
+            <div class="row vertical-margin">
                 <div class="col-lg-2 col-sm-3">障害内容</div>
                 <div class="col-lg-10 col-sm-9">
                     <textarea id="issueDetail" name="issueDetail" class="form-control" rows="4" cols="60"
@@ -172,7 +170,7 @@
                     <span th:if="${#fields.hasErrors('issueDetail')}" th:errors="*{issueDetail}" class="help-block">error!</span>
                 </div>
             </div>
-            <div class="row">
+            <div class="row vertical-margin">
                 <div class="col-lg-2 col-sm-3">原因</div>
                 <div class="col-lg-10 col-sm-9">
                     <textarea id="caused" name="caused" class="form-control" rows="4" cols="60"
@@ -185,7 +183,7 @@
                     <span th:if="${#fields.hasErrors('caused')}" th:errors="*{caused}" class="help-block">error!</span>
                 </div>
             </div>
-            <div class="row">
+            <div class="row vertical-margin">
                 <div class="col-lg-2 col-sm-3">対応内容</div>
                 <div class="col-lg-10 col-sm-9">
                     <textarea id="countermeasures" name="countermeasures" class="form-control" rows="4" cols="60"
@@ -199,11 +197,11 @@
                           class="help-block">error!</span>
                 </div>
             </div>
-            <div class="row">
+            <div class="row vertical-margin">
                 <div class="col-lg-2 col-sm-3">対応者</div>
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
-                        <select class="form-control" id="correspondingUserSelector" name="correspondingUserSelector"
+                        <select class="form-control" id="correspondingUserSelector" name="correspondingUserId"
                                 th:disabled="${modeTag eq 'R'}">
                             <option value="">---</option>
                             <option th:each="correspondingUserItem : ${correspondingUsers}"
@@ -217,7 +215,7 @@
                           class="help-block">error!</span>
                 </div>
             </div>
-            <div class="row">
+            <div class="row vertical-margin">
                 <div class="col-lg-2 col-sm-3">対応時間</div>
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
@@ -229,7 +227,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row vertical-margin">
                 <div class="col-lg-2 col-sm-3">対応終了日</div>
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group date col-lg-3 col-sm-6 col-xs-12 datePickerBox" data-provide="datepicker">
@@ -244,11 +242,11 @@
                           class="help-block">Error</span>
                 </div>
             </div>
-            <div class="row">
+            <div class="row vertical-margin">
                 <div class="col-lg-2 col-sm-3">確認者</div>
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
-                        <select class="form-control" id="confirmedUserSelector" name="confirmedUserSelector"
+                        <select class="form-control" id="confirmedUserSelector" name="confirmedUserId"
                                 th:disabled="${modeTag eq 'R'}">
                             <option value="">---</option>
                             <option th:each="confirmedUserItem : ${confirmedUsers}"
@@ -261,7 +259,7 @@
                           class="help-block">error!</span>
                 </div>
             </div>
-            <div class="row">
+            <div class="row vertical-margin">
                 <div class="col-lg-2 col-sm-3">確認日</div>
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group date col-lg-3 col-sm-6 col-xs-12 datePickerBox" data-provide="datepicker">
@@ -274,7 +272,7 @@
                     <span th:if="${#fields.hasErrors('confirmedDate')}" th:errors="*{confirmedDate}" class="help-block">Error</span>
                 </div>
             </div>
-            <div class="row">
+            <div class="row vertical-margin">
                 <button type="reset" id="resetBtn" class="btn btn-default col-lg-1"
                         th:disabled="${modeTag eq 'R'}">リセット
                 </button>
