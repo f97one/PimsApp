@@ -1,10 +1,7 @@
 package net.formula97.webapp.pims.web;
 
 import net.formula97.webapp.pims.BaseTestCase;
-import net.formula97.webapp.pims.domain.IssueItems;
-import net.formula97.webapp.pims.domain.IssueLedger;
-import net.formula97.webapp.pims.domain.LedgerRefUser;
-import net.formula97.webapp.pims.domain.Users;
+import net.formula97.webapp.pims.domain.*;
 import net.formula97.webapp.pims.misc.AppConstants;
 import net.formula97.webapp.pims.repository.*;
 import net.formula97.webapp.pims.web.forms.IssueItemForm;
@@ -35,6 +32,7 @@ import javax.validation.Validator;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.hamcrest.Matchers.is;
@@ -136,6 +134,7 @@ public class LedgerControllerTest extends BaseTestCase {
         items.setLedgerId(this.existingLedgerId);
         items.setFoundUser("user11");
         items.setFoundDate(new Date());
+        items.setCategoryId(3);
         items.setFoundProcessId(3);
         items.setIssueDetail("Hoge処理が動かない。なんとかしろ");
         items.setRowUpdatedAt(new Date());
@@ -143,7 +142,7 @@ public class LedgerControllerTest extends BaseTestCase {
 
         MySpecificationAdapter<IssueItems> iiSpec = new MySpecificationAdapter<>(IssueItems.class);
         Optional<IssueItems> itemsOpt = Optional.ofNullable(
-                issueItemsRepo.findOne(Specifications.where(iiSpec.eq("ledgerId", existingIssueId))
+                issueItemsRepo.findOne(Specifications.where(iiSpec.eq("ledgerId", existingLedgerId))
                         .and(iiSpec.eq("foundUser", "user11"))
                         .and(iiSpec.eq("issueDetail", "Hoge処理が動かない。なんとかしろ"))));
         itemsOpt.ifPresent(items1 -> this.existingIssueId = items1.getIssueId());
@@ -438,66 +437,281 @@ public class LedgerControllerTest extends BaseTestCase {
     @Test
     @WithAnonymousUser
     public void 非ログインだと課題を更新できない() throws Exception {
-        fail("まだ実装していない");
-//        int beforeIssueCount = issueItemsRepo.findAll().size();
-//
-//        String template = String.format(Locale.getDefault(), "%s/%d/add", apiEndpoint, existingLedgerId);
-//        ResultActions actions = mMvcMock.perform(post(template)
-//                .with(csrf())
-//                .param("addItemBtn", "追加")
-//                .param("currentLedgerName", "LCTest用台帳１")
-//                .param("issueNumberLabel", "新規")
-//                .param("recordTimestamp", String.valueOf(Calendar.getInstance().getTimeInMillis()))
-//                .param("foundDate", "2017/01/01")
-//                .param("severity", "1")
-//                .param("foundUserId", "user11")
-//                .param("categoryId", String.valueOf(AppConstants.SELECTION_NOT_SELECTED))
-//                .param("processId", String.valueOf(AppConstants.SELECTION_NOT_SELECTED))
-//                .param("issueDetail", "いきなり落ちた")
-//                .param("caused", "")
-//                .param("countermeasures", "")
-//                .param("correspondingUserId", "")
-//                .param("correspondingTime", "")
-//                .param("correspondingEndDate", "")
-//                .param("confirmedUserId", "")
-//                .param("confirmedDate", ""))
-//                .andDo(print());
-//
-//        MvcResult mvcResult = actions
-//                .andExpect(status().isOk())
-//                .andExpect(view().name(is("/ledger/issueItem")))
-//                .andExpect(model().hasNoErrors())
-//                .andReturn();
-//
-//        List<IssueItems> issueItemsList = issueItemsRepo.findAll();
-//        assertThat("課題の増減はなし", issueItemsList.size(), is(beforeIssueCount));
-//
-//        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
-//        String errMsg = modelMap.get("errMsg");
-//        assertThat(errMsg, is(""));
+        IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
+
+        IssueItems baseItem = issueItemsRepo.findOne(pk);
+
+        SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
+
+        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId, existingIssueId);
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("updateItemBtn", "更新")
+                .param("currentLedgerName", "LCTest用台帳１")
+                .param("issueNumberLabel", String.format(Locale.getDefault(), "#%d", existingIssueId))
+                .param("recordTimestamp", String.valueOf(baseItem.getRowUpdatedAt().getTime()))
+                .param("foundDate", sdf.format(baseItem.getFoundDate()))
+                .param("severity", String.valueOf(baseItem.getSevereLevelId()))
+                .param("foundUserId", baseItem.getFoundUser())
+                .param("categoryId", String.valueOf(baseItem.getCategoryId()))
+                .param("processId", String.valueOf(baseItem.getFoundProcessId()))
+                .param("issueDetail", baseItem.getIssueDetail())
+                .param("caused", "null判断が不十分だったため")
+                .param("countermeasures", "null判断を追加")
+                .param("correspondingUserId", "user11")
+                .param("correspondingTime", "1.5")
+                .param("correspondingEndDate", "2017/01/07")
+                .param("confirmedUserId", "")
+                .param("confirmedDate", ""))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        IssueItems resultItem = issueItemsRepo.findOne(pk);
+        assertThat("レコードは更新されていない", resultItem.getRowUpdatedAt().compareTo(baseItem.getRowUpdatedAt()), is(0));
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("課題の更新にはログインが必要です。"));
     }
 
     @Test
     @WithMockUser("user11")
     public void 存在しない台帳の課題は更新できない() throws Exception {
-        fail("まだ実装していない");
+        IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
+
+        IssueItems baseItem = issueItemsRepo.findOne(pk);
+
+        SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
+
+        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId + 1, existingIssueId);
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("updateItemBtn", "更新")
+                .param("currentLedgerName", "LCTest用台帳１")
+                .param("issueNumberLabel", String.format(Locale.getDefault(), "#%d", existingIssueId))
+                .param("recordTimestamp", String.valueOf(baseItem.getRowUpdatedAt().getTime()))
+                .param("foundDate", sdf.format(baseItem.getFoundDate()))
+                .param("severity", String.valueOf(baseItem.getSevereLevelId()))
+                .param("foundUserId", baseItem.getFoundUser())
+                .param("categoryId", String.valueOf(baseItem.getCategoryId()))
+                .param("processId", String.valueOf(baseItem.getFoundProcessId()))
+                .param("issueDetail", baseItem.getIssueDetail())
+                .param("caused", "null判断が不十分だったため")
+                .param("countermeasures", "null判断を追加")
+                .param("correspondingUserId", "user11")
+                .param("correspondingTime", "1.5")
+                .param("correspondingEndDate", "2017/01/07")
+                .param("confirmedUserId", "")
+                .param("confirmedDate", ""))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        IssueItems resultItem = issueItemsRepo.findOne(pk);
+        assertThat("レコードは更新されていない", resultItem.getRowUpdatedAt().compareTo(baseItem.getRowUpdatedAt()), is(0));
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("台帳が見つかりません。"));
     }
 
     @Test
     @WithMockUser("user11")
     public void 存在しない課題は更新できない() throws Exception {
-        fail("まだ実装していない");
+        IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
+
+        IssueItems baseItem = issueItemsRepo.findOne(pk);
+
+        SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
+
+        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId, existingIssueId + 1);
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("updateItemBtn", "更新")
+                .param("currentLedgerName", "LCTest用台帳１")
+                .param("issueNumberLabel", String.format(Locale.getDefault(), "#%d", existingIssueId))
+                .param("recordTimestamp", String.valueOf(baseItem.getRowUpdatedAt().getTime()))
+                .param("foundDate", sdf.format(baseItem.getFoundDate()))
+                .param("severity", String.valueOf(baseItem.getSevereLevelId()))
+                .param("foundUserId", baseItem.getFoundUser())
+                .param("categoryId", String.valueOf(baseItem.getCategoryId()))
+                .param("processId", String.valueOf(baseItem.getFoundProcessId()))
+                .param("issueDetail", baseItem.getIssueDetail())
+                .param("caused", "null判断が不十分だったため")
+                .param("countermeasures", "null判断を追加")
+                .param("correspondingUserId", "user11")
+                .param("correspondingTime", "1.5")
+                .param("correspondingEndDate", "2017/01/07")
+                .param("confirmedUserId", "")
+                .param("confirmedDate", ""))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        IssueItems resultItem = issueItemsRepo.findOne(pk);
+        assertThat("レコードは更新されていない", resultItem.getRowUpdatedAt().compareTo(baseItem.getRowUpdatedAt()), is(0));
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("課題が見つかりません。"));
     }
 
     @Test
     @WithMockUser("user22")
     public void 台帳に関係ないユーザーでは課題を更新できない() throws Exception {
-        fail("まだ実装していない");
+        IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
+
+        IssueItems baseItem = issueItemsRepo.findOne(pk);
+
+        SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
+
+        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId, existingIssueId + 1);
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("updateItemBtn", "更新")
+                .param("currentLedgerName", "LCTest用台帳１")
+                .param("issueNumberLabel", String.format(Locale.getDefault(), "#%d", existingIssueId))
+                .param("recordTimestamp", String.valueOf(baseItem.getRowUpdatedAt().getTime()))
+                .param("foundDate", sdf.format(baseItem.getFoundDate()))
+                .param("severity", String.valueOf(baseItem.getSevereLevelId()))
+                .param("foundUserId", baseItem.getFoundUser())
+                .param("categoryId", String.valueOf(baseItem.getCategoryId()))
+                .param("processId", String.valueOf(baseItem.getFoundProcessId()))
+                .param("issueDetail", baseItem.getIssueDetail())
+                .param("caused", "null判断が不十分だったため")
+                .param("countermeasures", "null判断を追加")
+                .param("correspondingUserId", "user11")
+                .param("correspondingTime", "1.5")
+                .param("correspondingEndDate", "2017/01/07")
+                .param("confirmedUserId", "")
+                .param("confirmedDate", ""))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        IssueItems resultItem = issueItemsRepo.findOne(pk);
+        assertThat("レコードは更新されていない", resultItem.getRowUpdatedAt().compareTo(baseItem.getRowUpdatedAt()), is(0));
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("課題を更新する権限がありません。"));
+    }
+
+    @Test
+    @WithMockUser("user11")
+    public void 先に更新されていると更新が拒否される() throws Exception {
+        // アイテムの更新日時を未来日付に書き換えておく
+        IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
+
+        IssueItems baseItem = issueItemsRepo.findOne(pk);
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(baseItem.getRowUpdatedAt());
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+
+        baseItem.setRowUpdatedAt(cal.getTime());
+        issueItemsRepo.save(baseItem);
+
+        SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
+
+        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId, existingIssueId + 1);
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("updateItemBtn", "更新")
+                .param("currentLedgerName", "LCTest用台帳１")
+                .param("issueNumberLabel", String.format(Locale.getDefault(), "#%d", existingIssueId))
+                .param("recordTimestamp", String.valueOf(baseItem.getRowUpdatedAt().getTime()))
+                .param("foundDate", sdf.format(baseItem.getFoundDate()))
+                .param("severity", String.valueOf(baseItem.getSevereLevelId()))
+                .param("foundUserId", baseItem.getFoundUser())
+                .param("categoryId", String.valueOf(baseItem.getCategoryId()))
+                .param("processId", String.valueOf(baseItem.getFoundProcessId()))
+                .param("issueDetail", baseItem.getIssueDetail())
+                .param("caused", "null判断が不十分だったため")
+                .param("countermeasures", "null判断を追加")
+                .param("correspondingUserId", "user11")
+                .param("correspondingTime", "1.5")
+                .param("correspondingEndDate", "2017/01/07")
+                .param("confirmedUserId", "")
+                .param("confirmedDate", ""))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        IssueItems resultItem = issueItemsRepo.findOne(pk);
+        assertThat("レコードは更新されていない", resultItem.getRowUpdatedAt().compareTo(baseItem.getRowUpdatedAt()), is(0));
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("別のユーザーが課題を更新しました。リロードしてください。"));
+
     }
 
     @Test
     @WithMockUser("user11")
     public void 課題を更新できる() throws Exception {
-        fail("まだ実装していない");
+        IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
+
+        IssueItems baseItem = issueItemsRepo.findOne(pk);
+
+        SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
+
+        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId, existingIssueId + 1);
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("updateItemBtn", "更新")
+                .param("currentLedgerName", "LCTest用台帳１")
+                .param("issueNumberLabel", String.format(Locale.getDefault(), "#%d", existingIssueId))
+                .param("recordTimestamp", String.valueOf(baseItem.getRowUpdatedAt().getTime()))
+                .param("foundDate", sdf.format(baseItem.getFoundDate()))
+                .param("severity", String.valueOf(baseItem.getSevereLevelId()))
+                .param("foundUserId", baseItem.getFoundUser())
+                .param("categoryId", String.valueOf(baseItem.getCategoryId()))
+                .param("processId", String.valueOf(baseItem.getFoundProcessId()))
+                .param("issueDetail", baseItem.getIssueDetail())
+                .param("caused", "null判断が不十分だったため")
+                .param("countermeasures", "null判断を追加")
+                .param("correspondingUserId", "user11")
+                .param("correspondingTime", "1.5")
+                .param("correspondingEndDate", "2017/01/07")
+                .param("confirmedUserId", "")
+                .param("confirmedDate", ""))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        IssueItems resultItem = issueItemsRepo.findOne(pk);
+        assertThat("レコードは更新されている", resultItem.getRowUpdatedAt().after(baseItem.getRowUpdatedAt()), is(true));
+        assertThat(resultItem.getCaused(), is("null判断が不十分だったため"));
+        assertThat(resultItem.getCountermeasures(), is("null判断を追加"));
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String infoMsg = (String) modelMap.get("infoMsg");
+        assertThat(infoMsg, is("課題を更新しました。"));
     }
 }

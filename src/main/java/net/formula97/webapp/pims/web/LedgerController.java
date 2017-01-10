@@ -164,10 +164,10 @@ public class LedgerController extends BaseWebController {
                 // 課題を編集できるかどうかを判断
                 if (issueItemsSvc.hasEditPrivilege(ledgerId, users)) {
                     model.addAttribute("modeTag", AppConstants.EDIT_MODE_ADD);
-//                    issueItemForm.setFoundUserId(users.getUsername());
+                    issueItemForm.setFoundUserId(users.getUsername());
 
                     // 関係ユーザーをマップする
-//                    issueItemsSvc.mapRelatedUsers(model, ledgerId);
+                    issueItemsSvc.mapRelatedUsers(model, ledgerId);
                 } else {
                     model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
                     putErrMsg(model, "課題を追加する権限がありません。");
@@ -183,7 +183,7 @@ public class LedgerController extends BaseWebController {
         model.addAttribute("issueNumberLabel", "新規");
         issueItemForm.setRecordTimestamp(Calendar.getInstance().getTimeInMillis());
 
-//        issueItemsSvc.mapMaster(model);
+        issueItemsSvc.mapMaster(model);
 
         model.addAttribute("issueItem", issueItemForm);
 
@@ -194,6 +194,8 @@ public class LedgerController extends BaseWebController {
     public String addIssueToLedger(@PathVariable("ledgerId") Integer ledgerId,
                                    @ModelAttribute("issueItem") @Validated IssueItemForm issueItemForm,
                                    BindingResult result, Model model, HeaderForm headerForm) {
+
+        model.addAttribute("issueItem", issueItemForm);
 
         Users users = getUserState(model, headerForm);
         if (!result.hasErrors()) {
@@ -218,8 +220,69 @@ public class LedgerController extends BaseWebController {
                 model.addAttribute("currentLedgerName", "※不明※");
             }
         }
+        issueItemsSvc.mapRelatedUsers(model, ledgerId);
+        issueItemsSvc.mapMaster(model);
 
         return "/ledger/issueItem";
     }
 
+    @RequestMapping(value = "{ledgerId}/{issueId}", method = RequestMethod.POST, params = "updateItemBtn")
+    public String updateIssue(@PathVariable("ledgerId") Integer ledgerId, @PathVariable("issueId") Integer issueId,
+                              @ModelAttribute("issueItem") @Validated IssueItemForm issueItemForm,
+                              BindingResult result, Model model, HeaderForm headerForm) {
+        Users myUserDetail = getUserState(model, headerForm);
+
+        model.addAttribute("issueItem", issueItemForm);
+
+        if (!result.hasErrors()) {
+            Optional<IssueLedger> ledgerOptional = Optional.ofNullable(issueLedgerSvc.getLedgerById(ledgerId));
+            if (ledgerOptional.isPresent()) {
+                if (myUserDetail == null) {
+                    putErrMsg(model, "課題の更新にはログインが必要です。");
+                } else {
+                    IssueItems baseItem = issueItemsSvc.getIssueItem(ledgerId, issueId);
+
+                    if (baseItem == null) {
+                        // 指定番号の課題が見つからない場合はエラー
+                        putErrMsg(model, "課題が見つかりません。");
+                    } else {
+                        if (issueItemsSvc.hasEditPrivilege(ledgerId, myUserDetail)) {
+                            IssueItems issueItems = issueItemForm.exportToEntity();
+
+                            if (issueItems.getRowUpdatedAt().compareTo(baseItem.getRowUpdatedAt()) < 0) {
+                                // 他人が更新しているので、この処理での更新を拒否
+                                putErrMsg(model, "別のユーザーが課題を更新しました。リロードしてください。");
+                            } else {
+                                issueItems.setLedgerId(ledgerId);
+
+                                issueItemsSvc.saveItem(issueItems);
+                                putInfoMsg(model, "課題を更新しました。");
+                            }
+                        } else {
+                            putErrMsg(model, "課題を更新する権限がありません。");
+                        }
+                    }
+                }
+            } else {
+                // 指定番号の台帳がない場合はエラーにする
+                putErrMsg(model, "台帳が見つかりません。");
+                model.addAttribute("currentLedgerName", "※不明※");
+            }
+        }
+
+        issueItemsSvc.mapRelatedUsers(model, ledgerId);
+        issueItemsSvc.mapMaster(model);
+
+        return "/ledger/issueItem";
+    }
+
+    @RequestMapping(value = "{ledgerId}/{issueId}", method = RequestMethod.POST, params = "removeItemBtn")
+    public String removeIssue(@PathVariable("ledgerId") Integer ledgerId, @PathVariable("issueId") Integer issueId,
+                              @ModelAttribute("issueItem") @Validated IssueItemForm issueItemForm,
+                              Model model, HeaderForm headerForm) {
+        Users myUserDetail = getUserState(model, headerForm);
+        // TODO: 中身を書く
+
+        return null;
+    }
 }
