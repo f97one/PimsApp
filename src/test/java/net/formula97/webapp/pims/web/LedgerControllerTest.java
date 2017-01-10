@@ -578,7 +578,7 @@ public class LedgerControllerTest extends BaseTestCase {
 
         SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
 
-        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId, existingIssueId + 1);
+        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId, existingIssueId);
         ResultActions actions = mMvcMock.perform(post(template)
                 .with(csrf())
                 .param("updateItemBtn", "更新")
@@ -622,22 +622,26 @@ public class LedgerControllerTest extends BaseTestCase {
 
         IssueItems baseItem = issueItemsRepo.findOne(pk);
 
+        String baseTimestamp = String.valueOf(baseItem.getRowUpdatedAt().getTime());
+
         Calendar cal = Calendar.getInstance();
         cal.setTime(baseItem.getRowUpdatedAt());
         cal.add(Calendar.DAY_OF_MONTH, 1);
 
         baseItem.setRowUpdatedAt(cal.getTime());
+        baseItem.setLedgerId(existingLedgerId);
+        baseItem.setIssueId(existingIssueId);
         issueItemsRepo.save(baseItem);
 
         SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
 
-        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId, existingIssueId + 1);
+        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId, existingIssueId);
         ResultActions actions = mMvcMock.perform(post(template)
                 .with(csrf())
                 .param("updateItemBtn", "更新")
                 .param("currentLedgerName", "LCTest用台帳１")
                 .param("issueNumberLabel", String.format(Locale.getDefault(), "#%d", existingIssueId))
-                .param("recordTimestamp", String.valueOf(baseItem.getRowUpdatedAt().getTime()))
+                .param("recordTimestamp", baseTimestamp)
                 .param("foundDate", sdf.format(baseItem.getFoundDate()))
                 .param("severity", String.valueOf(baseItem.getSevereLevelId()))
                 .param("foundUserId", baseItem.getFoundUser())
@@ -677,7 +681,7 @@ public class LedgerControllerTest extends BaseTestCase {
 
         SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
 
-        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId, existingIssueId + 1);
+        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId, existingIssueId);
         ResultActions actions = mMvcMock.perform(post(template)
                 .with(csrf())
                 .param("updateItemBtn", "更新")
@@ -705,13 +709,13 @@ public class LedgerControllerTest extends BaseTestCase {
                 .andExpect(model().hasNoErrors())
                 .andReturn();
 
-        IssueItems resultItem = issueItemsRepo.findOne(pk);
-        assertThat("レコードは更新されている", resultItem.getRowUpdatedAt().after(baseItem.getRowUpdatedAt()), is(true));
-        assertThat(resultItem.getCaused(), is("null判断が不十分だったため"));
-        assertThat(resultItem.getCountermeasures(), is("null判断を追加"));
-
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
         String infoMsg = (String) modelMap.get("infoMsg");
         assertThat(infoMsg, is("課題を更新しました。"));
+
+        IssueItems resultItem = issueItemsRepo.findOne(pk);
+        assertThat("レコードは更新されている", resultItem.getRowUpdatedAt().compareTo(baseItem.getRowUpdatedAt()) >= 0, is(true));
+        assertThat(resultItem.getCaused(), is("null判断が不十分だったため"));
+        assertThat(resultItem.getCountermeasures(), is("null判断を追加"));
     }
 }

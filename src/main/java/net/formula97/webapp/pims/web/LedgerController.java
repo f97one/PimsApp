@@ -226,6 +226,14 @@ public class LedgerController extends BaseWebController {
         return "/ledger/issueItem";
     }
 
+    @RequestMapping(value = "{ledgerId}/{issueId}", method = RequestMethod.GET)
+    public String getIssueItem(@PathVariable("ledgerId") Integer ledgerId, @PathVariable("issueId") Integer issueId,
+                               Model model, HeaderForm headerForm) {
+        Users myUserDetail = getUserState(model, headerForm);
+
+        return null;
+    }
+
     @RequestMapping(value = "{ledgerId}/{issueId}", method = RequestMethod.POST, params = "updateItemBtn")
     public String updateIssue(@PathVariable("ledgerId") Integer ledgerId, @PathVariable("issueId") Integer issueId,
                               @ModelAttribute("issueItem") @Validated IssueItemForm issueItemForm,
@@ -254,6 +262,7 @@ public class LedgerController extends BaseWebController {
                                 putErrMsg(model, "別のユーザーが課題を更新しました。リロードしてください。");
                             } else {
                                 issueItems.setLedgerId(ledgerId);
+                                issueItems.setIssueId(issueId);
 
                                 issueItemsSvc.saveItem(issueItems);
                                 putInfoMsg(model, "課題を更新しました。");

@@ -8,10 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by f97one on 2016/11/12.
@@ -36,7 +33,7 @@ public class IssueItemsService extends BaseService {
     @Autowired
     UserRepository userRepo;
 
-    public IssueItems getIssueItem(Integer issueId, Integer ledgerId) {
+    public IssueItems getIssueItem(Integer ledgerId, Integer issueId) {
         return issueItemsRepo.findOne(new IssueItemsPK(ledgerId, issueId));
     }
 
@@ -119,6 +116,8 @@ public class IssueItemsService extends BaseService {
 
     @Transactional
     public void saveItem(IssueItems item) {
+        // 更新日時をUpdateする
+        item.setRowUpdatedAt(new Date());
         issueItemsRepo.save(item);
     }
 
