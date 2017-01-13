@@ -117,9 +117,13 @@ public class IssueItemForm implements Serializable {
             this.correspondingTime = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
         }
 
-        this.correspondingEndDate = sdf.format(item.getCorrespondingEndDate());
+        if (item.getCorrespondingEndDate() != null) {
+            this.correspondingEndDate = sdf.format(item.getCorrespondingEndDate());
+        }
         this.confirmedUserId = item.getConfirmedId();
-        this.confirmedDate = sdf.format(item.getConfirmedDate());
+        if (item.getConfirmedDate() != null) {
+            this.confirmedDate = sdf.format(item.getConfirmedDate());
+        }
 
         return this;
     }

@@ -718,4 +718,140 @@ public class LedgerControllerTest extends BaseTestCase {
         assertThat(resultItem.getCaused(), is("null判断が不十分だったため"));
         assertThat(resultItem.getCountermeasures(), is("null判断を追加"));
     }
+
+    @Test
+    @WithMockUser("user11")
+    public void 存在しない台帳の課題の編集画面は表示できない() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId + 1, existingIssueId);
+        ResultActions actions = mMvcMock.perform(get(template)).andDo(print());
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("リードオンリーモードで表示している", modeTag, is(AppConstants.EDIT_MODE_READONLY));
+
+        IssueItemForm form = (IssueItemForm) modelMap.get("issueItem");
+        assertNull("障害内容がnull", form.getIssueDetail());
+
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("台帳が見つかりません。"));
+    }
+
+    @Test
+    @WithMockUser("user11")
+    public void 存在しない課題の編集画面は表示できない() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId, existingIssueId + 1);
+        ResultActions actions = mMvcMock.perform(get(template)).andDo(print());
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("リードオンリーモードで表示している", modeTag, is(AppConstants.EDIT_MODE_READONLY));
+
+        IssueItemForm form = (IssueItemForm) modelMap.get("issueItem");
+        assertNull("障害内容がnull", form.getIssueDetail());
+
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("課題が見つかりません。"));
+    }
+
+    @Test
+    @WithMockUser("user22")
+    public void 公開台帳に関係ないユーザーだと課題を参照だけできる() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId, existingIssueId);
+        ResultActions actions = mMvcMock.perform(get(template)).andDo(print());
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("リードオンリーモードで表示している", modeTag, is(AppConstants.EDIT_MODE_READONLY));
+
+        IssueItemForm form = (IssueItemForm) modelMap.get("issueItem");
+        assertThat(form.getIssueDetail(), is("Hoge処理が動かない。なんとかしろ"));
+    }
+
+    @Test
+    @WithMockUser("user22")
+    public void 非公開台帳に関係ないユーザーだと課題を表示できない() throws Exception {
+        // 非公開台帳に書き換える
+        IssueLedger l1 = issueLedgerRepo.findOne(existingLedgerId);
+        l1.setPublicLedger(false);
+        issueLedgerRepo.save(l1);
+
+        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId, existingIssueId);
+        ResultActions actions = mMvcMock.perform(get(template)).andDo(print());
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("リードオンリーモードで表示している", modeTag, is(AppConstants.EDIT_MODE_READONLY));
+
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("課題が見つかりません。"));
+
+        IssueItemForm form = (IssueItemForm) modelMap.get("issueItem");
+        assertNull("障害内容がnull", form.getIssueDetail());
+
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void 非ログインだと非公開台帳の課題も参照できない() throws Exception {
+        // 非公開台帳に書き換える
+        IssueLedger l1 = issueLedgerRepo.findOne(existingLedgerId);
+        l1.setPublicLedger(false);
+        issueLedgerRepo.save(l1);
+
+        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId, existingIssueId);
+        ResultActions actions = mMvcMock.perform(get(template)).andDo(print());
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("リードオンリーモードで表示している", modeTag, is(AppConstants.EDIT_MODE_READONLY));
+
+        IssueItemForm form = (IssueItemForm) modelMap.get("issueItem");
+        assertNull("障害内容がnull", form.getIssueDetail());
+
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("課題が見つかりません。"));
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void 非ログインだと公開台帳の課題は参照だけできる() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId, existingIssueId);
+        ResultActions actions = mMvcMock.perform(get(template)).andDo(print());
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("リードオンリーモードで表示している", modeTag, is(AppConstants.EDIT_MODE_READONLY));
+    }
+
+    @Test
+    @WithMockUser("user11")
+    public void 課題の編集画面を表示できる() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/%d/%d", apiEndpoint, existingLedgerId, existingIssueId);
+        ResultActions actions = mMvcMock.perform(get(template)).andDo(print());
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("更新モードで表示している", modeTag, is(AppConstants.EDIT_MODE_MODIFY));
+    }
 }

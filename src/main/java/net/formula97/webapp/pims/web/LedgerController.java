@@ -231,7 +231,64 @@ public class LedgerController extends BaseWebController {
                                Model model, HeaderForm headerForm) {
         Users myUserDetail = getUserState(model, headerForm);
 
-        return null;
+        IssueLedger ledger = issueLedgerSvc.getLedgerById(ledgerId);
+        IssueItems items = issueItemsSvc.getIssueItem(ledgerId, issueId);
+
+        issueItemsSvc.mapMaster(model);
+
+        if (ledger == null) {
+            // 台帳が見つからない場合はエラー
+            putErrMsg(model, "台帳が見つかりません。");
+            model.addAttribute("issueItem", new IssueItemForm());
+            model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
+
+            issueItemsSvc.mapEmptyUsers(model);
+        } else {
+            issueItemsSvc.mapRelatedUsers(model, ledgerId);
+
+            if (items == null) {
+                putErrMsg(model, "課題が見つかりません。");
+                model.addAttribute("issueItem", new IssueItemForm());
+                model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
+            } else {
+                if (myUserDetail == null) {
+                    if (ledger.getPublicLedger()) {
+                        // 公開かつ非ログインは、リードオンリーで課題を表示する
+                        IssueItemForm form = new IssueItemForm().convertToForm(items);
+                        model.addAttribute("issueItem", form);
+                        model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
+                    } else {
+                        // 非公開かつ非ログインはエラー
+                        putErrMsg(model, "課題が見つかりません。");
+                        model.addAttribute("issueItem", new IssueItemForm());
+                        model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
+                    }
+                } else {
+                    LedgerRefUser ref = ledgerRefUserSvc.findReferenceForUser(myUserDetail.getUsername(), ledgerId);
+
+                    if (ref == null) {
+                        if (ledger.getPublicLedger()) {
+                            // 関係ないユーザーは、公開台帳の課題を参照だけできる
+                            IssueItemForm form = new IssueItemForm().convertToForm(items);
+                            model.addAttribute("issueItem", form);
+                            model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
+                        } else {
+                            // 非公開台帳に所属しない場合はエラー
+                            putErrMsg(model, "課題が見つかりません。");
+                            model.addAttribute("issueItem", new IssueItemForm());
+                            model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
+                        }
+                    } else {
+                        // 関係あるユーザーは更新を許可
+                        IssueItemForm form = new IssueItemForm().convertToForm(items);
+                        model.addAttribute("issueItem", form);
+                        model.addAttribute("modeTag", AppConstants.EDIT_MODE_MODIFY);
+                    }
+                }
+            }
+        }
+
+        return "/ledger/issueItem";
     }
 
     @RequestMapping(value = "{ledgerId}/{issueId}", method = RequestMethod.POST, params = "updateItemBtn")
