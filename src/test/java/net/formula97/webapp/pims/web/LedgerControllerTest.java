@@ -959,4 +959,242 @@ public class LedgerControllerTest extends BaseTestCase {
         IssueItemForm form = (IssueItemForm) modelMap.get("issueItem");
         assertThat("発見者IDはuser11", form.getFoundUserId(), is("user11"));
     }
+
+    @Test
+    @WithMockUser("user11")
+    public void 存在しない台帳の課題は削除できない() throws Exception {
+        IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
+
+        IssueItems baseItem = issueItemsRepo.findOne(pk);
+
+        SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
+
+        String template = String.format(Locale.getDefault(), "%s/%d/remove/%d", apiEndpoint, existingLedgerId + 1, existingIssueId);
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("removeItemBtn", "削除")
+                .param("currentLedgerName", "LCTest用台帳１")
+                .param("issueNumberLabel", String.format(Locale.getDefault(), "#%d", existingIssueId))
+                .param("recordTimestamp", String.valueOf(baseItem.getRowUpdatedAt().getTime()))
+                .param("foundDate", sdf.format(baseItem.getFoundDate()))
+                .param("severity", String.valueOf(baseItem.getSevereLevelId()))
+                .param("foundUserId", baseItem.getFoundUser())
+                .param("categoryId", String.valueOf(baseItem.getCategoryId()))
+                .param("processId", String.valueOf(baseItem.getFoundProcessId()))
+                .param("issueDetail", baseItem.getIssueDetail())
+                .param("caused", "null判断が不十分だったため")
+                .param("countermeasures", "null判断を追加")
+                .param("correspondingUserId", "user11")
+                .param("correspondingTime", "1.5")
+                .param("correspondingEndDate", "2017/01/07")
+                .param("confirmedUserId", "")
+                .param("confirmedDate", ""))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("台帳が見つかりません。"));
+
+//        IssueItems resultItem = issueItemsRepo.findOne(pk);
+//        assertThat("レコードは更新されている", resultItem.getRowUpdatedAt().compareTo(baseItem.getRowUpdatedAt()) >= 0, is(true));
+//        assertThat(resultItem.getCaused(), is("null判断が不十分だったため"));
+//        assertThat(resultItem.getCountermeasures(), is("null判断を追加"));
+    }
+
+    @Test
+    @WithMockUser("user11")
+    public void 存在しない課題は削除できない() throws Exception {
+        IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
+
+        IssueItems baseItem = issueItemsRepo.findOne(pk);
+
+        SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
+
+        String template = String.format(Locale.getDefault(), "%s/%d/remove/%d", apiEndpoint, existingLedgerId, existingIssueId + 1);
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("removeItemBtn", "削除")
+                .param("currentLedgerName", "LCTest用台帳１")
+                .param("issueNumberLabel", String.format(Locale.getDefault(), "#%d", existingIssueId))
+                .param("recordTimestamp", String.valueOf(baseItem.getRowUpdatedAt().getTime()))
+                .param("foundDate", sdf.format(baseItem.getFoundDate()))
+                .param("severity", String.valueOf(baseItem.getSevereLevelId()))
+                .param("foundUserId", baseItem.getFoundUser())
+                .param("categoryId", String.valueOf(baseItem.getCategoryId()))
+                .param("processId", String.valueOf(baseItem.getFoundProcessId()))
+                .param("issueDetail", baseItem.getIssueDetail())
+                .param("caused", "null判断が不十分だったため")
+                .param("countermeasures", "null判断を追加")
+                .param("correspondingUserId", "user11")
+                .param("correspondingTime", "1.5")
+                .param("correspondingEndDate", "2017/01/07")
+                .param("confirmedUserId", "")
+                .param("confirmedDate", ""))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("課題が見つかりません。"));
+
+    }
+
+    @Test
+    @WithMockUser("user22")
+    public void 公開非公開にかかわらず台帳に関係ないユーザーだと課題を削除できない() throws Exception {
+        IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
+
+        IssueItems baseItem = issueItemsRepo.findOne(pk);
+
+        SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
+
+        String template = String.format(Locale.getDefault(), "%s/%d/remove/%d", apiEndpoint, existingLedgerId, existingIssueId);
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("removeItemBtn", "削除")
+                .param("currentLedgerName", "LCTest用台帳１")
+                .param("issueNumberLabel", String.format(Locale.getDefault(), "#%d", existingIssueId))
+                .param("recordTimestamp", String.valueOf(baseItem.getRowUpdatedAt().getTime()))
+                .param("foundDate", sdf.format(baseItem.getFoundDate()))
+                .param("severity", String.valueOf(baseItem.getSevereLevelId()))
+                .param("foundUserId", baseItem.getFoundUser())
+                .param("categoryId", String.valueOf(baseItem.getCategoryId()))
+                .param("processId", String.valueOf(baseItem.getFoundProcessId()))
+                .param("issueDetail", baseItem.getIssueDetail())
+                .param("caused", "null判断が不十分だったため")
+                .param("countermeasures", "null判断を追加")
+                .param("correspondingUserId", "user11")
+                .param("correspondingTime", "1.5")
+                .param("correspondingEndDate", "2017/01/07")
+                .param("confirmedUserId", "")
+                .param("confirmedDate", ""))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("課題を削除する権限がありません。"));
+
+        IssueItems resultItem = issueItemsRepo.findOne(pk);
+        assertNotNull("課題は削除されずに残っている", resultItem);
+        assertThat("原因は空のまま", CommonsStringUtils.isNullOrEmpty(resultItem.getCaused()), is(true));
+        assertThat("更新処理を通っていない", baseItem.getRowUpdatedAt().compareTo(resultItem.getRowUpdatedAt()), is(0));
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void 非ログインだと課題を削除できない() throws Exception {
+        IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
+
+        IssueItems baseItem = issueItemsRepo.findOne(pk);
+
+        SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
+
+        String template = String.format(Locale.getDefault(), "%s/%d/remove/%d", apiEndpoint, existingLedgerId, existingIssueId);
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("removeItemBtn", "削除")
+                .param("currentLedgerName", "LCTest用台帳１")
+                .param("issueNumberLabel", String.format(Locale.getDefault(), "#%d", existingIssueId))
+                .param("recordTimestamp", String.valueOf(baseItem.getRowUpdatedAt().getTime()))
+                .param("foundDate", sdf.format(baseItem.getFoundDate()))
+                .param("severity", String.valueOf(baseItem.getSevereLevelId()))
+                .param("foundUserId", baseItem.getFoundUser())
+                .param("categoryId", String.valueOf(baseItem.getCategoryId()))
+                .param("processId", String.valueOf(baseItem.getFoundProcessId()))
+                .param("issueDetail", baseItem.getIssueDetail())
+                .param("caused", "null判断が不十分だったため")
+                .param("countermeasures", "null判断を追加")
+                .param("correspondingUserId", "user11")
+                .param("correspondingTime", "1.5")
+                .param("correspondingEndDate", "2017/01/07")
+                .param("confirmedUserId", "")
+                .param("confirmedDate", ""))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("課題の削除にはログインが必要です。"));
+
+        IssueItems resultItem = issueItemsRepo.findOne(pk);
+        assertNotNull("課題は削除されずに残っている", resultItem);
+        assertThat("原因は空のまま", CommonsStringUtils.isNullOrEmpty(resultItem.getCaused()), is(true));
+        assertThat("更新処理を通っていない", baseItem.getRowUpdatedAt().compareTo(resultItem.getRowUpdatedAt()), is(0));
+    }
+
+    @Test
+    @WithMockUser("user11")
+    public void 課題を削除できる() throws Exception {
+        IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
+
+        IssueItems baseItem = issueItemsRepo.findOne(pk);
+        int baseItemCount = issueItemsRepo.findAll().size();
+
+        SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
+
+        String template = String.format(Locale.getDefault(), "%s/%d/remove/%d", apiEndpoint, existingLedgerId, existingIssueId);
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("removeItemBtn", "削除")
+                .param("currentLedgerName", "LCTest用台帳１")
+                .param("issueNumberLabel", String.format(Locale.getDefault(), "#%d", existingIssueId))
+                .param("recordTimestamp", String.valueOf(baseItem.getRowUpdatedAt().getTime()))
+                .param("foundDate", sdf.format(baseItem.getFoundDate()))
+                .param("severity", String.valueOf(baseItem.getSevereLevelId()))
+                .param("foundUserId", baseItem.getFoundUser())
+                .param("categoryId", String.valueOf(baseItem.getCategoryId()))
+                .param("processId", String.valueOf(baseItem.getFoundProcessId()))
+                .param("issueDetail", baseItem.getIssueDetail())
+                .param("caused", "null判断が不十分だったため")
+                .param("countermeasures", "null判断を追加")
+                .param("correspondingUserId", "user11")
+                .param("correspondingTime", "1.5")
+                .param("correspondingEndDate", "2017/01/07")
+                .param("confirmedUserId", "")
+                .param("confirmedDate", ""))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String infoMsg = (String) modelMap.get("infoMsg");
+        assertThat(infoMsg, is("課題を削除しました。"));
+
+        IssueItems resultItem = issueItemsRepo.findOne(pk);
+        assertNull("課題は削除されている", resultItem);
+
+        int resultItemCount = issueItemsRepo.findAll().size();
+        assertThat("1レコードだけ減少している", resultItemCount, is(baseItemCount - 1));
+
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("新規追加モードになっている", modeTag, is(AppConstants.EDIT_MODE_ADD));
+        String issueNumberLabel = (String) modelMap.get("issueNumberLabel");
+        assertThat(issueNumberLabel, is("新規"));
+    }
 }

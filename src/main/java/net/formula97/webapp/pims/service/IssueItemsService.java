@@ -121,6 +121,13 @@ public class IssueItemsService extends BaseService {
         issueItemsRepo.save(item);
     }
 
+    @Transactional
+    public void removeItem(int ledgerId, int issueId) {
+        IssueItemsPK pk = new IssueItemsPK(ledgerId, issueId);
+
+        issueItemsRepo.delete(pk);
+    }
+
     public boolean hasEditPrivilege(int ledgerId, Users users) {
         if (users == null) {
             return false;

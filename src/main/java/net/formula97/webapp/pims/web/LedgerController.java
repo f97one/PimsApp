@@ -364,14 +364,15 @@ public class LedgerController extends BaseWebController {
 
             issueItemsSvc.mapEmptyUsers(model);
         } else {
+            model.addAttribute("currentLedgerName", ledger.getLedgerName());
+            issueItemsSvc.mapRelatedUsers(model, ledgerId);
+
             if (items == null) {
                 // 課題が見つからない時はエラー
                 putErrMsg(model, "課題が見つかりません。");
                 model.addAttribute("issueItem", new IssueItemForm());
                 model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
             } else {
-                issueItemsSvc.mapRelatedUsers(model, ledgerId);
-
                 model.addAttribute("currentLedgerName", ledger.getLedgerName());
 
                 if (myUserDetail == null) {
@@ -407,7 +408,54 @@ public class LedgerController extends BaseWebController {
                               @ModelAttribute("issueItem") @Validated IssueItemForm issueItemForm,
                               Model model, HeaderForm headerForm) {
         Users myUserDetail = getUserState(model, headerForm);
-        // TODO: 中身を書く
+
+        IssueLedger ledger = issueLedgerSvc.getLedgerById(ledgerId);
+        IssueItems items = issueItemsSvc.getIssueItem(ledgerId, issueId);
+
+        issueItemsSvc.mapMaster(model);
+
+        if (ledger == null) {
+            // 台帳が見つからない時はエラー
+            putErrMsg(model, "台帳が見つかりません。");
+            model.addAttribute("issueItem", new IssueItemForm());
+            model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
+
+            issueItemsSvc.mapEmptyUsers(model);
+        } else {
+            model.addAttribute("currentLedgerName", ledger.getLedgerName());
+            issueItemsSvc.mapRelatedUsers(model, ledgerId);
+
+            if (items == null) {
+                // 課題が見つからない時はエラー
+                putErrMsg(model, "課題が見つかりません。");
+                model.addAttribute("issueItem", new IssueItemForm());
+                model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
+            } else {
+                if (myUserDetail == null) {
+                    // 非ログインだとエラー
+                    putErrMsg(model, "課題の削除にはログインが必要です。");
+                    model.addAttribute("issueItem", new IssueItemForm());
+                    model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
+                } else {
+                    LedgerRefUser refUser = ledgerRefUserSvc.findReferenceForUser(myUserDetail.getUsername(), ledgerId);
+
+                    if (refUser == null) {
+                        // 台帳に関係ないユーザーだとエラー
+                        putErrMsg(model, "課題を削除する権限がありません。");
+                        model.addAttribute("issueItem", new IssueItemForm());
+                        model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
+                    } else {
+                        // 課題を削除して新規追加モードにする
+                        issueItemsSvc.removeItem(ledgerId, issueId);
+                        putInfoMsg(model, "課題を削除しました。");
+                        model.addAttribute("issueItem", new IssueItemForm());
+                        model.addAttribute("modeTag", AppConstants.EDIT_MODE_ADD);
+                        model.addAttribute("issueNumberLabel", "新規");
+
+                    }
+                }
+            }
+        }
 
         return "/ledger/issueItem";
     }
