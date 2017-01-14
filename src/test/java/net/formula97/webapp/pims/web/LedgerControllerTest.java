@@ -3,6 +3,7 @@ package net.formula97.webapp.pims.web;
 import net.formula97.webapp.pims.BaseTestCase;
 import net.formula97.webapp.pims.domain.*;
 import net.formula97.webapp.pims.misc.AppConstants;
+import net.formula97.webapp.pims.misc.CommonsStringUtils;
 import net.formula97.webapp.pims.repository.*;
 import net.formula97.webapp.pims.web.forms.IssueItemForm;
 import net.formula97.webapp.pims.web.forms.NewLedgerForm;
@@ -853,5 +854,109 @@ public class LedgerControllerTest extends BaseTestCase {
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
         String modeTag = (String) modelMap.get("modeTag");
         assertThat("更新モードで表示している", modeTag, is(AppConstants.EDIT_MODE_MODIFY));
+
+        String issueNumberLabel = (String) modelMap.get("issueNumberLabel");
+        String acturalLabel = String.format(Locale.getDefault(), "#%d", existingIssueId);
+        assertThat("課題番号が表示できている", issueNumberLabel, is(acturalLabel));
+    }
+
+    @Test
+    @WithMockUser("user11")
+    public void 存在しない台帳の課題は削除画面を表示できない() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/%d/remove/%d", apiEndpoint, existingLedgerId + 1, existingIssueId);
+        ResultActions actions = mMvcMock.perform(get(template)).andDo(print());
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("リードオンリーモードで表示している", modeTag, is(AppConstants.EDIT_MODE_READONLY));
+
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("台帳が見つかりません。"));
+
+        IssueItemForm form = (IssueItemForm) modelMap.get("issueItem");
+        assertThat("発見者IDは空", CommonsStringUtils.isNullOrEmpty(form.getFoundUserId()), is(true));
+    }
+
+    @Test
+    @WithMockUser("user11")
+    public void 存在しない課題の削除画面は表示できない() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/%d/remove/%d", apiEndpoint, existingLedgerId, existingIssueId + 1);
+        ResultActions actions = mMvcMock.perform(get(template)).andDo(print());
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("リードオンリーモードで表示している", modeTag, is(AppConstants.EDIT_MODE_READONLY));
+
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("課題が見つかりません。"));
+
+        IssueItemForm form = (IssueItemForm) modelMap.get("issueItem");
+        assertThat("発見者IDは空", CommonsStringUtils.isNullOrEmpty(form.getFoundUserId()), is(true));
+    }
+
+    @Test
+    @WithMockUser("user22")
+    public void 公開非公開かかわらず台帳に関係ないユーザーだと削除画面は表示できない() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/%d/remove/%d", apiEndpoint, existingLedgerId, existingIssueId);
+        ResultActions actions = mMvcMock.perform(get(template)).andDo(print());
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("リードオンリーモードで表示している", modeTag, is(AppConstants.EDIT_MODE_READONLY));
+
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("課題が見つかりません。"));
+
+        IssueItemForm form = (IssueItemForm) modelMap.get("issueItem");
+        assertThat("発見者IDは空", CommonsStringUtils.isNullOrEmpty(form.getFoundUserId()), is(true));
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void 非ログインだと削除画面を表示できない() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/%d/remove/%d", apiEndpoint, existingLedgerId, existingIssueId);
+        ResultActions actions = mMvcMock.perform(get(template)).andDo(print());
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("リードオンリーモードで表示している", modeTag, is(AppConstants.EDIT_MODE_READONLY));
+
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("課題が見つかりません。"));
+
+        IssueItemForm form = (IssueItemForm) modelMap.get("issueItem");
+        assertThat("発見者IDは空", CommonsStringUtils.isNullOrEmpty(form.getFoundUserId()), is(true));
+    }
+
+    @Test
+    @WithMockUser("user11")
+    public void 課題の削除画面を表示できる() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/%d/remove/%d", apiEndpoint, existingLedgerId, existingIssueId);
+        ResultActions actions = mMvcMock.perform(get(template)).andDo(print());
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(view().name(is("/ledger/issueItem")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String modeTag = (String) modelMap.get("modeTag");
+        assertThat("削除モードで表示している", modeTag, is(AppConstants.EDIT_MODE_REMOVE));
+
+        String infoMsg = (String) modelMap.get("infoMsg");
+        assertThat(infoMsg, is("この課題を削除します。削除したら元に戻せません。よろしいですか？"));
+
+        IssueItemForm form = (IssueItemForm) modelMap.get("issueItem");
+        assertThat("発見者IDはuser11", form.getFoundUserId(), is("user11"));
     }
 }

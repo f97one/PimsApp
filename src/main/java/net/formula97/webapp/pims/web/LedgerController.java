@@ -246,11 +246,15 @@ public class LedgerController extends BaseWebController {
         } else {
             issueItemsSvc.mapRelatedUsers(model, ledgerId);
 
+            model.addAttribute("currentLedgerName", ledger.getLedgerName());
+
             if (items == null) {
                 putErrMsg(model, "課題が見つかりません。");
                 model.addAttribute("issueItem", new IssueItemForm());
                 model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
             } else {
+                model.addAttribute("issueNumberLabel", String.format(Locale.getDefault(), "#%d", items.getIssueId()));
+
                 if (myUserDetail == null) {
                     if (ledger.getPublicLedger()) {
                         // 公開かつ非ログインは、リードオンリーで課題を表示する
@@ -342,13 +346,69 @@ public class LedgerController extends BaseWebController {
         return "/ledger/issueItem";
     }
 
-    @RequestMapping(value = "{ledgerId}/{issueId}", method = RequestMethod.POST, params = "removeItemBtn")
+    @RequestMapping(value = "{ledgerId}/remove/{issueId}", method = RequestMethod.GET)
+    public String confirmRemoveIssue(@PathVariable("ledgerId") Integer ledgerId, @PathVariable("issueId") Integer issueId,
+                                     Model model, HeaderForm headerForm) {
+        Users myUserDetail = getUserState(model, headerForm);
+
+        IssueLedger ledger = issueLedgerSvc.getLedgerById(ledgerId);
+        IssueItems items = issueItemsSvc.getIssueItem(ledgerId, issueId);
+
+        issueItemsSvc.mapMaster(model);
+
+        if (ledger == null) {
+            // 台帳が見つからない時はエラー
+            putErrMsg(model, "台帳が見つかりません。");
+            model.addAttribute("issueItem", new IssueItemForm());
+            model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
+
+            issueItemsSvc.mapEmptyUsers(model);
+        } else {
+            if (items == null) {
+                // 課題が見つからない時はエラー
+                putErrMsg(model, "課題が見つかりません。");
+                model.addAttribute("issueItem", new IssueItemForm());
+                model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
+            } else {
+                issueItemsSvc.mapRelatedUsers(model, ledgerId);
+
+                model.addAttribute("currentLedgerName", ledger.getLedgerName());
+
+                if (myUserDetail == null) {
+                    // 非ログインはエラー
+                    putErrMsg(model, "課題が見つかりません。");
+                    model.addAttribute("issueItem", new IssueItemForm());
+                    model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
+                } else {
+                    LedgerRefUser refUser = ledgerRefUserSvc.findReferenceForUser(myUserDetail.getUsername(), ledgerId);
+
+                    if (refUser == null) {
+                        // 台帳に関係ないユーザーだとエラー
+                        putErrMsg(model, "課題が見つかりません。");
+                        model.addAttribute("issueItem", new IssueItemForm());
+                        model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
+                    } else {
+                        // 削除確認メッセージを出して削除モードにする
+                        putInfoMsg(model, "この課題を削除します。削除したら元に戻せません。よろしいですか？");
+                        model.addAttribute("modeTag", AppConstants.EDIT_MODE_REMOVE);
+
+                        IssueItemForm form = new IssueItemForm().convertToForm(items);
+                        model.addAttribute("issueItem", form);
+                    }
+                }
+            }
+        }
+
+        return "/ledger/issueItem";
+    }
+
+    @RequestMapping(value = "{ledgerId}/remove/{issueId}", method = RequestMethod.POST, params = "removeItemBtn")
     public String removeIssue(@PathVariable("ledgerId") Integer ledgerId, @PathVariable("issueId") Integer issueId,
                               @ModelAttribute("issueItem") @Validated IssueItemForm issueItemForm,
                               Model model, HeaderForm headerForm) {
         Users myUserDetail = getUserState(model, headerForm);
         // TODO: 中身を書く
 
-        return null;
+        return "/ledger/issueItem";
     }
 }
