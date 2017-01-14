@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Ledger Management | PIMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css"
+          href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap-theme.min.css}"/>
+    <link rel="stylesheet" type="text/css"
+          href="../../../static/css/pimsmain.css" th:href="@{/static/css/pimsmain.css}"/>
+</head>
+<body>
+    <div class="container">
+        <div th:replace="/common/common_header::common_header"></div>
+
+        <h2 class="h2">ユーザー管理</h2>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <form id="ledgerConditionForm" method="get" class="form-horizontal"
+                        th:action="@{/admin/ledgerManagement/search}" th:object="${ledgerSearchConditionForm}">
+                    <fieldset>
+                        <legend>検索条件</legend>
+
+                        <div class="row">
+                            <div class="col-lg-2">
+                                台帳名
+                            </div>
+                            <div class="col-lg-10">
+                                <input type="text" name="ledgerName" maxlength="128" class="form-control"
+                                       placeholder="部分一致検索します" th:field="*{ledgerName}"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-2">
+                                ステータス
+                            </div>
+                            <div class="col-lg-10">
+                                <span class="checkbox-inline" th:each="status : ${statusMap}">
+                                    <label>
+                                        <input type="checkbox" th:text="${status.value}" th:field="*{ledgerStatus}" th:value="${status.key}" />
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <input type="button" id="addLedgerBtn" value="台帳追加"
+                                       class="btn btn-default col-lg-2 pull-left"
+                                       onclick="window.location.href = 'ledgerManagement/add';" />
+                                <input type="submit" id="searchLedgerBtn" value="検索"
+                                       class="btn btn-primary col-lg-2 pull-right" />
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+
+        <div th:if="${searchExecuted}">
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>
+                        台帳数：<span th:text="${matchLedgerCount}">2</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <div class="row">
+                <div class="col-lg-2"></div>
+                <div class="col-lg-8 center-block" th:if="${matchLedgerCount > 0}">
+                    <div class="table-responsive">
+                        <table class="table table-condensed table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>台帳名</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="ledger : ${ledgerList}">
+                                    <td>
+                                        <a th:href="@{'/admin/ledgerManagement/' + ${ledger.ledgerId}}">
+                                            <span th:text="${ledger.ledgerName}">Hogeシステム改修</span>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <input type="button" class="btn btn-default col-lg-4" value="ユーザー割当"
+                                                th:onclick="'window.location.href = \'ledgerManagement/assignUser/${ledger.ledgerId}\';'"/>
+                                        <input type="button" class="btn btn-danger col-lg-4 pull-right" value="削除"
+                                                th:onclick="'window.location.href = \'ledgerManagement/remove/${ledger.ledgerId}\';'"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-lg-12 text-center" th:if="${matchLedgerCount == 0}">
+                    台帳が見つかりませんでした。
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

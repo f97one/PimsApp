@@ -1,14 +1,18 @@
 package net.formula97.webapp.pims.web;
 
 import net.formula97.webapp.pims.domain.Users;
+import net.formula97.webapp.pims.service.StatusMasterService;
 import net.formula97.webapp.pims.web.forms.HeaderForm;
+import net.formula97.webapp.pims.web.forms.LedgerSearchConditionForm;
 import net.formula97.webapp.pims.web.forms.UserSearchConditionForm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by f97one on 2016/10/22.
@@ -16,6 +20,9 @@ import java.util.ArrayList;
 @Controller
 @RequestMapping("admin")
 public class AdminController extends BaseWebController {
+
+    @Autowired
+    StatusMasterService statusMasterSvc;
 
     @RequestMapping(method = RequestMethod.GET)
     public String showMenu(Model model, HeaderForm headerForm) {
@@ -46,8 +53,12 @@ public class AdminController extends BaseWebController {
 
     @RequestMapping(value = "ledgerManagement", method = RequestMethod.GET)
     public String showLedgerManagement(Model model, HeaderForm headerForm) {
-        Users users = getUserState(model, headerForm);
+        Users myUserDetail = getUserState(model, headerForm);
 
-        return "/admin/ledgerManagement";
+        Map<Integer, String> statusMap =statusMasterSvc.getStatusMap();
+        model.addAttribute("statusMap", statusMap);
+        model.addAttribute("ledgerSearchConditionForm", new LedgerSearchConditionForm());
+
+        return "/admin/ledger_list";
     }
 }
