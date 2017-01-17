@@ -4,6 +4,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Collections;
@@ -29,6 +32,18 @@ public class LedgerSearchConditionForm implements Serializable {
      * 台帳ステータス選択リスト
      */
     private List<Integer> ledgerStatus;
+    /**
+     * 台帳の公開ステータス<br />
+     * <ul>
+     *     <li>公開のみ:1</li>
+     *     <li>非公開のみ:2</li>
+     *     <li>すべて:3</li>
+     * </ul>
+     */
+    @NotNull
+    @Min(1)
+    @Max(3)
+    private Integer publicStatus;
 
     public List<Integer> getLedgerStatus() {
         if (this.ledgerStatus == null) {
