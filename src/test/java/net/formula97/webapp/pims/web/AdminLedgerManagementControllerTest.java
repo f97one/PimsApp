@@ -36,7 +36,6 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -213,13 +212,17 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
 
         List<IssueLedger> ledgerList = (List<IssueLedger>) modelMap.get("ledgerList");
         assertThat("２件ヒットしている", ledgerList.size(), is(2));
+
+        Optional<IssueLedger> issueLedgerOpt = ledgerList.stream().filter(r -> r.getLedgerName().equals("非公開台帳１")).findFirst();
+        assertThat("非公開台帳１が見つかっている", issueLedgerOpt.isPresent(), is(true));
+        issueLedgerOpt = ledgerList.stream().filter(r -> r.getLedgerName().equals("公開台帳1")).findFirst();
+        assertThat("公開台帳1が見つかっている", issueLedgerOpt.isPresent(), is(true));
     }
 
     @Test
     @WithMockUser(username = "kanrisha1", roles = "ADMIN")
     @SuppressWarnings("unchecked")
     public void 公開台帳だけ検索できる() throws Exception {
-        fail("まだ実装していない");
         String template = String.format(Locale.getDefault(), "%s/search", apiEndpoint);
         ResultActions actions = mMvcMock.perform(get(template)
                 .param("searchLedgerBtn", "検索")
@@ -236,13 +239,17 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
 
         List<IssueLedger> ledgerList = (List<IssueLedger>) modelMap.get("ledgerList");
         assertThat("２件ヒットしている", ledgerList.size(), is(2));
+
+        Optional<IssueLedger> issueLedgerOpt = ledgerList.stream().filter(r -> r.getLedgerName().equals("公開台帳1")).findFirst();
+        assertThat("公開台帳1が見つかっている", issueLedgerOpt.isPresent(), is(true));
+        issueLedgerOpt = ledgerList.stream().filter(r -> r.getLedgerName().equals("Ledger1")).findFirst();
+        assertThat("Ledger1が見つかっている", issueLedgerOpt.isPresent(), is(true));
     }
 
     @Test
     @WithMockUser(username = "kanrisha1", roles = "ADMIN")
     @SuppressWarnings("unchecked")
     public void 非公開台帳だけを検索できる() throws Exception {
-        fail("まだ実装していない");
         String template = String.format(Locale.getDefault(), "%s/search", apiEndpoint);
         ResultActions actions = mMvcMock.perform(get(template)
                 .param("searchLedgerBtn", "検索")
@@ -259,13 +266,13 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
 
         List<IssueLedger> ledgerList = (List<IssueLedger>) modelMap.get("ledgerList");
         assertThat("１件ヒットしている", ledgerList.size(), is(1));
+        assertThat("非公開台帳１が見つかっている", ledgerList.get(0).getLedgerName(), is("非公開台帳１"));
     }
 
     @Test
     @WithMockUser(username = "kanrisha1", roles = "ADMIN")
     @SuppressWarnings("unchecked")
     public void ステータスで検索できる() throws Exception {
-        fail("まだ実装していない");
         String template = String.format(Locale.getDefault(), "%s/search", apiEndpoint);
         ResultActions actions = mMvcMock.perform(get(template)
                 .param("searchLedgerBtn", "検索")
@@ -282,6 +289,10 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
 
         List<IssueLedger> ledgerList = (List<IssueLedger>) modelMap.get("ledgerList");
         assertThat("2件ヒットしている", ledgerList.size(), is(2));
+        Optional<IssueLedger> issueLedgerOpt = ledgerList.stream().filter(r -> r.getOpenStatus() == 1).findFirst();
+        assertThat("ステータス1の台帳が見つかっている", issueLedgerOpt.isPresent(), is(true));
+        issueLedgerOpt = ledgerList.stream().filter(r -> r.getOpenStatus() == 2).findFirst();
+        assertThat("ステータス2の台帳が見つかっている", issueLedgerOpt.isPresent(), is(true));
     }
 
 

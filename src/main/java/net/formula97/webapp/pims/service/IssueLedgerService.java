@@ -6,10 +6,13 @@ package net.formula97.webapp.pims.service;
 import net.formula97.webapp.pims.domain.IssueLedger;
 import net.formula97.webapp.pims.domain.LedgerRefUser;
 import net.formula97.webapp.pims.domain.Users;
+import net.formula97.webapp.pims.misc.CommonsStringUtils;
 import net.formula97.webapp.pims.repository.IssueLedgerRepository;
 import net.formula97.webapp.pims.repository.LedgerRefUserRepository;
 import net.formula97.webapp.pims.repository.MySpecificationAdapter;
+import net.formula97.webapp.pims.web.forms.LedgerSearchConditionForm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,5 +72,39 @@ public class IssueLedgerService {
 
     public IssueLedger getLedgerById(int ledgerId) {
         return issueLedgerRepo.findOne(ledgerId);
+    }
+
+    public List<IssueLedger> getLedgerByList(LedgerSearchConditionForm form) {
+        MySpecificationAdapter<IssueLedger> issueLedgerSpec = new MySpecificationAdapter<>(IssueLedger.class);
+
+        String ledgerName = CommonsStringUtils.isNullOrEmpty(form.getLedgerName()) ? null : form.getLedgerName();
+        Boolean publicLedger;
+        switch (form.getPublicStatus()) {
+            case 1:
+                publicLedger = true;
+                break;
+            case 2:
+                publicLedger = false;
+                break;
+            default:
+                publicLedger = null;
+                break;
+        }
+
+        List<IssueLedger> ledgerBaseList = issueLedgerRepo.findAll(
+                Specifications.where(issueLedgerSpec.contains("ledgerName", ledgerName)).
+                        and(issueLedgerSpec.eq("publicLedger", publicLedger)));
+
+        final List<Integer> statusList = form.getLedgerStatus() == null ?
+                new ArrayList<>() : new ArrayList<>(form.getLedgerStatus());
+
+        List<IssueLedger> ledgerList;
+        if (statusList.size() == 0) {
+            ledgerList = new ArrayList<>(ledgerBaseList);
+        } else {
+            ledgerList = ledgerBaseList.stream().filter(r -> statusList.contains(r.getOpenStatus())).collect(Collectors.toList());
+        }
+
+        return ledgerList;
     }
 }
