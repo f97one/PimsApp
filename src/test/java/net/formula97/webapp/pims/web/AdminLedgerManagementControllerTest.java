@@ -295,5 +295,25 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
         assertThat("ステータス2の台帳が見つかっている", issueLedgerOpt.isPresent(), is(true));
     }
 
+    @Test
+    @WithMockUser(username = "kanrisha1", roles = "ADMIN")
+    @SuppressWarnings("unchecked")
+    public void 条件に外れた検索では結果が表示されない() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/search", apiEndpoint);
+        ResultActions actions = mMvcMock.perform(get(template)
+                .param("searchLedgerBtn", "検索")
+                .param("ledgerName", "だいちょう")
+                .param("ledgerStatus", "4", "5")
+                .param("publicStatus", "3"))
+                .andDo(print());
 
+        MvcResult mvcResult = actions.andExpect(view().name(is("/admin/ledger_list")))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+
+        List<IssueLedger> ledgerList = (List<IssueLedger>) modelMap.get("ledgerList");
+        assertThat("0件ヒットしている", ledgerList.size(), is(0));
+    }
 }
