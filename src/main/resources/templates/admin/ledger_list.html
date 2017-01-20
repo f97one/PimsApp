@@ -16,7 +16,7 @@
     <div class="container">
         <div th:replace="/common/common_header::common_header"></div>
 
-        <h2 class="h2">ユーザー管理</h2>
+        <h2 class="h2">台帳管理</h2>
 
         <div class="row">
             <div class="col-lg-12">
@@ -112,8 +112,6 @@
                                         </a>
                                     </td>
                                     <td>
-                                        <input type="button" class="btn btn-default col-lg-4" value="ユーザー割当"
-                                                th:onclick="'window.location.href = \'ledgerManagement/assignUser/' + ${ledger.ledgerId} + '\';'"/>
                                         <input type="button" class="btn btn-danger col-lg-4 pull-right" value="削除"
                                                 th:onclick="'window.location.href = \'ledgerManagement/remove/' + ${ledger.ledgerId} + '\';'"/>
                                     </td>
