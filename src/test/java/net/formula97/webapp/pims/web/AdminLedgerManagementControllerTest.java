@@ -2,9 +2,12 @@ package net.formula97.webapp.pims.web;
 
 import net.formula97.webapp.pims.BaseTestCase;
 import net.formula97.webapp.pims.domain.IssueLedger;
+import net.formula97.webapp.pims.domain.LedgerRefUser;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.repository.*;
+import net.formula97.webapp.pims.service.RefUserConfigForm;
 import net.formula97.webapp.pims.web.forms.LedgerSearchConditionForm;
+import net.formula97.webapp.pims.web.forms.RefUserItem;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -97,6 +100,15 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
         user1.setMailAddress("user1@example.com");
         userRepo.save(user1);
 
+        Users disabledUser = new Users();
+        disabledUser.setUsername("disabled1");
+        disabledUser.setPassword(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
+        disabledUser.setAuthority("USER");
+        disabledUser.setEnabled(false);
+        disabledUser.setDisplayName("無効ユーザー1");
+        disabledUser.setMailAddress("disabled1@example.com");
+        userRepo.save(disabledUser);
+
         IssueLedger ledger = new IssueLedger();
         ledger.setLedgerName("非公開台帳１");
         ledger.setPublicLedger(false);
@@ -119,10 +131,13 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
         ledger2.setOpenStatus(3);
         issueLedgerRepo.save(ledger2);
 
+        LedgerRefUser ledgerRefUser = new LedgerRefUser(this.existingLedgerId, user1.getUsername());
+        ledgerRefUserRepo.save(ledgerRefUser);
     }
 
     @After
     public void tearDown() throws Exception {
+        ledgerRefUserRepo.deleteAll();
         userRepo.deleteAll();
         issueLedgerRepo.deleteAll();
     }
@@ -315,5 +330,58 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
 
         List<IssueLedger> ledgerList = (List<IssueLedger>) modelMap.get("ledgerList");
         assertThat("0件ヒットしている", ledgerList.size(), is(0));
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void 非ログインでは台帳詳細画面を表示できない() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId);
+        ResultActions actions = mMvcMock.perform(get(template)).andDo(print());
+        actions.andExpect(status().is3xxRedirection()).andReturn();
+    }
+
+    @Test
+    @WithMockUser(username = "user1", roles = "USER")
+    public void 一般ユーザーだと台帳詳細画面を表示できない() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId);
+        ResultActions actions = mMvcMock.perform(get(template)).andDo(print());
+        actions.andExpect(status().isForbidden()).andReturn();
+    }
+
+    @Test
+    @WithMockUser(username = "kanrisha1", roles = "ADMIN")
+    public void 存在しない台帳の詳細は表示できない() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId + 10);
+        ResultActions actions = mMvcMock.perform(get(template)).andDo(print());
+        MvcResult mvcResult = actions.andExpect(status().isOk()).andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("台帳が見つかりません。"));
+    }
+
+    @Test
+    @WithMockUser(username = "kanrisha1", roles = "ADMIN")
+    public void 管理者ユーザーなら台帳詳細画面を表示できる() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId);
+        ResultActions actions = mMvcMock.perform(get(template)).andDo(print());
+        MvcResult mvcResult = actions.andExpect(status().isOk()).andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+
+        IssueLedger actualLedger = (IssueLedger) modelMap.get("ledgerDetailForm");
+        assertThat("台帳名は非公開台帳１", actualLedger.getLedgerName(), is("非公開台帳１"));
+        assertThat("非公開台帳扱い", actualLedger.getPublicLedger(), is(false));
+
+        List<RefUserItem> actualRefUserItems = ((RefUserConfigForm) modelMap.get("refUserConfigForm")).getRefUserList();
+        assertThat("有効ユーザーすべてが取得できている", actualRefUserItems.size(), is(2));
+
+        Optional<RefUserItem> refUserItemOpt = actualRefUserItems.stream().filter(r -> r.getUserId().equals("kanrisha1")).findFirst();
+        assertThat("kanrisha1を含む", refUserItemOpt.isPresent(), is(true));
+        assertThat("台帳に含まれない", refUserItemOpt.get().getUserJoined(), is(false));
+
+        refUserItemOpt = actualRefUserItems.stream().filter(r -> r.getUserId().equals("user1")).findFirst();
+        assertThat("user1を含む", refUserItemOpt.isPresent(), is(true));
+        assertThat("台帳に含まれる", refUserItemOpt.get().getUserJoined(), is(true));
     }
 }

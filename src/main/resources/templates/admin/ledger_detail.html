@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Ledger Detail | PIMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css"
+          href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap-theme.min.css}"/>
+    <link rel="stylesheet" type="text/css"
+          href="../../../static/css/pimsmain.css" th:href="@{/static/css/pimsmain.css}"/>
+</head>
+<body>
+    <div class="container">
+        <div th:replace="/common/common_header::common_header"></div>
+
+        <h2 class="h2">台帳詳細</h2>
+
+        <form id="ledgerDetailForm" method="post" class="form-horizontal"
+              th:action="@{/admin/ledgerManagement/ledgerDetail}" th:object="${ledgerDetailForm}">
+            <fieldset>
+                <legend>台帳設定</legend>
+                <div class="row vertical-margin">
+                    <div class="col-lg-2">
+                        台帳名
+                    </div>
+                    <div class="col-lg-10">
+                        <input type="hidden" id="ledgerId" th:field="*{ledgerId}" />
+                        <input type="text" maxlength="64" class="form-control" th:field="*{ledgerName}"
+                               th:errorClass="form-control" th:disabled="${modeTag eq 'R'}" />
+                        <span th:if="${#fields.hasErrors('ledgerName')}" th:errors="*{ledgerName}"
+                              class="help-block text-warning">Error</span>
+                    </div>
+                </div>
+                <div class="row vertical-margin">
+                    <div class="col-lg-2"></div>
+                    <div class="col-lg-10">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" id="publicLedger" th:field="*{publicLedger}"
+                                   th:disabled="${modeTag eq 'R'}" />公開台帳にする
+                        </label>
+                    </div>
+                </div>
+                <div class="row vertical-margin">
+                    <div class="col-lg-2">公開ステータス</div>
+                    <div class="col-lg-3">
+                        <select class="form-control" id="openStatus" th:fiedl="*{openStatus}" th:disabled="${modeTag eq 'R'}">
+                            <option value="-1">---</option>
+                            <option th:each="st : ${severityList}" th:value="${st.key}"
+                                    th:text="${st.value}" th:selected="${st.key} eq *{openStatus}">
+                                pull-down item
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row vertical-margin">
+                    <button type="reset" id="resetBtn" class="btn btn-default col-lg-1"
+                            th:disabled="${modeTag eq 'R'}">リセット
+                    </button>
+                    <input type="submit" id="updateItemBtn" class="btn btn-primary col-lg-1 pull-right"
+                           th:if="${modeTag eq 'M'}" value="更新"/>
+                    <input type="submit" id="addItemBtn" class="btn btn-primary col-lg-1 pull-right"
+                           th:if="${modeTag eq 'A'}" value="追加"/>
+                    <input type="submit" id="removeItemBtn" class="btn btn-danger col-lg-1 pull-right"
+                           th:if="${modeTag eq 'D'}" value="削除"/>
+                </div>
+            </fieldset>
+        </form>
+
+        <form id="refUserConfigForm" method="post" class="form-horizontal"
+              th:action="@{'/admin/ledgerManagement/refUser' + ${ledgerId}}" th:object="${refUserConfigForm}">
+            <fieldset>
+                <legend>台帳所属ユーザー</legend>
+                <div class="row">
+                    <div class="col-lg-3"></div>
+                    <div class="table-responsive col-lg-6">
+                        <table class="table table-hover table-bordered table-striped">
+                            <thead>
+                                <th class="col-lg-1 text-center">所属</th>
+                                <th class="col-lg-5 text-center">ユーザー名</th>
+                            </thead>
+                            <tbody>
+                                <tr th:each="refUserItem : ${refUserList}">
+                                    <td class="text-center">
+                                        <input type="checkbox" id="userJoined" th:field="*{refUserItem.userJoined}" />
+                                    </td>
+                                    <td>
+                                        <input type="hidden" id="userId" th:field="*{refUserItem.userId}" />
+                                        <span th:text="*{refUserItem.displayName}">User Hoge</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-3"></div>
+                </div>
+                <div class="row vertical-margin">
+                    <input type="submit" id="registerRefUserBtn" class="btn btn-primary col-lg-1 pull-right"
+                           th:disabled="${modeTag eq 'R'}" value="登録" />
+                </div>
+            </fieldset>
+        </form>
+
+    </div>
+</body>
+</html>
