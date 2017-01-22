@@ -1,8 +1,7 @@
-package net.formula97.webapp.pims.service;
+package net.formula97.webapp.pims.web.forms;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.formula97.webapp.pims.web.forms.RefUserItem;
 
 import java.util.List;
 

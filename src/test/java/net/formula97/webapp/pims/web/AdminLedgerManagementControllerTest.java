@@ -5,8 +5,8 @@ import net.formula97.webapp.pims.domain.IssueLedger;
 import net.formula97.webapp.pims.domain.LedgerRefUser;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.repository.*;
-import net.formula97.webapp.pims.service.RefUserConfigForm;
 import net.formula97.webapp.pims.web.forms.LedgerSearchConditionForm;
+import net.formula97.webapp.pims.web.forms.RefUserConfigForm;
 import net.formula97.webapp.pims.web.forms.RefUserItem;
 import org.junit.After;
 import org.junit.Before;
@@ -39,6 +39,7 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -383,5 +384,31 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
         refUserItemOpt = actualRefUserItems.stream().filter(r -> r.getUserId().equals("user1")).findFirst();
         assertThat("user1を含む", refUserItemOpt.isPresent(), is(true));
         assertThat("台帳に含まれる", refUserItemOpt.get().getUserJoined(), is(true));
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void 非ログインだと台帳詳細を更新できない() throws Exception {
+        fail("まだ実装していない");
+
+
+    }
+
+    @Test
+    @WithMockUser(username = "user1", roles = "USER")
+    public void 一般ユーザーだと台帳詳細を更新できない() throws Exception {
+        fail("まだ実装していない");
+    }
+
+    @Test
+    @WithMockUser(username = "kanrisha1", roles = "ADMIN")
+    public void 存在しない台帳は更新できない() throws Exception {
+        fail("まだ実装していない");
+    }
+
+    @Test
+    @WithMockUser(username = "kanrisha1", roles = "ADMIN")
+    public void 台帳詳細を更新できる() throws Exception {
+        fail("まだ実装していない");
     }
 }
