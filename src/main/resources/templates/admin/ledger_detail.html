@@ -65,10 +65,7 @@
                            th:if="${modeTag eq 'D'}" value="削除"/>
                 </div>
             </fieldset>
-        </form>
 
-        <form id="refUserConfigForm" method="post" class="form-horizontal"
-              th:action="@{'/admin/ledgerManagement/refUser' + ${ledgerId}}" th:object="${refUserConfigForm}">
             <fieldset>
                 <legend>台帳所属ユーザー</legend>
                 <div class="row">
@@ -80,15 +77,15 @@
                                 <th class="col-lg-5 text-center">ユーザー名</th>
                             </thead>
                             <tbody>
-                                <tr th:each="refUserItem : ${refUserList}">
-                                    <td class="text-center">
-                                        <input type="checkbox" id="userJoined" th:field="*{refUserItem.userJoined}" />
-                                    </td>
-                                    <td>
-                                        <input type="hidden" id="userId" th:field="*{refUserItem.userId}" />
-                                        <span th:text="*{refUserItem.displayName}">User Hoge</span>
-                                    </td>
-                                </tr>
+                            <tr th:each="refUserItem : *{refUserItemList}">
+                                <td class="text-center">
+                                    <input type="checkbox" id="userJoined" th:value="${refUserItem.userJoined}" />
+                                </td>
+                                <td>
+                                    <input type="hidden" id="userId" th:value="${refUserItem.userId}" />
+                                    <span th:text="${refUserItem.displayName}">User Hoge</span>
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>

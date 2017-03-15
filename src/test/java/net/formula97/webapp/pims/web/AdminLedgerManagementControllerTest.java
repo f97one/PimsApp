@@ -5,8 +5,8 @@ import net.formula97.webapp.pims.domain.IssueLedger;
 import net.formula97.webapp.pims.domain.LedgerRefUser;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.repository.*;
+import net.formula97.webapp.pims.web.forms.LedgerDetailForm;
 import net.formula97.webapp.pims.web.forms.LedgerSearchConditionForm;
-import net.formula97.webapp.pims.web.forms.RefUserConfigForm;
 import net.formula97.webapp.pims.web.forms.RefUserItem;
 import org.junit.After;
 import org.junit.Before;
@@ -370,11 +370,12 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
 
-        IssueLedger actualLedger = (IssueLedger) modelMap.get("ledgerDetailForm");
+        LedgerDetailForm ledgerDetailForm = (LedgerDetailForm) modelMap.get("ledgerDetailForm");
+        IssueLedger actualLedger = ledgerDetailForm.exportLedger();
         assertThat("台帳名は非公開台帳１", actualLedger.getLedgerName(), is("非公開台帳１"));
         assertThat("非公開台帳扱い", actualLedger.getPublicLedger(), is(false));
 
-        List<RefUserItem> actualRefUserItems = ((RefUserConfigForm) modelMap.get("refUserConfigForm")).getRefUserList();
+        List<RefUserItem> actualRefUserItems = ledgerDetailForm.getRefUserItemList();
         assertThat("有効ユーザーすべてが取得できている", actualRefUserItems.size(), is(2));
 
         Optional<RefUserItem> refUserItemOpt = actualRefUserItems.stream().filter(r -> r.getUserId().equals("kanrisha1")).findFirst();

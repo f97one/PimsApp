@@ -6,8 +6,8 @@ import net.formula97.webapp.pims.misc.AppConstants;
 import net.formula97.webapp.pims.service.IssueLedgerService;
 import net.formula97.webapp.pims.service.LedgerRefUserService;
 import net.formula97.webapp.pims.web.forms.HeaderForm;
+import net.formula97.webapp.pims.web.forms.LedgerDetailForm;
 import net.formula97.webapp.pims.web.forms.LedgerSearchConditionForm;
-import net.formula97.webapp.pims.web.forms.RefUserConfigForm;
 import net.formula97.webapp.pims.web.forms.RefUserItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -46,37 +46,33 @@ public class AdminLedgerManagementController extends BaseWebController {
         Users myUserDetail = getUserState(model, headerForm);
 
         IssueLedger ledger = issueLedgerSvc.getLedgerById(ledgerId);
+        LedgerDetailForm frm = new LedgerDetailForm();
 
         if (ledger == null) {
             // 台帳が見つからない時はエラー
             putErrMsg(model, "台帳が見つかりません。");
             model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
 
+            frm.importLedger(new IssueLedger());
             model.addAttribute("ledgerDetailForm", new IssueLedger());
 
         } else {
-            model.addAttribute("ledgerDetailForm", ledger);
+            frm.importLedger(ledger);
 
             List<RefUserItem> refUserList = ledgerRefUserSvc.getReferenceConditionById(ledgerId);
-            RefUserConfigForm frm = new RefUserConfigForm();
-            frm.setRefUserList(refUserList);
-            model.addAttribute("refUserConfigForm", frm);
+            frm.setRefUserItemList(refUserList);
 
             model.addAttribute("modeTag", AppConstants.EDIT_MODE_MODIFY);
         }
+
+        model.addAttribute("ledgerDetailForm", frm);
 
         return "/admin/ledger_detail";
     }
 
     @RequestMapping(value = "update/{ledgerId}", method = RequestMethod.POST)
-    public String updateLedgerSummary(@PathVariable Integer ledgerId, Model model, HeaderForm headerForm) {
-        Users myUserDetail = getUserState(model, headerForm);
-
-        return null;
-    }
-
-    @RequestMapping(value = "refUser/{ledgerId}", method = RequestMethod.POST)
-    public String updateRefUsers(@PathVariable Integer ledgerId, Model model, HeaderForm headerForm) {
+    public String updateLedgerSummary(
+            @PathVariable Integer ledgerId, Model model, HeaderForm headerForm) {
         Users myUserDetail = getUserState(model, headerForm);
 
         return null;
