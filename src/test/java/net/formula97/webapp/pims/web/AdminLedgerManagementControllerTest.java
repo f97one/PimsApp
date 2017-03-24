@@ -39,8 +39,9 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -390,26 +391,98 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
     @Test
     @WithAnonymousUser
     public void 非ログインだと台帳詳細を更新できない() throws Exception {
-        fail("まだ実装していない");
-
+        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId);
+        ResultActions actions = mMvcMock.perform(post(template)
+                    .with(csrf())
+                .param("updateItemBtn", "更新")
+                .param("ledgerId", String.valueOf(existingLedgerId))
+                .param("ledgerName", "非公開台帳１−１")
+                .param("publicLedger", "checked")
+                ).andDo(print());
+        actions.andExpect(status().is3xxRedirection()).andReturn();
 
     }
 
     @Test
     @WithMockUser(username = "user1", roles = "USER")
     public void 一般ユーザーだと台帳詳細を更新できない() throws Exception {
-        fail("まだ実装していない");
+        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId);
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("updateItemBtn", "更新")
+                .param("ledgerId", String.valueOf(existingLedgerId))
+                .param("ledgerName", "非公開台帳１−１")
+                .param("publicLedger", "checked")
+        ).andDo(print());
+        actions.andExpect(status().isForbidden()).andReturn();
     }
 
     @Test
     @WithMockUser(username = "kanrisha1", roles = "ADMIN")
     public void 存在しない台帳は更新できない() throws Exception {
-        fail("まだ実装していない");
+        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId + 1);
+
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("updateItemBtn", "更新")
+                .param("ledgerId", String.valueOf(existingLedgerId))
+                .param("ledgerName", "非公開台帳１−１")
+                .param("publicLedger", "true")
+                .param("openStatus", "1")
+                .param("refUserItemList[0].userJoined", "false")
+                .param("refUserItemList[0].userId", "kanrisha1")
+                .param("refUserItemList[0].displayName", "管理者１")
+                .param("refUserItemList[1].userJoined", "true")
+                .param("refUserItemList[1].userId", "user1")
+                .param("refUserItemList[1].displayName", "ユーザー１")
+            ).andDo(print());
+        MvcResult mvcResult = actions.andExpect(status().isOk()).andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("台帳が見つかりません。"));
     }
 
     @Test
     @WithMockUser(username = "kanrisha1", roles = "ADMIN")
     public void 台帳詳細を更新できる() throws Exception {
-        fail("まだ実装していない");
+        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId);
+
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("updateItemBtn", "更新")
+                .param("ledgerId", String.valueOf(existingLedgerId))
+                .param("ledgerName", "非公開台帳１−１")
+                .param("publicLedger", "true")
+                .param("openStatus", "1")
+                .param("refUserItemList[0].userJoined", "false")
+                .param("refUserItemList[0].userId", "kanrisha1")
+                .param("refUserItemList[0].displayName", "管理者１")
+                .param("refUserItemList[1].userJoined", "true")
+                .param("refUserItemList[1].userId", "user1")
+                .param("refUserItemList[1].displayName", "ユーザー１")
+            ).andDo(print());
+        MvcResult mvcResult = actions.andExpect(status().isOk()).andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+
+        IssueLedger actualLedger = issueLedgerRepo.findOne(existingLedgerId);
+
+        assertThat("台帳名は非公開台帳１−１", actualLedger.getLedgerName(), is("非公開台帳１−１"));
+        assertThat("公開台帳扱い", actualLedger.getPublicLedger(), is(true));
+
+        LedgerDetailForm ledgerDetailForm = (LedgerDetailForm) modelMap.get("ledgerDetailForm");
+        List<RefUserItem> actualRefUserItems = ledgerDetailForm.getRefUserItemList();
+        assertThat("有効ユーザーすべてが取得できている", actualRefUserItems.size(), is(2));
+
+        Optional<RefUserItem> refUserItemOpt = actualRefUserItems.stream().filter(r -> r.getUserId().equals("kanrisha1")).findFirst();
+        assertThat("kanrisha1を含む", refUserItemOpt.isPresent(), is(true));
+        assertThat("台帳に含まれない", refUserItemOpt.get().getUserJoined(), is(false));
+
+        refUserItemOpt = actualRefUserItems.stream().filter(r -> r.getUserId().equals("user1")).findFirst();
+        assertThat("user1を含む", refUserItemOpt.isPresent(), is(true));
+        assertThat("台帳に含まれる", refUserItemOpt.get().getUserJoined(), is(true));
     }
+
 }

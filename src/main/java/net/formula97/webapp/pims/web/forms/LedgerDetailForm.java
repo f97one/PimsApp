@@ -4,8 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.formula97.webapp.pims.domain.IssueLedger;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by f97one on 17/01/28.
@@ -22,11 +21,11 @@ public class LedgerDetailForm {
 
     private Boolean publicLedger;
 
-    private List<RefUserItem> refUserItemList;
+    private ArrayList<RefUserItem> refUserItemList;
 
-    public List<RefUserItem> getRefUserItemList() {
+    public ArrayList<RefUserItem> getRefUserItemList() {
         if (this.refUserItemList == null) {
-            this.refUserItemList = Collections.emptyList();
+            this.refUserItemList = new ArrayList<>();
         }
 
         return this.refUserItemList;

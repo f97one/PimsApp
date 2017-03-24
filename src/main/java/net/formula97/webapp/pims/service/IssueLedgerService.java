@@ -47,11 +47,6 @@ public class IssueLedgerService {
         return retList.stream().distinct().collect(Collectors.toList());
     }
 
-    public IssueLedger getLedgerById(Integer ledgerId) {
-        MySpecificationAdapter<IssueLedger> issueLedgerSpecification = new MySpecificationAdapter<>(IssueLedger.class);
-        return issueLedgerRepo.findOne(issueLedgerSpecification.eq("ledgerId", ledgerId));
-    }
-
     @Transactional
     public void saveLedger(IssueLedger ledger, Users users) {
         issueLedgerRepo.save(ledger);
@@ -70,6 +65,11 @@ public class IssueLedgerService {
         ledgerRefUserRepo.save(lru);
     }
 
+    @Transactional
+    public void saveLedger(IssueLedger ledger) {
+        issueLedgerRepo.save(ledger);
+    }
+
     public IssueLedger getLedgerById(int ledgerId) {
         return issueLedgerRepo.findOne(ledgerId);
     }
@@ -79,16 +79,20 @@ public class IssueLedgerService {
 
         String ledgerName = CommonsStringUtils.isNullOrEmpty(form.getLedgerName()) ? null : form.getLedgerName();
         Boolean publicLedger;
-        switch (form.getPublicStatus()) {
-            case 1:
-                publicLedger = true;
-                break;
-            case 2:
-                publicLedger = false;
-                break;
-            default:
-                publicLedger = null;
-                break;
+        if (form.getPublicStatus() == null) {
+            publicLedger = null;
+        } else {
+            switch (form.getPublicStatus()) {
+                case 1:
+                    publicLedger = true;
+                    break;
+                case 2:
+                    publicLedger = false;
+                    break;
+                default:
+                    publicLedger = null;
+                    break;
+            }
         }
 
         List<IssueLedger> ledgerBaseList = issueLedgerRepo.findAll(

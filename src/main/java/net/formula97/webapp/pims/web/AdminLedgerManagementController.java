@@ -12,10 +12,12 @@ import net.formula97.webapp.pims.web.forms.RefUserItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,12 +56,11 @@ public class AdminLedgerManagementController extends BaseWebController {
             model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
 
             frm.importLedger(new IssueLedger());
-            model.addAttribute("ledgerDetailForm", new IssueLedger());
 
         } else {
             frm.importLedger(ledger);
 
-            List<RefUserItem> refUserList = ledgerRefUserSvc.getReferenceConditionById(ledgerId);
+            ArrayList<RefUserItem> refUserList = (ArrayList<RefUserItem>) ledgerRefUserSvc.getReferenceConditionById(ledgerId);
             frm.setRefUserItemList(refUserList);
 
             model.addAttribute("modeTag", AppConstants.EDIT_MODE_MODIFY);
@@ -70,25 +71,46 @@ public class AdminLedgerManagementController extends BaseWebController {
         return "/admin/ledger_detail";
     }
 
-    @RequestMapping(value = "update/{ledgerId}", method = RequestMethod.POST)
+    @RequestMapping(value = "{ledgerId}", method = RequestMethod.POST, params = "updateItemBtn")
     public String updateLedgerSummary(
-            @PathVariable Integer ledgerId, Model model, HeaderForm headerForm) {
+            @PathVariable Integer ledgerId, LedgerDetailForm detailForm, BindingResult result, Model model, HeaderForm headerForm) {
         Users myUserDetail = getUserState(model, headerForm);
 
-        return null;
+        IssueLedger issueLedger = issueLedgerSvc.getLedgerById(ledgerId);
+        IssueLedger formLedger = detailForm.exportLedger();
+        if (issueLedger == null || !ledgerId.equals(formLedger.getLedgerId())) {
+            // 台帳が見つからない時、またはformとURLでIDが一致しないときはエラー
+            putErrMsg(model, "台帳が見つかりません。");
+            model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
+
+            model.addAttribute("ledgerDetailForm", detailForm);
+
+        } else if (result.hasErrors()) {
+            // バリデーションエラーの場合
+            model.addAttribute("ledgerDetailForm", detailForm);
+
+        } else {
+            issueLedgerSvc.saveLedger(formLedger);
+
+            putInfoMsg(model, "台帳を更新しました。");
+
+            model.addAttribute("ledgerDetailForm", detailForm);
+        }
+
+        return "/admin/ledger_detail";
     }
 
-    @RequestMapping(value = "remove/{ledgerId}", method = RequestMethod.GET)
-    public String confirmToRemoveLedger(@PathVariable Integer ledgerId, Model model, HeaderForm headerForm) {
-        Users myUserDetail = getUserState(model, headerForm);
+//    @RequestMapping(value = "{ledgerId}", method = RequestMethod.GET)
+//    public String confirmToRemoveLedger(@PathVariable Integer ledgerId, Model model, HeaderForm headerForm) {
+//        Users myUserDetail = getUserState(model, headerForm);
+//
+//        return null;
+//    }
 
-        return null;
-    }
-
-    @RequestMapping(value = "remove/{ledgerId}", method = RequestMethod.POST)
-    public String removeLedger(@PathVariable Integer ledgerId, Model model, HeaderForm headerForm) {
-        Users myUserDetail = getUserState(model, headerForm);
-
-        return null;
-    }
+//    @RequestMapping(value = "{ledgerId}", method = RequestMethod.POST)
+//    public String removeLedger(@PathVariable Integer ledgerId, Model model, HeaderForm headerForm) {
+//        Users myUserDetail = getUserState(model, headerForm);
+//
+//        return null;
+//    }
 }

@@ -46,7 +46,7 @@
                 <div class="row vertical-margin">
                     <div class="col-lg-2">公開ステータス</div>
                     <div class="col-lg-3">
-                        <select class="form-control" id="openStatus" th:fiedl="*{openStatus}" th:disabled="${modeTag eq 'R'}">
+                        <select class="form-control" id="openStatus" th:field="*{openStatus}" th:disabled="${modeTag eq 'R'}">
                             <option value="-1">---</option>
                             <option th:each="st : ${severityList}" th:value="${st.key}"
                                     th:text="${st.value}" th:selected="${st.key} eq *{openStatus}">
@@ -77,13 +77,25 @@
                                 <th class="col-lg-5 text-center">ユーザー名</th>
                             </thead>
                             <tbody>
-                            <tr th:each="refUserItem : *{refUserItemList}">
+                            <tr th:each="refUserItem, stat : *{refUserItemList}">
                                 <td class="text-center">
-                                    <input type="checkbox" id="userJoined" th:value="${refUserItem.userJoined}" />
+                                    <input type="checkbox" th:id="'refUserItemList[' + __${stat.index}__ + '].userJoined'"
+                                           th:name="'refUserItemList[' + __${stat.index}__ + '].userJoined'"
+                                           th:field="*{refUserItemList[__${stat.index}__].userJoined}"
+                                           th:value="*{refUserItemList[__${stat.index}__].userJoined}" />
                                 </td>
                                 <td>
-                                    <input type="hidden" id="userId" th:value="${refUserItem.userId}" />
-                                    <span th:text="${refUserItem.displayName}">User Hoge</span>
+                                    <input type="hidden" th:id="'refUserItemList[' + __${stat.index}__ + '].userId'"
+                                           th:name="'refUserItemList[' + __${stat.index}__ + '].userId'"
+                                           th:field="*{refUserItemList[__${stat.index}__].userId}"
+                                           th:value="*{refUserItemList[__${stat.index}__].userId}" />
+                                    <span th:id="'refUserItemList[' + __${stat.index}__ + '].displayNameLabel'"
+                                          th:name="'refUserItemList[' + __${stat.index}__ + '].displayNameLabel'"
+                                          th:text="*{refUserItemList[__${stat.index}__].displayName}">User Hoge</span>
+                                    <input type="hidden" th:id="'refUserItemList[' + __${stat.index}__ + '].displayName'"
+                                           th:name="'refUserItemList[' + __${stat.index}__ + '].displayName'"
+                                           th:field="*{refUserItemList[__${stat.index}__].displayName}"
+                                           th:value="*{refUserItemList[__${stat.index}__].displayName}" />
                                 </td>
                             </tr>
                             </tbody>
