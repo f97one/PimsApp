@@ -420,12 +420,12 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
     @Test
     @WithMockUser(username = "kanrisha1", roles = "ADMIN")
     public void 存在しない台帳は更新できない() throws Exception {
-        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId + 1);
+        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId + 10);
 
         ResultActions actions = mMvcMock.perform(post(template)
                 .with(csrf())
                 .param("updateItemBtn", "更新")
-                .param("ledgerId", String.valueOf(existingLedgerId))
+                .param("ledgerId", String.valueOf(existingLedgerId + 10))
                 .param("ledgerName", "非公開台帳１−１")
                 .param("publicLedger", "true")
                 .param("openStatus", "1")
@@ -467,6 +467,9 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
 
+        String infoMsg = (String) modelMap.get("infoMsg");
+        assertThat(infoMsg, is("台帳を更新しました。"));
+
         IssueLedger actualLedger = issueLedgerRepo.findOne(existingLedgerId);
 
         assertThat("台帳名は非公開台帳１−１", actualLedger.getLedgerName(), is("非公開台帳１−１"));
@@ -485,4 +488,126 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
         assertThat("台帳に含まれる", refUserItemOpt.get().getUserJoined(), is(true));
     }
 
+    @Test
+    @WithAnonymousUser
+    public void 非ログインでは台帳参加ユーザーを編集できない() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId);
+
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("registerRefUserBtn", "登録")
+                .param("ledgerId", String.valueOf(existingLedgerId))
+                .param("ledgerName", "非公開台帳１−１")
+                .param("publicLedger", "true")
+                .param("openStatus", "1")
+                .param("refUserItemList[0].userJoined", "true")
+                .param("refUserItemList[0].userId", "kanrisha1")
+                .param("refUserItemList[0].displayName", "管理者１")
+                .param("refUserItemList[1].userJoined", "false")
+                .param("refUserItemList[1].userId", "user1")
+                .param("refUserItemList[1].displayName", "ユーザー１")
+        ).andDo(print());
+
+        actions.andExpect(status().is3xxRedirection()).andReturn();
+
+    }
+
+    @Test
+    @WithMockUser(username = "user1", roles = "USER")
+    public void 一般ユーザーだと台帳参加ユーザーを編集できない() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId);
+
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("registerRefUserBtn", "登録")
+                .param("ledgerId", String.valueOf(existingLedgerId))
+                .param("ledgerName", "非公開台帳１−１")
+                .param("publicLedger", "true")
+                .param("openStatus", "1")
+                .param("refUserItemList[0].userJoined", "true")
+                .param("refUserItemList[0].userId", "kanrisha1")
+                .param("refUserItemList[0].displayName", "管理者１")
+                .param("refUserItemList[1].userJoined", "false")
+                .param("refUserItemList[1].userId", "user1")
+                .param("refUserItemList[1].displayName", "ユーザー１")
+        ).andDo(print());
+
+        actions.andExpect(status().isForbidden()).andReturn();
+    }
+
+    @Test
+    @WithMockUser(username = "kanrisha1", roles = "ADMIN")
+    public void 存在しない台帳の参加ユーザーは編集できない() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId + 10);
+
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("registerRefUserBtn", "登録")
+                .param("ledgerId", String.valueOf(existingLedgerId + 10))
+                .param("ledgerName", "非公開台帳１−１")
+                .param("publicLedger", "true")
+                .param("openStatus", "1")
+                .param("refUserItemList[0].userJoined", "true")
+                .param("refUserItemList[0].userId", "kanrisha1")
+                .param("refUserItemList[0].displayName", "管理者１")
+                .param("refUserItemList[1].userJoined", "false")
+                .param("refUserItemList[1].userId", "user1")
+                .param("refUserItemList[1].displayName", "ユーザー１")
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().isOk()).andReturn();
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+
+        String errMsg = (String) modelMap.get("errMsg");
+        assertThat(errMsg, is("台帳が見つかりません。"));
+
+        MySpecificationAdapter<LedgerRefUser> refUserMySpec = new MySpecificationAdapter<>(LedgerRefUser.class);
+        List<LedgerRefUser> existingparticipants = ledgerRefUserRepo.findAll(Specifications.where(refUserMySpec.eq("ledgerId", existingLedgerId)));
+
+        Optional<LedgerRefUser> kanrisha1LRUOpt = existingparticipants.stream().filter(r -> r.getUserId().equals("kanrisha1")).findFirst();
+        assertThat("kanrisha1は非参加のまま", kanrisha1LRUOpt.isPresent(), is(false));
+
+        Optional<LedgerRefUser> user1LRUOpt = existingparticipants.stream().filter(r -> r.getUserId().equals("user1")).findFirst();
+        assertThat("user1は参加のまま", user1LRUOpt.isPresent(), is(true));
+    }
+
+    @Test
+    @WithMockUser(username = "kanrisha1", roles = "ADMIN")
+    public void 管理者ユーザーなら台帳参加ユーザーを編集できる() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId);
+
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("registerRefUserBtn", "登録")
+                .param("ledgerId", String.valueOf(existingLedgerId))
+                .param("ledgerName", "非公開台帳１−１")
+                .param("publicLedger", "true")
+                .param("openStatus", "1")
+                .param("refUserItemList[0].userJoined", "true")
+                .param("refUserItemList[0].userId", "kanrisha1")
+                .param("refUserItemList[0].displayName", "管理者１")
+                .param("refUserItemList[1].userJoined", "false")
+                .param("refUserItemList[1].userId", "user1")
+                .param("refUserItemList[1].displayName", "ユーザー１")
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().isOk()).andReturn();
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+
+        String infoMsg = (String) modelMap.get("infoMsg");
+        assertThat(infoMsg, is("台帳参加ユーザーを更新しました。"));
+
+        MySpecificationAdapter<LedgerRefUser> refUserMySpec = new MySpecificationAdapter<>(LedgerRefUser.class);
+        List<LedgerRefUser> existingparticipants = ledgerRefUserRepo.findAll(Specifications.where(refUserMySpec.eq("ledgerId", existingLedgerId)));
+
+        Optional<LedgerRefUser> kanrisha1LRUOpt = existingparticipants.stream().filter(r -> r.getUserId().equals("kanrisha1")).findFirst();
+        assertThat("kanrisha1は参加", kanrisha1LRUOpt.isPresent(), is(true));
+
+        Optional<LedgerRefUser> user1LRUOpt = existingparticipants.stream().filter(r -> r.getUserId().equals("user1")).findFirst();
+        assertThat("user1は非参加", user1LRUOpt.isPresent(), is(false));
+
+        IssueLedger existingLedger = issueLedgerRepo.findOne(existingLedgerId);
+        assertThat("台帳名は非公開台帳１のまま", existingLedger.getLedgerName(), is("非公開台帳１"));
+        assertThat("公開範囲は非公開のまま", existingLedger.getPublicLedger(), is(false));
+    }
 }

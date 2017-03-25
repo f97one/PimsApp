@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -56,4 +57,11 @@ public class LedgerRefUserService {
             return refUserItemList;
         }
     }
+
+    @Transactional
+    public void refreshParticipants(List<LedgerRefUser> updateParticipants, List<LedgerRefUser> removeParticipants) {
+        ledgerRefUserRepo.save(updateParticipants);
+        ledgerRefUserRepo.deleteInBatch(removeParticipants);
+    }
+
 }

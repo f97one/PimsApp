@@ -1,6 +1,7 @@
 package net.formula97.webapp.pims.web;
 
 import net.formula97.webapp.pims.domain.IssueLedger;
+import net.formula97.webapp.pims.domain.LedgerRefUser;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.misc.AppConstants;
 import net.formula97.webapp.pims.service.IssueLedgerService;
@@ -93,6 +94,50 @@ public class AdminLedgerManagementController extends BaseWebController {
             issueLedgerSvc.saveLedger(formLedger);
 
             putInfoMsg(model, "台帳を更新しました。");
+
+            model.addAttribute("ledgerDetailForm", detailForm);
+        }
+
+        return "/admin/ledger_detail";
+    }
+
+    @RequestMapping(value = "{ledgerId}", method = RequestMethod.POST, params = "registerRefUserBtn")
+    public String updateParticipants(@PathVariable Integer ledgerId, LedgerDetailForm detailForm, BindingResult result,
+                                     Model model, HeaderForm headerForm) {
+
+        Users myUserDetail = getUserState(model, headerForm);
+
+        IssueLedger issueLedger = issueLedgerSvc.getLedgerById(ledgerId);
+
+        if (issueLedger == null || !ledgerId.equals(detailForm.getLedgerId())) {
+            // 台帳が見つからない時、またはformとURLでIDが一致しないときはエラー
+            putErrMsg(model, "台帳が見つかりません。");
+            model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
+
+            model.addAttribute("ledgerDetailForm", detailForm);
+        } else if (result.hasErrors()) {
+            // バリデーションエラーの場合
+            System.out.println("バリデーションエラーに突入");
+            model.addAttribute("ledgerDetailForm", detailForm);
+        } else {
+            System.out.println("通常処理に突入");
+
+            List<LedgerRefUser> updateParticipants = new ArrayList<>();
+            List<LedgerRefUser> removeParticipants = new ArrayList<>();
+
+            for (RefUserItem refUserItem : detailForm.getRefUserItemList()) {
+                LedgerRefUser refUser = refUserItem.exportItem(ledgerId);
+                // 更新用と削除用に分別する
+                if (refUser == null) {
+                    removeParticipants.add(new LedgerRefUser(ledgerId, refUserItem.getUserId()));
+                } else {
+                    updateParticipants.add(refUser);
+                }
+            }
+
+            ledgerRefUserSvc.refreshParticipants(updateParticipants, removeParticipants);
+
+            putInfoMsg(model, "台帳参加ユーザーを更新しました。");
 
             model.addAttribute("ledgerDetailForm", detailForm);
         }
