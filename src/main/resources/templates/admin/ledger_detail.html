@@ -18,8 +18,10 @@
 
         <h2 class="h2">台帳詳細</h2>
 
+        <div th:replace="/common/info_block::info_block"></div>
+
         <form id="ledgerDetailForm" method="post" class="form-horizontal"
-              th:action="@{/admin/ledgerManagement/ledgerDetail}" th:object="${ledgerDetailForm}">
+              th:action="@{/admin/ledgerManagement/ledgerDetail/${ledgerId}}" th:object="${ledgerDetailForm}">
             <fieldset>
                 <legend>台帳設定</legend>
                 <div class="row vertical-margin">

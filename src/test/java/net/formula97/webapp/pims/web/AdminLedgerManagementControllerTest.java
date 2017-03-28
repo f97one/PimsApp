@@ -391,7 +391,7 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
     @Test
     @WithAnonymousUser
     public void 非ログインだと台帳詳細を更新できない() throws Exception {
-        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId);
+        String template = String.format(Locale.getDefault(), "%s/ledgerDetail/%d", apiEndpoint, existingLedgerId);
         ResultActions actions = mMvcMock.perform(post(template)
                     .with(csrf())
                 .param("updateItemBtn", "更新")
@@ -406,7 +406,7 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
     @Test
     @WithMockUser(username = "user1", roles = "USER")
     public void 一般ユーザーだと台帳詳細を更新できない() throws Exception {
-        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId);
+        String template = String.format(Locale.getDefault(), "%s/ledgerDetail/%d", apiEndpoint, existingLedgerId);
         ResultActions actions = mMvcMock.perform(post(template)
                 .with(csrf())
                 .param("updateItemBtn", "更新")
@@ -420,7 +420,7 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
     @Test
     @WithMockUser(username = "kanrisha1", roles = "ADMIN")
     public void 存在しない台帳は更新できない() throws Exception {
-        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId + 10);
+        String template = String.format(Locale.getDefault(), "%s/ledgerDetail/%d", apiEndpoint, existingLedgerId + 10);
 
         ResultActions actions = mMvcMock.perform(post(template)
                 .with(csrf())
@@ -447,7 +447,7 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
     @Test
     @WithMockUser(username = "kanrisha1", roles = "ADMIN")
     public void 台帳詳細を更新できる() throws Exception {
-        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId);
+        String template = String.format(Locale.getDefault(), "%s/ledgerDetail/%d", apiEndpoint, existingLedgerId);
 
         ResultActions actions = mMvcMock.perform(post(template)
                 .with(csrf())
@@ -491,7 +491,7 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
     @Test
     @WithAnonymousUser
     public void 非ログインでは台帳参加ユーザーを編集できない() throws Exception {
-        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId);
+        String template = String.format(Locale.getDefault(), "%s/ledgerDetail/%d", apiEndpoint, existingLedgerId);
 
         ResultActions actions = mMvcMock.perform(post(template)
                 .with(csrf())
@@ -515,7 +515,7 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
     @Test
     @WithMockUser(username = "user1", roles = "USER")
     public void 一般ユーザーだと台帳参加ユーザーを編集できない() throws Exception {
-        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId);
+        String template = String.format(Locale.getDefault(), "%s/ledgerDetail/%d", apiEndpoint, existingLedgerId);
 
         ResultActions actions = mMvcMock.perform(post(template)
                 .with(csrf())
@@ -538,7 +538,7 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
     @Test
     @WithMockUser(username = "kanrisha1", roles = "ADMIN")
     public void 存在しない台帳の参加ユーザーは編集できない() throws Exception {
-        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId + 10);
+        String template = String.format(Locale.getDefault(), "%s/ledgerDetail/%d", apiEndpoint, existingLedgerId + 10);
 
         ResultActions actions = mMvcMock.perform(post(template)
                 .with(csrf())
@@ -574,7 +574,7 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
     @Test
     @WithMockUser(username = "kanrisha1", roles = "ADMIN")
     public void 管理者ユーザーなら台帳参加ユーザーを編集できる() throws Exception {
-        String template = String.format(Locale.getDefault(), "%s/%d", apiEndpoint, existingLedgerId);
+        String template = String.format(Locale.getDefault(), "%s/ledgerDetail/%d", apiEndpoint, existingLedgerId);
 
         ResultActions actions = mMvcMock.perform(post(template)
                 .with(csrf())

@@ -72,7 +72,7 @@ public class AdminLedgerManagementController extends BaseWebController {
         return "/admin/ledger_detail";
     }
 
-    @RequestMapping(value = "{ledgerId}", method = RequestMethod.POST, params = "updateItemBtn")
+    @RequestMapping(value = "ledgerDetail/{ledgerId}", method = RequestMethod.POST, params = "updateItemBtn")
     public String updateLedgerSummary(
             @PathVariable Integer ledgerId, LedgerDetailForm detailForm, BindingResult result, Model model, HeaderForm headerForm) {
         Users myUserDetail = getUserState(model, headerForm);
@@ -101,7 +101,7 @@ public class AdminLedgerManagementController extends BaseWebController {
         return "/admin/ledger_detail";
     }
 
-    @RequestMapping(value = "{ledgerId}", method = RequestMethod.POST, params = "registerRefUserBtn")
+    @RequestMapping(value = "ledgerDetail/{ledgerId}", method = RequestMethod.POST, params = "registerRefUserBtn")
     public String updateParticipants(@PathVariable Integer ledgerId, LedgerDetailForm detailForm, BindingResult result,
                                      Model model, HeaderForm headerForm) {
 
@@ -145,12 +145,12 @@ public class AdminLedgerManagementController extends BaseWebController {
         return "/admin/ledger_detail";
     }
 
-//    @RequestMapping(value = "{ledgerId}", method = RequestMethod.GET)
-//    public String confirmToRemoveLedger(@PathVariable Integer ledgerId, Model model, HeaderForm headerForm) {
-//        Users myUserDetail = getUserState(model, headerForm);
-//
-//        return null;
-//    }
+    @RequestMapping(value = "remove/{ledgerId}", method = RequestMethod.GET)
+    public String confirmToRemoveLedger(@PathVariable Integer ledgerId, Model model, HeaderForm headerForm) {
+        Users myUserDetail = getUserState(model, headerForm);
+
+        return null;
+    }
 
 //    @RequestMapping(value = "{ledgerId}", method = RequestMethod.POST)
 //    public String removeLedger(@PathVariable Integer ledgerId, Model model, HeaderForm headerForm) {
