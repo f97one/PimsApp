@@ -1,15 +1,14 @@
 package net.formula97.webapp.pims.web;
 
+import net.formula97.webapp.pims.domain.IssueItems;
 import net.formula97.webapp.pims.domain.IssueLedger;
 import net.formula97.webapp.pims.domain.LedgerRefUser;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.misc.AppConstants;
+import net.formula97.webapp.pims.service.IssueItemsService;
 import net.formula97.webapp.pims.service.IssueLedgerService;
 import net.formula97.webapp.pims.service.LedgerRefUserService;
-import net.formula97.webapp.pims.web.forms.HeaderForm;
-import net.formula97.webapp.pims.web.forms.LedgerDetailForm;
-import net.formula97.webapp.pims.web.forms.LedgerSearchConditionForm;
-import net.formula97.webapp.pims.web.forms.RefUserItem;
+import net.formula97.webapp.pims.web.forms.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,6 +29,8 @@ public class AdminLedgerManagementController extends BaseWebController {
 
     @Autowired
     IssueLedgerService issueLedgerSvc;
+    @Autowired
+    IssueItemsService issueItemsSvc;
     @Autowired
     LedgerRefUserService ledgerRefUserSvc;
 
@@ -145,11 +146,29 @@ public class AdminLedgerManagementController extends BaseWebController {
         return "/admin/ledger_detail";
     }
 
-    @RequestMapping(value = "remove/{ledgerId}", method = RequestMethod.GET)
-    public String confirmToRemoveLedger(@PathVariable Integer ledgerId, Model model, HeaderForm headerForm) {
+    @RequestMapping(value = "ledgerDetail/{ledgerId}", method = RequestMethod.POST, params = "removeItemBtn")
+    public String confirmToRemoveLedger(@PathVariable Integer ledgerId, LedgerDetailForm detailForm,
+                                        Model model, HeaderForm headerForm) {
         Users myUserDetail = getUserState(model, headerForm);
 
-        return null;
+        IssueLedger issueLedger = issueLedgerSvc.getLedgerById(ledgerId);
+
+        LedgerRemovalDetailForm frm = new LedgerRemovalDetailForm();
+        if (issueLedger == null) {
+            // 台帳が見つからない時、またはformとURLでIDが一致しないときはエラー
+            putErrMsg(model, "台帳が見つかりません。");
+            model.addAttribute("modeTag", AppConstants.EDIT_MODE_READONLY);
+
+        } else {
+            frm.importLedger(issueLedger);
+
+            List<IssueItemsLineForm> issueItems = issueItemsSvc.getIssueItemsForDisplay(ledgerId);
+            frm.setIssueItems(issueItems);
+        }
+
+        model.addAttribute("ledgerRemovalDetailForm", frm);
+
+        return "/admin/ledger_removal";
     }
 
 //    @RequestMapping(value = "{ledgerId}", method = RequestMethod.POST)

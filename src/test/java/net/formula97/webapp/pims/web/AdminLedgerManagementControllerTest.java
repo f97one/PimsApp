@@ -1,6 +1,7 @@
 package net.formula97.webapp.pims.web;
 
 import net.formula97.webapp.pims.BaseTestCase;
+import net.formula97.webapp.pims.domain.IssueItems;
 import net.formula97.webapp.pims.domain.IssueLedger;
 import net.formula97.webapp.pims.domain.LedgerRefUser;
 import net.formula97.webapp.pims.domain.Users;
@@ -39,6 +40,7 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -135,6 +137,19 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
 
         LedgerRefUser ledgerRefUser = new LedgerRefUser(this.existingLedgerId, user1.getUsername());
         ledgerRefUserRepo.save(ledgerRefUser);
+
+        IssueItems items = new IssueItems();
+        items.setActionStatusId(1);
+        items.setSevereLevelId(2);
+        items.setLedgerId(this.existingLedgerId);
+        items.setFoundUser("user1");
+        items.setFoundDate(new Date());
+        items.setCategoryId(3);
+        items.setFoundProcessId(3);
+        items.setIssueDetail("Hoge処理が動かない。なんとかしろ");
+        items.setRowUpdatedAt(new Date());
+        issueItemsRepo.save(items);
+
     }
 
     @After
@@ -609,5 +624,29 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
         IssueLedger existingLedger = issueLedgerRepo.findOne(existingLedgerId);
         assertThat("台帳名は非公開台帳１のまま", existingLedger.getLedgerName(), is("非公開台帳１"));
         assertThat("公開範囲は非公開のまま", existingLedger.getPublicLedger(), is(false));
+    }
+
+    @Test
+    @WithMockUser(username = "kanrisha1", roles = "ADMIN")
+    public void 削除ボタンで確認画面を表示する() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/ledgerDetail/%d", apiEndpoint, existingLedgerId);
+
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("removeItemBtn", "削除")
+                .param("ledgerId", String.valueOf(existingLedgerId))
+                .param("ledgerName", "非公開台帳１−１")
+                .param("publicLedger", "true")
+                .param("openStatus", "1")
+                .param("refUserItemList[0].userJoined", "true")
+                .param("refUserItemList[0].userId", "kanrisha1")
+                .param("refUserItemList[0].displayName", "管理者１")
+                .param("refUserItemList[1].userJoined", "false")
+                .param("refUserItemList[1].userId", "user1")
+                .param("refUserItemList[1].displayName", "ユーザー１")
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(view().name(is("/admin/ledger_removal"))).andReturn();
     }
 }
