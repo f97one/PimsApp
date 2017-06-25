@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>System Preference | PIMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css"
+          href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap-theme.min.css}"/>
+    <link rel="stylesheet" type="text/css"
+          href="../../../static/css/pimsmain.css" th:href="@{/static/css/pimsmain.css}"/>
+</head>
+<body>
+
+<div class="container">
+    <div th:replace="/common/common_header::common_header"></div>
+
+    <h2 class="h2">システム設定</h2>
+
+    <div th:replace="/common/info_block::info_block"></div>
+
+    <form id="systemPreferenceForm" method="post" class="form-horizontal"
+          th:action="@{'/admin/system/config}" th:object="${systemPreferenceForm}">
+
+        <div class="row">
+            <input type="submit" class="btn btn-primary col-lg-1 pull-right" name="updateBtn" value="更新" />
+            <input type="submit" class="btn btn-default col-lg-1 pull-right" name="resetBtn" value="リセット" />
+        </div>
+
+        <div class="row vertical-margin">
+            <div class="col-lg-2 col-sm-3">アプリケーション表示名</div>
+            <div class="col-lg-10 col-sm-9">
+                <div class="input-group col-lg-2 col-sm-4 col-xs-12">
+                    <input type="text" id="appName" name="appName"
+                           class="form-control text-right" th:field="*{appName}" maxlength="32"
+                           th:disabled="${modeTag eq 'R'}"/>
+                    <span th:if="${#fields.hasErrors('appName')}" th:errors="*{appName}"
+                          class="help-block">error!</span>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+</div>
+
+</body>
+</html>
