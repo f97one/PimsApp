@@ -16,3 +16,7 @@ and open the template in the editor.
     margin-right: 16px;
     margin-left: 16px;
 }
+
+.long-textbox {
+    width: 320px;
+}

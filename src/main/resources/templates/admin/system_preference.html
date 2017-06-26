@@ -26,7 +26,7 @@
 
         <div class="row">
             <input type="submit" class="btn btn-primary col-lg-1 pull-right" name="updateBtn" value="更新" />
-            <input type="submit" class="btn btn-default col-lg-1 pull-right" name="resetBtn" value="リセット" />
+            <input type="reset" class="btn btn-default col-lg-1 pull-right" name="resetBtn" value="リセット"/>
         </div>
 
         <div class="row vertical-margin">
@@ -34,12 +34,18 @@
             <div class="col-lg-10 col-sm-9">
                 <div class="input-group col-lg-2 col-sm-4 col-xs-12">
                     <input type="text" id="appName" name="appName"
-                           class="form-control text-right" th:field="*{appName}" maxlength="32"
+                           class="form-control text-right long-textbox" th:field="*{appName}" maxlength="32"
                            th:disabled="${modeTag eq 'R'}"/>
                     <span th:if="${#fields.hasErrors('appName')}" th:errors="*{appName}"
                           class="help-block">error!</span>
                 </div>
             </div>
+        </div>
+
+
+        <div class="row">
+            <input type="submit" class="btn btn-primary col-lg-1 pull-right" name="updateBtn" value="更新"/>
+            <input type="reset" class="btn btn-default col-lg-1 pull-right" name="resetBtn" value="リセット"/>
         </div>
 
     </form>
