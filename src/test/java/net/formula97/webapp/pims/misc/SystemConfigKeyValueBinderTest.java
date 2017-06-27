@@ -62,7 +62,6 @@ public class SystemConfigKeyValueBinderTest {
         SystemConfigKeyValueBinder binder = new SystemConfigKeyValueBinder();
         Map<String, String> sysConfigMap = binder.exportToMap(dto);
 
-
         assertThat("エントリーは2", sysConfigMap.size(), is(2));
 
         assertThat(sysConfigMap.containsKey("Member1"), is(true));
@@ -87,5 +86,45 @@ public class SystemConfigKeyValueBinderTest {
         } catch (Exception e) {
             assertThat(e, is(instanceOf(IllegalArgumentException.class)));
         }
+    }
+
+    @Test
+    public void formのキー設定が不足している場合は無視される1() throws Exception {
+        SimDto3 simDto3 = new SimDto3();
+        simDto3.setMember1("member1");
+        simDto3.setMember2("member2");
+        simDto3.setMember3("member3");
+
+        SystemConfigKeyValueBinder binder = new SystemConfigKeyValueBinder();
+        List<SystemConfig> sysConfigList = binder.exportToList(simDto3);
+
+        assertThat("エントリーは2", sysConfigList.size(), is(2));
+
+        SystemConfig e1 = sysConfigList.get(0);
+        assertThat(e1.getConfigKey(), is("Member1"));
+        assertThat(e1.getConfigValue(), is("member1"));
+
+        SystemConfig e2 = sysConfigList.get(1);
+        assertThat(e2.getConfigKey(), is("Member2"));
+        assertThat(e2.getConfigValue(), is("member2"));
+    }
+
+    @Test
+    public void formのキー設定が不足している場合は無視される2() throws Exception {
+        SimDto3 simDto3 = new SimDto3();
+        simDto3.setMember1("member1");
+        simDto3.setMember2("member2");
+        simDto3.setMember3("member3");
+
+        SystemConfigKeyValueBinder binder = new SystemConfigKeyValueBinder();
+        Map<String, String> sysConfigMap = binder.exportToMap(simDto3);
+
+        assertThat("エントリーは2", sysConfigMap.size(), is(2));
+
+        assertThat(sysConfigMap.containsKey("Member1"), is(true));
+        assertThat(sysConfigMap.get("Member1"), is("member1"));
+
+        assertThat(sysConfigMap.containsKey("Member2"), is(true));
+        assertThat(sysConfigMap.get("Member2"), is("member2"));
     }
 }

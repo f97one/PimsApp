@@ -5,10 +5,7 @@ import net.formula97.webapp.pims.misc.annotations.ConfigKey;
 import net.formula97.webapp.pims.web.forms.PreferenceForm;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by f97one on 2017/06/25.
@@ -34,14 +31,16 @@ public class SystemConfigKeyValueBinder {
             f.setAccessible(true);
             ConfigKey configKey = f.getAnnotation(ConfigKey.class);
 
-            if (hasConfigKey(ret, configKey.value())) {
-//                throw new IllegalArgumentException("Configuration Key annotations duplicated.");
-            } else {
-                try {
-                    SystemConfig sysConfItem = new SystemConfig(configKey.value(), (String) f.get(form));
-                    ret.add(sysConfItem);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+            if (configKey != null) {
+                if (hasConfigKey(ret, configKey.value())) {
+                    throw new IllegalArgumentException("Configuration Key annotations duplicated.");
+                } else {
+                    try {
+                        SystemConfig sysConfItem = new SystemConfig(configKey.value(), (String) f.get(form));
+                        ret.add(sysConfItem);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -57,8 +56,28 @@ public class SystemConfigKeyValueBinder {
      * @throws IllegalArgumentException エンティティの ConfigKey アノテーションに重複した値を設定しているとき
      */
     public Map<String, String> exportToMap(PreferenceForm form) {
+        Map<String, String> ret = new HashMap<>();
 
-        return null;
+        Field[] fields = form.getClass().getDeclaredFields();
+
+        for (Field f : fields) {
+            f.setAccessible(true);
+            ConfigKey configKey = f.getAnnotation(ConfigKey.class);
+
+            if (configKey != null) {
+                if (ret.containsKey(configKey.value())) {
+                    throw new IllegalArgumentException("Configuration Key annotations duplicated.");
+                } else {
+                    try {
+                        ret.put(configKey.value(), (String) f.get(form));
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        return ret;
     }
 
     /**
