@@ -84,22 +84,74 @@ public class SystemConfigKeyValueBinder {
      * エンティティのコレクションに格納されている設定値をFormに格納する。
      *
      * @param entityList 設定値を格納しているエンティティのコレクション
+     * @param entity 設定値を戻すFormの型
      * @return 画面用Form
      */
-    public PreferenceForm convertToEntity(List<SystemConfig> entityList) {
+    public <T extends PreferenceForm> T convertToEntity(List<SystemConfig> entityList, Class<T> entity) {
+        T clzObj = null;
+        try {
+            clzObj = entity.newInstance();
 
-        return null;
+            for (SystemConfig config : entityList) {
+                Field[] fields = entity.getDeclaredFields();
+
+                // エンティティのK/Vに一致するフィールドをアノテーションをもとに探す
+                Field field = null;
+                for (Field f : fields) {
+                    f.setAccessible(true);
+                    ConfigKey configKey = f.getAnnotation(ConfigKey.class);
+                    if (config.getConfigKey().equals(configKey.value())) {
+                        field = f;
+                        break;
+                    }
+                }
+
+                if (field != null) {
+                    field.set(clzObj, config.getConfigValue());
+                }
+            }
+
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return clzObj;
     }
 
     /**
      * Mapに格納されている設定値をFormに格納する。
      *
      * @param entityMap 設定値を格納しているMap
+     * @param entity 設定値を戻すFormの型
      * @return 画面用Form
      */
-    public PreferenceForm convertToEntity(Map<String, String> entityMap) {
+    public <T extends PreferenceForm> T convertToEntity(Map<String, String> entityMap, Class<T> entity) {
+        T clzObj = null;
+        try {
+            clzObj = entity.newInstance();
 
-        return null;
+            for (String key : entityMap.keySet()) {
+                Field[] fields = entity.getDeclaredFields();
+
+                // MapのK/Vに一致するフィールドをアノテーションをもとに探す
+                Field field = null;
+                for (Field f : fields) {
+                    f.setAccessible(true);
+                    ConfigKey configKey = f.getAnnotation(ConfigKey.class);
+                    if (key.equals(configKey.value())) {
+                        field = f;
+                        break;
+                    }
+                }
+
+                if (field != null) {
+                    field.set(clzObj, entityMap.get(key));
+                }
+            }
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return clzObj;
     }
 
     private boolean hasConfigKey(List<SystemConfig> systemConfigList, String configKey) {

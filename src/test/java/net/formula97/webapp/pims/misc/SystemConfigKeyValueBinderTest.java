@@ -3,11 +3,14 @@ package net.formula97.webapp.pims.misc;
 import net.formula97.webapp.pims.domain.SystemConfig;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -126,5 +129,37 @@ public class SystemConfigKeyValueBinderTest {
 
         assertThat(sysConfigMap.containsKey("Member2"), is(true));
         assertThat(sysConfigMap.get("Member2"), is("member2"));
+    }
+
+    @Test
+    public void エンティティのコレクションからFormに戻せる1() throws Exception {
+        List<SystemConfig> sysConfigList = new ArrayList<>();
+        SystemConfig item1 = new SystemConfig("Member1", "メンバー１");
+        SystemConfig item2 = new SystemConfig("Member2", "メンバー2");
+        sysConfigList.add(item1);
+        sysConfigList.add(item2);
+
+        SystemConfigKeyValueBinder binder = new SystemConfigKeyValueBinder();
+        SimDto dto = binder.convertToEntity(sysConfigList, SimDto.class);
+
+        assertThat(dto, is(notNullValue()));
+
+        assertThat(dto.getMember1(), is("メンバー１"));
+        assertThat(dto.getMember2(), is("メンバー2"));
+    }
+
+    @Test
+    public void 設定値のMapからFormに戻せる1() throws Exception {
+        Map<String, String> sysConfigMap = new HashMap<>(2);
+        sysConfigMap.put("Member1", "メンバー１");
+        sysConfigMap.put("Member2", "メンバー2");
+
+        SystemConfigKeyValueBinder binder = new SystemConfigKeyValueBinder();
+        SimDto dto = binder.convertToEntity(sysConfigMap, SimDto.class);
+
+        assertThat(dto, is(notNullValue()));
+
+        assertThat(dto.getMember1(), is("メンバー１"));
+        assertThat(dto.getMember2(), is("メンバー2"));
     }
 }
