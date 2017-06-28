@@ -8,9 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -161,5 +159,74 @@ public class SystemConfigKeyValueBinderTest {
 
         assertThat(dto.getMember1(), is("メンバー１"));
         assertThat(dto.getMember2(), is("メンバー2"));
+    }
+
+    @Test
+    public void 重複キーを持っていると例外を投げる1() throws Exception {
+        List<SystemConfig> sysConfigList = new ArrayList<>();
+        SystemConfig item1 = new SystemConfig("Member1", "メンバー１");
+        SystemConfig item2 = new SystemConfig("Member2", "メンバー2");
+        sysConfigList.add(item1);
+        sysConfigList.add(item2);
+
+        try {
+            SystemConfigKeyValueBinder binder = new SystemConfigKeyValueBinder();
+            SimDto2 dto = binder.convertToEntity(sysConfigList, SimDto2.class);
+
+            fail("処理が例外が発生することなく進んだ");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+        }
+    }
+
+    @Test
+    public void 重複キーを持っていると例外を投げる2() throws Exception {
+        Map<String, String> sysConfigMap = new HashMap<>(2);
+        sysConfigMap.put("Member1", "メンバー１");
+        sysConfigMap.put("Member2", "メンバー2");
+
+        try {
+            SystemConfigKeyValueBinder binder = new SystemConfigKeyValueBinder();
+            SimDto2 dto = binder.convertToEntity(sysConfigMap, SimDto2.class);
+
+            fail("処理が例外が発生することなく進んだ");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+        }
+
+    }
+
+    @Test
+    public void formのキー設定が不足している場合は無視される3() throws Exception {
+        List<SystemConfig> sysConfigList = new ArrayList<>();
+        SystemConfig item1 = new SystemConfig("Member1", "メンバー１");
+        SystemConfig item2 = new SystemConfig("Member2", "メンバー2");
+        sysConfigList.add(item1);
+        sysConfigList.add(item2);
+
+        SystemConfigKeyValueBinder binder = new SystemConfigKeyValueBinder();
+        SimDto3 dto = binder.convertToEntity(sysConfigList, SimDto3.class);
+
+        assertThat(dto, is(notNullValue()));
+
+        assertThat(dto.getMember1(), is("メンバー１"));
+        assertThat(dto.getMember2(), is("メンバー2"));
+        assertThat(dto.getMember3(), is(nullValue()));
+    }
+
+    @Test
+    public void formのキー設定が不足している場合は無視される4() throws Exception {
+        Map<String, String> sysConfigMap = new HashMap<>(2);
+        sysConfigMap.put("Member1", "メンバー１");
+        sysConfigMap.put("Member2", "メンバー2");
+
+        SystemConfigKeyValueBinder binder = new SystemConfigKeyValueBinder();
+        SimDto3 dto = binder.convertToEntity(sysConfigMap, SimDto3.class);
+
+        assertThat(dto, is(notNullValue()));
+
+        assertThat(dto.getMember1(), is("メンバー１"));
+        assertThat(dto.getMember2(), is("メンバー2"));
+        assertThat(dto.getMember3(), is(nullValue()));
     }
 }

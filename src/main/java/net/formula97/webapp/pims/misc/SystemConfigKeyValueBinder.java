@@ -88,6 +88,10 @@ public class SystemConfigKeyValueBinder {
      * @return 画面用Form
      */
     public <T extends PreferenceForm> T convertToEntity(List<SystemConfig> entityList, Class<T> entity) {
+        if (hasDuplicateKey(entity)) {
+            throw new IllegalArgumentException("Duplicate key detected.");
+        }
+
         T clzObj = null;
         try {
             clzObj = entity.newInstance();
@@ -126,6 +130,10 @@ public class SystemConfigKeyValueBinder {
      * @return 画面用Form
      */
     public <T extends PreferenceForm> T convertToEntity(Map<String, String> entityMap, Class<T> entity) {
+        if (hasDuplicateKey(entity)) {
+            throw new IllegalArgumentException("Duplicate key detected.");
+        }
+
         T clzObj = null;
         try {
             clzObj = entity.newInstance();
@@ -157,5 +165,27 @@ public class SystemConfigKeyValueBinder {
     private boolean hasConfigKey(List<SystemConfig> systemConfigList, String configKey) {
         Optional<SystemConfig> sysConfigOpt = systemConfigList.stream().filter(r -> r.getConfigKey().equals(configKey)).findFirst();
         return sysConfigOpt.isPresent();
+    }
+
+    private <T> boolean hasDuplicateKey(Class<T> entity) {
+        TreeSet<String> keyCache = new TreeSet<>();
+        boolean ret = false;
+
+        Field[] fields = entity.getDeclaredFields();
+        for (Field f : fields) {
+            f.setAccessible(true);
+
+            ConfigKey ck = f.getAnnotation(ConfigKey.class);
+            if (ck != null) {
+                if (keyCache.contains(ck.value())) {
+                    ret = true;
+                    break;
+                } else {
+                    keyCache.add(ck.value());
+                }
+            }
+        }
+
+        return ret;
     }
 }
