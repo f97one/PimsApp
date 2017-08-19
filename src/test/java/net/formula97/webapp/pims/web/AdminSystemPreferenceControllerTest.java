@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -27,18 +28,17 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
-
 import java.util.Locale;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  *
@@ -138,5 +138,32 @@ public class AdminSystemPreferenceControllerTest extends BaseTestCase {
         assertThat(frm, is(notNullValue()));
 
         assertThat(frm.getAppTitle(), is("PIMS Beta"));
+    }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void システム定数を更新できる() throws Exception {
+        ResultActions actions = mMvcMock.perform(post(urlTemplate + "/update")
+                .with(csrf())
+                .param("updateBtn", "更新")
+                .param("appTitle", "pims alpha"))
+                .andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("/admin/system_preference")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        SystemPreferenceForm frm = (SystemPreferenceForm) modelMap.get("systemPreferenceForm");
+
+        assertThat(frm, is(notNullValue()));
+        assertThat(frm.getAppTitle(), is("pims alpha"));
+
+        SystemConfig sc = sysConfigRepo.findOne(AppConstants.SysConfig.APP_TITLE);
+        assertThat(sc.getConfigValue(), is("pims alpha"));
+
+        String infoMsg = (String) modelMap.get("infoMsg");
+        assertThat(infoMsg, is("システム定数を更新しました。"));
     }
 }

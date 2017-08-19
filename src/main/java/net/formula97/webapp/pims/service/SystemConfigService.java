@@ -12,6 +12,7 @@ import net.formula97.webapp.pims.web.forms.SystemPreferenceForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import net.formula97.webapp.pims.domain.SystemConfig;
@@ -67,5 +68,13 @@ public class SystemConfigService {
 
         SystemConfigKeyValueBinder binder = new SystemConfigKeyValueBinder();
         return binder.convertToEntity(sysConfigMap, SystemPreferenceForm.class);
+    }
+
+    @Transactional
+    public void storePreference(SystemPreferenceForm sysPrefForm) {
+        SystemConfigKeyValueBinder binder = new SystemConfigKeyValueBinder();
+        List<SystemConfig> updateList = binder.exportToList(sysPrefForm);
+
+        sysConfigRepos.save(updateList);
     }
 }
