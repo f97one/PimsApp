@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.formula97.webapp.pims.misc.SystemConfigKeyValueBinder;
+import net.formula97.webapp.pims.web.forms.SystemPreferenceForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -60,4 +62,10 @@ public class SystemConfigService {
         }
     }
 
+    public SystemPreferenceForm getViewForm() {
+        Map<String, String> sysConfigMap = getConfigMap();
+
+        SystemConfigKeyValueBinder binder = new SystemConfigKeyValueBinder();
+        return binder.convertToEntity(sysConfigMap, SystemPreferenceForm.class);
+    }
 }

@@ -6,12 +6,10 @@ package net.formula97.webapp.pims.web;
 import net.formula97.webapp.pims.BaseTestCase;
 import net.formula97.webapp.pims.domain.IssueLedger;
 import net.formula97.webapp.pims.domain.LedgerRefUser;
+import net.formula97.webapp.pims.domain.SystemConfig;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.misc.AppConstants;
-import net.formula97.webapp.pims.repository.IssueLedgerRepository;
-import net.formula97.webapp.pims.repository.LedgerRefUserRepository;
-import net.formula97.webapp.pims.repository.MySpecificationAdapter;
-import net.formula97.webapp.pims.repository.UserRepository;
+import net.formula97.webapp.pims.repository.*;
 import net.formula97.webapp.pims.service.IssueLedgerService;
 import org.hamcrest.Matchers;
 import org.junit.*;
@@ -60,6 +58,8 @@ public class TitleControllerTest extends BaseTestCase {
     private IssueLedgerRepository issueLedgerRepo;
     @Autowired
     private IssueLedgerService issueLedgerSvc;
+    @Autowired
+    private SystemConfigRepository sysConfigRepo;
     
     private MockMvc mMvcMock;
     
@@ -148,6 +148,9 @@ public class TitleControllerTest extends BaseTestCase {
         ledgerRefUserRepo.save(lru1);
         ledgerRefUserRepo.save(lru2);
         ledgerRefUserRepo.save(lru3);
+
+        SystemConfig systemConfig = new SystemConfig(AppConstants.SysConfig.APP_TITLE, "PIMS Beta");
+        sysConfigRepo.save(systemConfig);
     }
 
     /**
@@ -159,6 +162,7 @@ public class TitleControllerTest extends BaseTestCase {
         ledgerRefUserRepo.deleteAll();
         issueLedgerRepo.deleteAll();
         userRepo.deleteAll();
+        sysConfigRepo.deleteAll();
     }
 
     @Test

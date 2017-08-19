@@ -1,9 +1,12 @@
 package net.formula97.webapp.pims.web;
 
+import net.formula97.webapp.pims.domain.SystemConfig;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.service.StatusMasterService;
+import net.formula97.webapp.pims.service.SystemConfigService;
 import net.formula97.webapp.pims.web.forms.HeaderForm;
 import net.formula97.webapp.pims.web.forms.LedgerSearchConditionForm;
+import net.formula97.webapp.pims.web.forms.SystemPreferenceForm;
 import net.formula97.webapp.pims.web.forms.UserSearchConditionForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,7 +25,9 @@ import java.util.Map;
 public class AdminController extends BaseWebController {
 
     @Autowired
-    StatusMasterService statusMasterSvc;
+    private StatusMasterService statusMasterSvc;
+    @Autowired
+    private SystemConfigService sysConfigSvc;
 
     @RequestMapping(method = RequestMethod.GET)
     public String showMenu(Model model, HeaderForm headerForm) {
@@ -35,7 +40,10 @@ public class AdminController extends BaseWebController {
     public String showSystem(Model model, HeaderForm headerForm) {
         Users users = getUserState(model, headerForm);
 
-        return "/admin/system";
+        SystemPreferenceForm systemPreferenceForm = sysConfigSvc.getViewForm();
+        model.addAttribute("systemPreferenceForm", systemPreferenceForm);
+
+        return "/admin/system_preference";
     }
 
     @RequestMapping(value = "userManagement", method = RequestMethod.GET)
