@@ -69,4 +69,6 @@ public class AdminController extends BaseWebController {
 
         return "/admin/ledger_list";
     }
+
+    public String show
 }
