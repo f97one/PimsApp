@@ -4,15 +4,13 @@ import net.formula97.webapp.pims.domain.SystemConfig;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.service.StatusMasterService;
 import net.formula97.webapp.pims.service.SystemConfigService;
-import net.formula97.webapp.pims.web.forms.HeaderForm;
-import net.formula97.webapp.pims.web.forms.LedgerSearchConditionForm;
-import net.formula97.webapp.pims.web.forms.SystemPreferenceForm;
-import net.formula97.webapp.pims.web.forms.UserSearchConditionForm;
+import net.formula97.webapp.pims.web.forms.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -70,5 +68,47 @@ public class AdminController extends BaseWebController {
         return "/admin/ledger_list";
     }
 
-    public String show
+    @RequestMapping(value = "master", method = RequestMethod.GET)
+    public String showMasterConfig(@RequestParam(name = "masterType") String masterType, Model model, HeaderForm headerForm) {
+        Users myUserDetail = getUserState(model, headerForm);
+
+        String masterTypeName;
+        int itemNameLength;
+        switch (masterType) {
+            case "status":
+                masterTypeName = "ステータス";
+                itemNameLength = 16;
+                break;
+            case "severelevel":
+                masterTypeName = "緊急度";
+                itemNameLength = 8;
+                break;
+            case "process":
+                masterTypeName = "工程";
+                itemNameLength = 16;
+                break;
+            case "category":
+                masterTypeName = "カテゴリー";
+                itemNameLength = 128;
+                break;
+            default:
+                masterTypeName = "";
+                itemNameLength = 8;
+                break;
+        }
+        model.addAttribute("masterTypeName", masterTypeName);
+
+        model.addAttribute("masterType", masterType);
+
+        // 新規追加用Form
+        NewItemForm newItemForm = new NewItemForm();
+        newItemForm.setMasterType(masterType);
+        newItemForm.setItemNameLength(itemNameLength);
+
+        model.addAttribute("newItemForm", newItemForm);
+
+
+
+        return "/admin/master_config";
+    }
 }
