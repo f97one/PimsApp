@@ -21,7 +21,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryMaster implements Serializable {
+public class CategoryMaster implements Serializable, MasterDomain {
     
     /**
      * 

@@ -3,19 +3,12 @@
  */
 package net.formula97.webapp.pims.domain;
 
-import groovy.transform.EqualsAndHashCode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 /**
  * 緊急度マスタ
@@ -28,7 +21,7 @@ import javax.persistence.Table;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SevereLevelMaster implements Serializable {
+public class SevereLevelMaster implements Serializable, MasterDomain {
 
     /**
      * 
