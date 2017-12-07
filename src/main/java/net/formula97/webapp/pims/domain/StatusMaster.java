@@ -3,19 +3,12 @@
  */
 package net.formula97.webapp.pims.domain;
 
-import groovy.transform.EqualsAndHashCode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 /**
  * ステータスマスタ
@@ -40,6 +33,7 @@ public class StatusMaster implements Serializable {
     public static final String COLUMN_STATUS_ID = "STATUS_ID";
     public static final String COLUMN_STATUS_NAME = "STATUS_NAME";
     public static final String COLUMN_DISP_ORDER = "DISP_ORDER";
+    public static final String COLUMN_TREAT_AS_FINISHED = "TREAT_AS_FINISHED";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,4 +45,7 @@ public class StatusMaster implements Serializable {
 
     @Column(name = COLUMN_DISP_ORDER)
     private Integer dispOrder;
+
+    @Column(name = COLUMN_TREAT_AS_FINISHED)
+    private Boolean treatAsFinished;
 }
