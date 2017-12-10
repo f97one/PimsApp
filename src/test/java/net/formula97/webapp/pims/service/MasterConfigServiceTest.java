@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.instanceOf;
@@ -275,4 +276,267 @@ public class MasterConfigServiceTest {
             assertThat(e.getMessage(), is("Argument masterType must be specified valid value."));
         }
     }
+
+    @Test
+    public void 更新時にマスタータイプにnullを渡すと例外を投げる() {
+        List<MasterDomain> mdl = new ArrayList<>();
+        mdl.add(new CategoryMaster(1, "Webアプリケーション", 0));
+        mdl.add(new CategoryMaster(2, "Web API", 1));
+
+        try {
+            masterConfigService.updateDisplayOrder(null, mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Argument masterType must be specified valid value."));
+        }
+    }
+
+    @Test
+    public void 更新時にマスタータイプに空文字を渡すと例外を投げる() {
+        List<MasterDomain> mdl = new ArrayList<>();
+        mdl.add(new CategoryMaster(1, "Webアプリケーション", 0));
+        mdl.add(new CategoryMaster(2, "Web API", 1));
+
+        try {
+            masterConfigService.updateDisplayOrder("", mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Argument masterType must be specified valid value."));
+        }
+    }
+
+    @Test
+    public void 更新時にマスタータイプにあを渡すと例外を投げる() {
+        List<MasterDomain> mdl = new ArrayList<>();
+        mdl.add(new CategoryMaster(1, "Webアプリケーション", 0));
+        mdl.add(new CategoryMaster(2, "Web API", 1));
+
+        try {
+            masterConfigService.updateDisplayOrder("あ", mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Argument masterType must be specified valid value."));
+        }
+    }
+
+    @Test
+    public void マスタータイプcategoryとdomainの型が一致しない場合例外を投げる() {
+        List<MasterDomain> mdl = new ArrayList<>();
+
+        // 2個目をProcessMasterにする
+        mdl.add(new CategoryMaster(1, "Webアプリケーション", 0));
+        mdl.add(new ProcessMaster(2, "詳細設計", 1));
+
+        try {
+            masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_CATEGORY, mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Incompatible masterType, Type ProcessMaster was pass."));
+        }
+
+        // 2個目をSevereLevelMasterにする
+        mdl.remove(1);
+        mdl.add(new SevereLevelMaster(2, "中", 1));
+
+        try {
+            masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_CATEGORY, mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Incompatible masterType, Type SevereLevelMaster was pass."));
+        }
+
+        // 2個目をStatusMasterにする
+        mdl.remove(1);
+        mdl.add(new StatusMaster(2, "進行中", 1, false));
+
+        try {
+            masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_CATEGORY, mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Incompatible masterType, Type StatusMaster was pass."));
+        }
+
+        // 1個目をProcessMasterにする
+        mdl.remove(1);
+        mdl.add(0, new ProcessMaster(2, "詳細設計", 1));
+
+        try {
+            masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_CATEGORY, mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Incompatible masterType, Type ProcessMaster was pass."));
+        }
+    }
+
+    @Test
+    public void マスタータイプprocessとdomainの型が一致しない場合例外を投げる() {
+        List<MasterDomain> mdl = new ArrayList<>();
+
+        // 2個目をCategoryMasterにする
+        mdl.add(new ProcessMaster(1, "基本設計", 0));
+        mdl.add(new CategoryMaster(2, "Web API", 0));
+
+        try {
+            masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_PROCESS, mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Incompatible masterType, Type CategoryMaster was pass."));
+        }
+
+        // 2個目をSevereLevelMasterにする
+        mdl.remove(1);
+        mdl.add(new SevereLevelMaster(2, "中", 1));
+
+        try {
+            masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_PROCESS, mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Incompatible masterType, Type SevereLevelMaster was pass."));
+        }
+
+        // 2個目をStatusMasterにする
+        mdl.remove(1);
+        mdl.add(new StatusMaster(2, "進行中", 1, false));
+
+        try {
+            masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_PROCESS, mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Incompatible masterType, Type StatusMaster was pass."));
+        }
+
+        // 1個目をCategoryMasterにする
+        mdl.remove(1);
+        mdl.add(0, new CategoryMaster(2, "Web API", 0));
+
+        try {
+            masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_PROCESS, mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Incompatible masterType, Type CategoryMaster was pass."));
+        }
+    }
+
+    @Test
+    public void マスタータイプseverelevelとdomainの型が一致しない場合例外を投げる() {
+        List<MasterDomain> mdl = new ArrayList<>();
+
+        // 2個目をProcessMasterにする
+        mdl.add(new SevereLevelMaster(1, "低", 0));
+        mdl.add(new ProcessMaster(2, "詳細設計", 1));
+
+        try {
+            masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_SEVERE_LEVEL, mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Incompatible masterType, Type ProcessMaster was pass."));
+        }
+
+        // 2個目をCategoryMasterにする
+        mdl.remove(1);
+        mdl.add(new CategoryMaster(2, "Web API", 1));
+
+        try {
+            masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_SEVERE_LEVEL, mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Incompatible masterType, Type CategoryMaster was pass."));
+        }
+
+        // 2個目をStatusMasterにする
+        mdl.remove(1);
+        mdl.add(new StatusMaster(2, "進行中", 1, false));
+
+        try {
+            masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_SEVERE_LEVEL, mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Incompatible masterType, Type StatusMaster was pass."));
+        }
+
+        // 1個目をProcessMasterにする
+        mdl.remove(1);
+        mdl.add(0, new ProcessMaster(2, "詳細設計", 1));
+
+        try {
+            masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_SEVERE_LEVEL, mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Incompatible masterType, Type ProcessMaster was pass."));
+        }
+
+    }
+
+    @Test
+    public void マスタータイプstatusとdomainの型が一致しない場合例外を投げる() {
+        List<MasterDomain> mdl = new ArrayList<>();
+
+        // 2個目をProcessMasterにする
+        mdl.add(new StatusMaster(1, "新規", 0, false));
+        mdl.add(new ProcessMaster(2, "詳細設計", 1));
+
+        try {
+            masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_STATUS, mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Incompatible masterType, Type ProcessMaster was pass."));
+        }
+
+        // 2個目をCategoryMasterにする
+        mdl.remove(1);
+        mdl.add(new CategoryMaster(2, "Web API", 1));
+
+        try {
+            masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_STATUS, mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Incompatible masterType, Type CategoryMaster was pass."));
+        }
+
+        // 2個目をSevereLevelMasterにする
+        mdl.remove(1);
+        mdl.add(new SevereLevelMaster(2, "中", 1));
+
+        try {
+            masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_STATUS, mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Incompatible masterType, Type SevereLevelMaster was pass."));
+        }
+
+        // 1個目をProcessMasterにする
+        mdl.remove(1);
+        mdl.add(0, new ProcessMaster(2, "詳細設計", 1));
+
+        try {
+            masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_STATUS, mdl);
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Incompatible masterType, Type ProcessMaster was pass."));
+        }
+    }
+
+    public void マスタータイプにcategoryを指定した状態で入れ替えられた表示順を保存できる() {
+
+    }
+
 }
