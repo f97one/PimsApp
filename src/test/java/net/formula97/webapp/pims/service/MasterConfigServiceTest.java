@@ -535,8 +535,122 @@ public class MasterConfigServiceTest {
         }
     }
 
+    @Test
     public void マスタータイプにcategoryを指定した状態で入れ替えられた表示順を保存できる() {
+        List<MasterDomain> masterDomainList = new ArrayList<>(4);
 
+        masterDomainList.add(new CategoryMaster(1, "Webアプリ", 0));
+        masterDomainList.add(new CategoryMaster(2, "Web API", 2));
+        masterDomainList.add(new CategoryMaster(3, "端末用フロントエンド", 1));
+        masterDomainList.add(new CategoryMaster(4, "バッチ", 3));
+
+        masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_CATEGORY, masterDomainList);
+
+        List<CategoryMaster> afterList = categoryMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(afterList.size(), is(4));
+
+        CategoryMaster cm0 = afterList.get(0);
+        assertThat(cm0.getCategoryName(), is("Webアプリ"));
+        CategoryMaster cm1 = afterList.get(1);
+        assertThat(cm1.getCategoryName(), is("端末用フロントエンド"));
+        CategoryMaster cm2 = afterList.get(2);
+        assertThat(cm2.getCategoryName(), is("Web API"));
+        CategoryMaster cm3 = afterList.get(3);
+        assertThat(cm3.getCategoryName(), is("バッチ"));
+    }
+
+    @Test
+    public void マスタータイプにprocessを指定した状態で入れ替えられた表示順を保存できる() {
+        List<MasterDomain> masterDomainList = new ArrayList<>(6);
+
+        masterDomainList.add(new ProcessMaster(1, "基本せっけい", 0));
+        masterDomainList.add(new ProcessMaster(3, "PG", 1));
+        masterDomainList.add(new ProcessMaster(2, "詳細設計", 2));
+        masterDomainList.add(new ProcessMaster(4, "単体テスト", 3));
+        masterDomainList.add(new ProcessMaster(5, "結合テスト", 4));
+        masterDomainList.add(new ProcessMaster(6, "統合テスト", 5));
+
+        masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_PROCESS, masterDomainList);
+
+        List<ProcessMaster> afterList = processMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(afterList.size(), is(6));
+
+        ProcessMaster pm0 = afterList.get(0);
+        assertThat(pm0.getProcessName(), is("基本せっけい"));
+        ProcessMaster pm1 = afterList.get(1);
+        assertThat(pm1.getProcessName(), is("PG"));
+        ProcessMaster pm2 = afterList.get(2);
+        assertThat(pm2.getProcessName(), is("詳細設計"));
+        ProcessMaster pm3 = afterList.get(3);
+        assertThat(pm3.getProcessName(), is("単体テスト"));
+        ProcessMaster pm4 = afterList.get(4);
+        assertThat(pm4.getProcessName(), is("結合テスト"));
+        ProcessMaster pm5 = afterList.get(5);
+        assertThat(pm5.getProcessName(), is("統合テスト"));
+    }
+
+    @Test
+    public void マスタータイプにseverelevelを指定した状態で入れ替えられた表示順を保存できる() {
+        List<MasterDomain> masterDomainList = new ArrayList<>(4);
+
+        masterDomainList.add(new SevereLevelMaster(1, "低", 3));
+        masterDomainList.add(new SevereLevelMaster(2, "中", 2));
+        masterDomainList.add(new SevereLevelMaster(3, "高", 1));
+        masterDomainList.add(new SevereLevelMaster(4, "非常に高", 0));
+
+        masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_SEVERE_LEVEL, masterDomainList);
+
+        List<SevereLevelMaster> slmList = severeLevelMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(slmList.size(), is(4));
+
+        SevereLevelMaster slm0 = slmList.get(0);
+        assertThat(slm0.getSevereLevel(), is("非常に高"));
+        SevereLevelMaster slm1 = slmList.get(1);
+        assertThat(slm1.getSevereLevel(), is("高"));
+        SevereLevelMaster slm2 = slmList.get(2);
+        assertThat(slm2.getSevereLevel(), is("中"));
+        SevereLevelMaster slm3 = slmList.get(3);
+        assertThat(slm3.getSevereLevel(), is("低"));
+    }
+
+    @Test
+    public void マスタータイプにstatusを指定した状態で入れ替えられた表示順を保存できる() {
+        List<MasterDomain> masterDomainList = new ArrayList<>(4);
+
+        masterDomainList.add(new StatusMaster(1, "new", 0, false));
+        masterDomainList.add(new StatusMaster(2, "work in progress", 1, false));
+        masterDomainList.add(new StatusMaster(3, "solved", 2, true));
+        masterDomainList.add(new StatusMaster(4, "done", 3, true));
+        masterDomainList.add(new StatusMaster(5, "discard", 4, true));
+
+        masterConfigService.updateDisplayOrder(MasterConfigService.MASTER_TYPE_STATUS, masterDomainList);
+
+        List<StatusMaster> smList = statusMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(smList.size(), is(5));
+
+        StatusMaster sm0 = smList.get(0);
+        assertThat(sm0.getStatusName(), is("new"));
+        assertThat(sm0.getTreatAsFinished(), is(false));
+
+        StatusMaster sm1 = smList.get(1);
+        assertThat(sm1.getStatusName(), is("work in progress"));
+        assertThat(sm1.getTreatAsFinished(), is(false));
+
+        StatusMaster sm2 = smList.get(2);
+        assertThat(sm2.getStatusName(), is("solved"));
+        assertThat(sm2.getTreatAsFinished(), is(true));
+
+        StatusMaster sm3 = smList.get(3);
+        assertThat(sm3.getStatusName(), is("done"));
+        assertThat(sm3.getTreatAsFinished(), is(true));
+
+        StatusMaster sm4 = smList.get(4);
+        assertThat(sm4.getStatusName(), is("discard"));
+        assertThat(sm4.getTreatAsFinished(), is(true));
     }
 
 }
