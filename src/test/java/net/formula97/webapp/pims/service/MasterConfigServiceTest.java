@@ -653,4 +653,22 @@ public class MasterConfigServiceTest {
         assertThat(sm4.getTreatAsFinished(), is(true));
     }
 
+    @Test
+    public void マスタータイプにcategoryを渡してCategoryMasterのレコードを追加できる() {
+        List<CategoryMaster> beforeCmList = categoryMasterRepo.findAllOrderByDispOrder();
+
+        masterConfigService.addMasterByType(MasterConfigService.MASTER_TYPE_CATEGORY, "追加カテゴリー");
+
+        List<CategoryMaster> afterCmList = categoryMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(afterCmList.size(), is(beforeCmList.size() + 1));
+
+        CategoryMaster cm = afterCmList.get(afterCmList.size() - 1);
+        assertThat(cm.getCategoryName(), is("追加カテゴリー"));
+        assertThat(cm.getDispOrder(), is(afterCmList.size() - 1));
+
+        // 追加したレコードを削除する
+        categoryMasterRepo.delete(cm);
+    }
+
 }

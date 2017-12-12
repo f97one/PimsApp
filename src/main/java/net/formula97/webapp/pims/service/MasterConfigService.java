@@ -7,9 +7,7 @@ import net.formula97.webapp.pims.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * @author f97one
@@ -135,6 +133,34 @@ public class MasterConfigService extends BaseService {
                 }
                 statusMasterRepo.save(smList);
                 break;
+        }
+    }
+
+    public void addMasterByType(String masterType, String masterName) {
+        addMasterByType(masterType, masterName, false);
+    }
+
+    public void addMasterByType(String masterType, String masterName, boolean asFinished) {
+        int latestId;
+        int latestDispOrder;
+
+        switch (masterType) {
+            case MASTER_TYPE_CATEGORY:
+                // 最大の表示オーダーを取得
+                List<CategoryMaster> beforeCmList = categoryMasterRepo.findAllOrderByDispOrder();
+                Optional<CategoryMaster> latestOrder1 = beforeCmList.stream().max(Comparator.comparing(CategoryMaster::getCategoryId));
+                Optional<CategoryMaster> latestOrder2 = beforeCmList.stream().max(Comparator.comparing(CategoryMaster::getDispOrder));
+
+                latestId = latestOrder1.get().getCategoryId() + 1;
+                latestDispOrder = latestOrder2.get().getDispOrder() + 1;
+
+                CategoryMaster cm = new CategoryMaster(latestId, masterName, latestDispOrder);
+
+                categoryMasterRepo.save(cm);
+                break;
+
+            default:
+
         }
     }
 
