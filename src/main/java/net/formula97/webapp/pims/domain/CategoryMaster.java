@@ -41,7 +41,6 @@ public class CategoryMaster implements Serializable, MasterDomain {
      * カテゴリーID
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = COLUMN_CATEGORY_ID)
     private Integer categoryId;
     
