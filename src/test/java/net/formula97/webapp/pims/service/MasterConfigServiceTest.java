@@ -671,4 +671,21 @@ public class MasterConfigServiceTest {
         categoryMasterRepo.delete(cm);
     }
 
+    @Test
+    public void マスタータイプにprocessを渡してProcessMasterのレコードを追加できる() {
+        List<ProcessMaster> beforePmList = processMasterRepo.findAllOrderByDispOrder();
+
+        masterConfigService.addMasterByType(MasterConfigService.MASTER_TYPE_PROCESS, "追加工程");
+
+        List<ProcessMaster> afterPmList = processMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(afterPmList.size(), is(beforePmList.size() + 1));
+
+        ProcessMaster pm = afterPmList.get(afterPmList.size() - 1);
+        assertThat(pm.getProcessName(), is("追加工程"));
+        assertThat(pm.getDispOrder(), is(afterPmList.size() - 1));
+
+        // 追加したレコードを削除する
+        processMasterRepo.delete(pm);
+    }
 }

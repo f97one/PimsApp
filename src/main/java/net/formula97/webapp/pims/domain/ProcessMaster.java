@@ -41,7 +41,6 @@ public class ProcessMaster implements Serializable, MasterDomain {
      * 工程ID
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = COLUMN_PROCESS_ID)
     private Integer processId;
 

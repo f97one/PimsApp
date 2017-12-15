@@ -140,6 +140,7 @@ public class MasterConfigService extends BaseService {
         addMasterByType(masterType, masterName, false);
     }
 
+    @Transactional
     public void addMasterByType(String masterType, String masterName, boolean asFinished) {
         int latestId;
         int latestDispOrder;
@@ -157,6 +158,20 @@ public class MasterConfigService extends BaseService {
                 CategoryMaster cm = new CategoryMaster(latestId, masterName, latestDispOrder);
 
                 categoryMasterRepo.save(cm);
+                break;
+
+            case MASTER_TYPE_PROCESS:
+                // 最大の表示オーダーを取得
+                List<ProcessMaster> beforePmList = processMasterRepo.findAllOrderByDispOrder();
+                Optional<ProcessMaster> latestPmOrder1 = beforePmList.stream().max(Comparator.comparing(ProcessMaster::getProcessId));
+                Optional<ProcessMaster> latestPmOrder2 = beforePmList.stream().max(Comparator.comparing(ProcessMaster::getDispOrder));
+
+                latestId = latestPmOrder1.get().getProcessId() + 1;
+                latestDispOrder = latestPmOrder2.get().getDispOrder() + 1;
+
+                ProcessMaster pm = new ProcessMaster(latestId, masterName, latestDispOrder);
+
+                processMasterRepo.save(pm);
                 break;
 
             default:
