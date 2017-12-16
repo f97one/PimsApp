@@ -145,6 +145,10 @@ public class MasterConfigService extends BaseService {
         int latestId;
         int latestDispOrder;
 
+        if (masterType == null) {
+            throw new IllegalArgumentException("Argument masterType must be specified valid value.");
+        }
+
         switch (masterType) {
             case MASTER_TYPE_CATEGORY:
                 // 最大の表示オーダーを取得
@@ -202,6 +206,7 @@ public class MasterConfigService extends BaseService {
                 break;
 
             default:
+                throw new IllegalArgumentException("Argument masterType must be specified valid value.");
 
         }
     }

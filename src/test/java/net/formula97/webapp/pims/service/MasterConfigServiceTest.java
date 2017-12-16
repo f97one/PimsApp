@@ -725,4 +725,37 @@ public class MasterConfigServiceTest {
         // 追加したレコードを削除する
         statusMasterRepo.delete(sm);
     }
+
+    @Test
+    public void マスタータイプにnullを渡すとマスタ追加時に例外を投げる() {
+        try {
+            masterConfigService.addMasterByType(null, "nullステータス");
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Argument masterType must be specified valid value."));
+        }
+    }
+
+    @Test
+    public void マスタータイプに空文字を渡すとマスタ追加時に例外を投げる() {
+        try {
+            masterConfigService.addMasterByType("", "空文字ステータス");
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Argument masterType must be specified valid value."));
+        }
+    }
+
+    @Test
+    public void マスタータイプにあを渡すとマスタ追加時に例外を投げる() {
+        try {
+            masterConfigService.addMasterByType("あ", "あステータス");
+            fail("例外は投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+            assertThat(e.getMessage(), is("Argument masterType must be specified valid value."));
+        }
+    }
 }
