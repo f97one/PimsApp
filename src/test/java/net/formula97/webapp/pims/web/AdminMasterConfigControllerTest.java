@@ -317,4 +317,47 @@ public class AdminMasterConfigControllerTest extends BaseTestCase {
 
     }
 
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void 規定外のマスタータイプを指定する場合エラーメッセージを出す() throws Exception {
+        String url = makeUrlByType(urlTemplate, "a");
+        ResultActions actions = mMvcMock.perform(get(url)).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("/admin/master_config")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String errMsg = (String) modelMap.get("errMsg");
+
+        assertThat(errMsg, is("指定されたマスタはありません。"));
+
+        CurrentItemForm currentItemForm = (CurrentItemForm) modelMap.get("currentItemForm");
+        List<MasterItem> masterItems = currentItemForm.getMasterList();
+        assertThat(masterItems.size(), is(0));
+    }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void マスタータイプを空にした場合エラーメッセージを出す() throws Exception {
+        String url = makeUrlByType(urlTemplate, "");
+        ResultActions actions = mMvcMock.perform(get(url)).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("/admin/master_config")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String errMsg = (String) modelMap.get("errMsg");
+
+        assertThat(errMsg, is("指定されたマスタはありません。"));
+
+        CurrentItemForm currentItemForm = (CurrentItemForm) modelMap.get("currentItemForm");
+        List<MasterItem> masterItems = currentItemForm.getMasterList();
+        assertThat(masterItems.size(), is(0));
+    }
+
+
 }
