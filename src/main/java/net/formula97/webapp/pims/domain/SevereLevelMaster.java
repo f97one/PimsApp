@@ -41,7 +41,6 @@ public class SevereLevelMaster implements Serializable, MasterDomain {
      * 緊急度ID
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = COLUMN_SEVERE_LEVEL_ID)
     private Integer severeLevelId;
 

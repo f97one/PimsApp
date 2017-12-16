@@ -36,7 +36,6 @@ public class StatusMaster implements Serializable, MasterDomain {
     public static final String COLUMN_TREAT_AS_FINISHED = "TREAT_AS_FINISHED";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = COLUMN_STATUS_ID)
     private Integer statusId;
 

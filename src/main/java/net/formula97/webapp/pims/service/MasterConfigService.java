@@ -174,6 +174,33 @@ public class MasterConfigService extends BaseService {
                 processMasterRepo.save(pm);
                 break;
 
+            case MASTER_TYPE_SEVERE_LEVEL:
+                // 最大の表示オーダーを取得
+                List<SevereLevelMaster> beforeSlmList = severeLevelMasterRepo.findAllOrderByDispOrder();
+                Optional<SevereLevelMaster> latestSlm1 = beforeSlmList.stream().max(Comparator.comparing(SevereLevelMaster::getSevereLevelId));
+                Optional<SevereLevelMaster> latestSlm2 = beforeSlmList.stream().max(Comparator.comparing(SevereLevelMaster::getDispOrder));
+
+                latestId = latestSlm1.get().getSevereLevelId() + 1;
+                latestDispOrder = latestSlm2.get().getDispOrder() + 1;
+
+                SevereLevelMaster slm = new SevereLevelMaster(latestId, masterName, latestDispOrder);
+
+                severeLevelMasterRepo.save(slm);
+                break;
+
+            case MASTER_TYPE_STATUS:
+                List<StatusMaster> beforeSmList = statusMasterRepo.findAllOrderByDispOrder();
+                Optional<StatusMaster> latestSm1 = beforeSmList.stream().max(Comparator.comparing(StatusMaster::getStatusId));
+                Optional<StatusMaster> latestSm2 = beforeSmList.stream().max(Comparator.comparing(StatusMaster::getDispOrder));
+
+                latestId = latestSm1.get().getStatusId() + 1;
+                latestDispOrder = latestSm2.get().getDispOrder() + 1;
+
+                StatusMaster sm = new StatusMaster(latestId, masterName, latestDispOrder, asFinished);
+
+                statusMasterRepo.save(sm);
+                break;
+
             default:
 
         }

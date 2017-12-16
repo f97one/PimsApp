@@ -688,4 +688,41 @@ public class MasterConfigServiceTest {
         // 追加したレコードを削除する
         processMasterRepo.delete(pm);
     }
+
+    @Test
+    public void マスタータイプにseverelevelを渡してSevereLevelMasterのレコードを追加できる() {
+        List<SevereLevelMaster> beforeSlmList = severeLevelMasterRepo.findAllOrderByDispOrder();
+
+        masterConfigService.addMasterByType(MasterConfigService.MASTER_TYPE_SEVERE_LEVEL, "追加緊急度");
+
+        List<SevereLevelMaster> afterSlmList = severeLevelMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(afterSlmList.size(), is(beforeSlmList.size() + 1));
+
+        SevereLevelMaster slm = afterSlmList.get(afterSlmList.size() - 1);
+        assertThat(slm.getSevereLevel(), is("追加緊急度"));
+        assertThat(slm.getDispOrder(), is(afterSlmList.size() - 1));
+
+        // 追加したレコードを削除する
+        severeLevelMasterRepo.delete(slm);
+    }
+
+    @Test
+    public void マスタータイプにstatusを渡してStatusMasterのレコードを追加できる() {
+        List<StatusMaster> beforeSmList = statusMasterRepo.findAllOrderByDispOrder();
+
+        masterConfigService.addMasterByType(MasterConfigService.MASTER_TYPE_STATUS, "追加ステータス", true);
+
+        List<StatusMaster> afterSmList = statusMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(afterSmList.size(), is(beforeSmList.size() + 1));
+
+        StatusMaster sm = afterSmList.get(afterSmList.size() - 1);
+        assertThat(sm.getStatusName(), is("追加ステータス"));
+        assertThat(sm.getDispOrder(), is(afterSmList.size() - 1));
+        assertThat(sm.getTreatAsFinished(), is(true));
+
+        // 追加したレコードを削除する
+        statusMasterRepo.delete(sm);
+    }
 }
