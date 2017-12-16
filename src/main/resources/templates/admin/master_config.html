@@ -91,7 +91,7 @@
                     <th class="text-center"><span th:text="${masterTypeName}">ステータス</span>（最大<span
                             th:text="${currentItemForm.itemNameLength}">16</span></th>
                     <th th:if="${masterType eq 'status'}" class="text-center">終了とみなす</th>
-                    <th></th>
+                    <!--/*<th></th>*/-->
                     </thead>
 
                     <tbody id="currentItemListBody">
@@ -121,10 +121,12 @@
                                    th:field="*{masterList[__${stat.index}__].treatAsFinished}"
                                    th:value="*{masterList[__${stat.index}__].treatAsFinished}"/>
                         </td>
+                        <!--/*
                         <td class="text-center">
                             <input type="button" class="btn btn-danger col-lg-4" value="削除"
                                    th:onclick="'window.location.href = \'master/remove/' + *{masterList[__${stat.index}__].itemId} + '?masterType=' + ${masterType} + '\';'"/>
                         </td>
+                        */-->
                     </tr>
                     </tbody>
                 </table>

@@ -1,7 +1,9 @@
 package net.formula97.webapp.pims.web;
 
-import net.formula97.webapp.pims.domain.SystemConfig;
+import net.formula97.webapp.pims.domain.CategoryMaster;
+import net.formula97.webapp.pims.domain.MasterDomain;
 import net.formula97.webapp.pims.domain.Users;
+import net.formula97.webapp.pims.service.MasterConfigService;
 import net.formula97.webapp.pims.service.StatusMasterService;
 import net.formula97.webapp.pims.service.SystemConfigService;
 import net.formula97.webapp.pims.web.forms.*;
@@ -12,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,6 +30,12 @@ public class AdminController extends BaseWebController {
     private StatusMasterService statusMasterSvc;
     @Autowired
     private SystemConfigService sysConfigSvc;
+    @Autowired
+    HttpSession httpSession;
+    @Autowired
+    private MasterConfigService masterConfigService;
+
+    private final String mMessageSessionKey = "messageSessionKey";
 
     @RequestMapping(method = RequestMethod.GET)
     public String showMenu(Model model, HeaderForm headerForm) {
@@ -75,19 +85,19 @@ public class AdminController extends BaseWebController {
         String masterTypeName;
         int itemNameLength;
         switch (masterType) {
-            case "status":
+            case MasterConfigService.MASTER_TYPE_STATUS:
                 masterTypeName = "ステータス";
                 itemNameLength = 16;
                 break;
-            case "severelevel":
+            case MasterConfigService.MASTER_TYPE_SEVERE_LEVEL:
                 masterTypeName = "緊急度";
                 itemNameLength = 8;
                 break;
-            case "process":
+            case MasterConfigService.MASTER_TYPE_PROCESS:
                 masterTypeName = "工程";
                 itemNameLength = 16;
                 break;
-            case "category":
+            case MasterConfigService.MASTER_TYPE_CATEGORY:
                 masterTypeName = "カテゴリー";
                 itemNameLength = 128;
                 break;
@@ -107,7 +117,34 @@ public class AdminController extends BaseWebController {
 
         model.addAttribute("newItemForm", newItemForm);
 
+        CurrentItemForm currentItemForm = new CurrentItemForm();
+        currentItemForm.setItemNameLength(itemNameLength);
+        currentItemForm.setMasterType(masterType);
 
+        try {
+            List<MasterDomain> masterDomainList = masterConfigService.getWholeMasterByType(masterType);
+
+            List<MasterItem> masterItems = new ArrayList<>();
+
+            for (MasterDomain md : masterDomainList) {
+                switch (masterType) {
+                    case MasterConfigService.MASTER_TYPE_CATEGORY:
+                        CategoryMaster cm = (CategoryMaster) md;
+                        masterItems.add(new MasterItem(cm.getCategoryId(), cm.getCategoryName(), cm.getDispOrder(), false));
+                        break;
+
+                }
+            }
+
+            currentItemForm.setMasterList(masterItems);
+
+        } catch (Exception e) {
+            putErrMsg(model, "指定されたマスタはありません。");
+
+            currentItemForm.setMasterList(new ArrayList<>(1));
+        }
+
+        model.addAttribute("currentItemForm", currentItemForm);
 
         return "/admin/master_config";
     }
