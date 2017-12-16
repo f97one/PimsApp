@@ -214,4 +214,107 @@ public class AdminMasterConfigControllerTest extends BaseTestCase {
         List<MasterItem> masterItemList = currentItemForm.getMasterList();
         assertThat(masterItemList.size(), is(4));
     }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void マスタータイプprocessで初期画面を表示する() throws Exception {
+        String url = makeUrlByType(urlTemplate, MasterConfigService.MASTER_TYPE_PROCESS);
+        ResultActions actions = mMvcMock.perform(get(url)).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("/admin/master_config")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+
+        // 新規追加用Form
+        NewItemForm newItemForm = (NewItemForm) modelMap.get("newItemForm");
+        assertThat(newItemForm.getMasterType(), is(MasterConfigService.MASTER_TYPE_PROCESS));
+        assertThat(newItemForm.getItemNameLength(), is(16));
+        assertThat(CommonsStringUtils.isNullOrEmpty(newItemForm.getItemName()), is(true));
+
+        // 編集用Form
+        CurrentItemForm currentItemForm = (CurrentItemForm) modelMap.get("currentItemForm");
+        assertThat(currentItemForm.getItemNameLength(), is(16));
+        assertThat(currentItemForm.getMasterType(), is(MasterConfigService.MASTER_TYPE_PROCESS));
+
+        List<MasterItem> masterItemList = currentItemForm.getMasterList();
+        assertThat(masterItemList.size(), is(6));
+
+    }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void マスタータイプseverelevelで初期画面を表示する() throws Exception {
+        String url = makeUrlByType(urlTemplate, MasterConfigService.MASTER_TYPE_SEVERE_LEVEL);
+        ResultActions actions = mMvcMock.perform(get(url)).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("/admin/master_config")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+
+        // 新規追加用Form
+        NewItemForm newItemForm = (NewItemForm) modelMap.get("newItemForm");
+        assertThat(newItemForm.getMasterType(), is(MasterConfigService.MASTER_TYPE_SEVERE_LEVEL));
+        assertThat(newItemForm.getItemNameLength(), is(8));
+        assertThat(CommonsStringUtils.isNullOrEmpty(newItemForm.getItemName()), is(true));
+
+        // 編集用Form
+        CurrentItemForm currentItemForm = (CurrentItemForm) modelMap.get("currentItemForm");
+        assertThat(currentItemForm.getItemNameLength(), is(8));
+        assertThat(currentItemForm.getMasterType(), is(MasterConfigService.MASTER_TYPE_SEVERE_LEVEL));
+
+        List<MasterItem> masterItemList = currentItemForm.getMasterList();
+        assertThat(masterItemList.size(), is(4));
+
+    }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void マスタータイプstatusで初期画面を表示する() throws Exception {
+        String url = makeUrlByType(urlTemplate, MasterConfigService.MASTER_TYPE_STATUS);
+        ResultActions actions = mMvcMock.perform(get(url)).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("/admin/master_config")))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+
+        // 新規追加用Form
+        NewItemForm newItemForm = (NewItemForm) modelMap.get("newItemForm");
+        assertThat(newItemForm.getMasterType(), is(MasterConfigService.MASTER_TYPE_STATUS));
+        assertThat(newItemForm.getItemNameLength(), is(16));
+        assertThat(CommonsStringUtils.isNullOrEmpty(newItemForm.getItemName()), is(true));
+
+        // 編集用Form
+        CurrentItemForm currentItemForm = (CurrentItemForm) modelMap.get("currentItemForm");
+        assertThat(currentItemForm.getItemNameLength(), is(16));
+        assertThat(currentItemForm.getMasterType(), is(MasterConfigService.MASTER_TYPE_STATUS));
+
+        List<MasterItem> masterItemList = currentItemForm.getMasterList();
+        assertThat(masterItemList.size(), is(5));
+
+        MasterItem mi0 = masterItemList.get(0);
+        assertThat(mi0.getTreatAsFinished(), is(false));
+
+        MasterItem mi1 = masterItemList.get(1);
+        assertThat(mi1.getTreatAsFinished(), is(false));
+
+        MasterItem mi2 = masterItemList.get(2);
+        assertThat(mi2.getTreatAsFinished(), is(false));
+
+        MasterItem mi3 = masterItemList.get(3);
+        assertThat(mi3.getTreatAsFinished(), is(true));
+
+        MasterItem mi4 = masterItemList.get(4);
+        assertThat(mi4.getTreatAsFinished(), is(true));
+
+    }
+
 }

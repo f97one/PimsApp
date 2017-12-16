@@ -1,8 +1,6 @@
 package net.formula97.webapp.pims.web;
 
-import net.formula97.webapp.pims.domain.CategoryMaster;
-import net.formula97.webapp.pims.domain.MasterDomain;
-import net.formula97.webapp.pims.domain.Users;
+import net.formula97.webapp.pims.domain.*;
 import net.formula97.webapp.pims.service.MasterConfigService;
 import net.formula97.webapp.pims.service.StatusMasterService;
 import net.formula97.webapp.pims.service.SystemConfigService;
@@ -132,7 +130,18 @@ public class AdminController extends BaseWebController {
                         CategoryMaster cm = (CategoryMaster) md;
                         masterItems.add(new MasterItem(cm.getCategoryId(), cm.getCategoryName(), cm.getDispOrder(), false));
                         break;
-
+                    case MasterConfigService.MASTER_TYPE_PROCESS:
+                        ProcessMaster pm = (ProcessMaster) md;
+                        masterItems.add(new MasterItem(pm.getProcessId(), pm.getProcessName(), pm.getDispOrder(), false));
+                        break;
+                    case MasterConfigService.MASTER_TYPE_SEVERE_LEVEL:
+                        SevereLevelMaster slm = (SevereLevelMaster) md;
+                        masterItems.add(new MasterItem(slm.getSevereLevelId(), slm.getSevereLevel(), slm.getDispOrder(), false));
+                        break;
+                    case MasterConfigService.MASTER_TYPE_STATUS:
+                        StatusMaster sm = (StatusMaster) md;
+                        masterItems.add(new MasterItem(sm.getStatusId(), sm.getStatusName(), sm.getDispOrder(), sm.getTreatAsFinished()));
+                        break;
                 }
             }
 
