@@ -369,18 +369,21 @@ public class AdminMasterConfigControllerTest extends BaseTestCase {
     @Test
     @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
     public void マスタータイプcategoryで1レコード追加できる() throws Exception {
-        List<CategoryMaster> beforeCmList = categoryMasterRepo.findAllOrderByDispOrder();
+        List<CategoryMaster> beforeList = categoryMasterRepo.findAllOrderByDispOrder();
+
+        String additionalItem = "追加カテゴリー";
+        int itemLimit = 128;
 
         NewItemForm newItemForm = new NewItemForm();
-        newItemForm.setItemName("追加カテゴリー");
-        newItemForm.setItemNameLength(128);
+        newItemForm.setItemName(additionalItem);
+        newItemForm.setItemNameLength(itemLimit);
         newItemForm.setMasterType(MasterConfigService.MASTER_TYPE_CATEGORY);
 
         String url = makeUrlByType(urlTemplate + "/add", MasterConfigService.MASTER_TYPE_CATEGORY);
         ResultActions actions = mMvcMock.perform(post(url).with(csrf())
                 .param("newItemAdd", "追加")
-                .param("itemName", "追加カテゴリー")
-                .param("itemNameLength", "128")
+                .param("itemName", additionalItem)
+                .param("itemNameLength", String.valueOf(itemLimit))
         ).andDo(print());
 
         MvcResult mvcResult = actions.andExpect(status().is3xxRedirection())
@@ -388,11 +391,113 @@ public class AdminMasterConfigControllerTest extends BaseTestCase {
                 .andExpect(view().name(is("redirect:/admin/master?masterType=category")))
                 .andReturn();
 
-        List<CategoryMaster> afterCmList = categoryMasterRepo.findAllOrderByDispOrder();
+        List<CategoryMaster> afterList = categoryMasterRepo.findAllOrderByDispOrder();
 
-        assertThat(afterCmList.size(), is(beforeCmList.size() + 1));
-        Optional<CategoryMaster> latestMi = afterCmList.stream().max(Comparator.comparing(CategoryMaster::getDispOrder));
+        assertThat(afterList.size(), is(beforeList.size() + 1));
+        Optional<CategoryMaster> latestMi = afterList.stream().max(Comparator.comparing(CategoryMaster::getDispOrder));
         CategoryMaster cm = latestMi.get();
-        assertThat(cm.getCategoryName(), is("追加カテゴリー"));
+        assertThat(cm.getCategoryName(), is(additionalItem));
     }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void マスタータイプprocessで1レコード追加できる() throws Exception {
+        List<ProcessMaster> beforeList = processMasterRepo.findAllOrderByDispOrder();
+
+        String additionalItem = "追加工程";
+        int itemLimit = 16;
+
+        NewItemForm newItemForm = new NewItemForm();
+        newItemForm.setItemName(additionalItem);
+        newItemForm.setItemNameLength(itemLimit);
+        newItemForm.setMasterType(MasterConfigService.MASTER_TYPE_PROCESS);
+
+        String url = makeUrlByType(urlTemplate + "/add", MasterConfigService.MASTER_TYPE_PROCESS);
+        ResultActions actions = mMvcMock.perform(post(url).with(csrf())
+                .param("newItemAdd", "追加")
+                .param("itemName", additionalItem)
+                .param("itemNameLength", String.valueOf(itemLimit))
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().is3xxRedirection())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("redirect:/admin/master?masterType=process")))
+                .andReturn();
+
+        List<ProcessMaster> afterList = processMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(afterList.size(), is(beforeList.size() + 1));
+        Optional<ProcessMaster> latestMi = afterList.stream().max(Comparator.comparing(ProcessMaster::getDispOrder));
+        ProcessMaster pm = latestMi.get();
+        assertThat(pm.getProcessName(), is(additionalItem));
+    }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void マスタータイプseverelevelで1レコード追加できる() throws Exception {
+        List<SevereLevelMaster> beforeList = severeLevelMasterRepo.findAllOrderByDispOrder();
+
+        String additionalItem = "追加緊急度";
+        int itemLimit = 8;
+
+        NewItemForm newItemForm = new NewItemForm();
+        newItemForm.setItemName(additionalItem);
+        newItemForm.setItemNameLength(itemLimit);
+        newItemForm.setMasterType(MasterConfigService.MASTER_TYPE_SEVERE_LEVEL);
+
+        String url = makeUrlByType(urlTemplate + "/add", MasterConfigService.MASTER_TYPE_SEVERE_LEVEL);
+        ResultActions actions = mMvcMock.perform(post(url).with(csrf())
+                .param("newItemAdd", "追加")
+                .param("itemName", additionalItem)
+                .param("itemNameLength", String.valueOf(itemLimit))
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().is3xxRedirection())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("redirect:/admin/master?masterType=severelevel")))
+                .andReturn();
+
+        List<SevereLevelMaster> afterList = severeLevelMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(afterList.size(), is(beforeList.size() + 1));
+        Optional<SevereLevelMaster> latestMi = afterList.stream().max(Comparator.comparing(SevereLevelMaster::getDispOrder));
+        SevereLevelMaster slm = latestMi.get();
+        assertThat(slm.getSevereLevel(), is(additionalItem));
+    }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void マスタータイプstatusで1レコード追加できる() throws Exception {
+        List<StatusMaster> beforeList = statusMasterRepo.findAllOrderByDispOrder();
+
+        String additionalItem = "追加ステータス";
+        int itemLimit = 16;
+
+        NewItemForm newItemForm = new NewItemForm();
+        newItemForm.setItemName(additionalItem);
+        newItemForm.setItemNameLength(itemLimit);
+        newItemForm.setMasterType(MasterConfigService.MASTER_TYPE_STATUS);
+
+        String url = makeUrlByType(urlTemplate + "/add", MasterConfigService.MASTER_TYPE_STATUS);
+        ResultActions actions = mMvcMock.perform(post(url).with(csrf())
+                .param("newItemAdd", "追加")
+                .param("itemName", additionalItem)
+                .param("itemNameLength", String.valueOf(itemLimit))
+                .param("treatAsFinished", "true")
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().is3xxRedirection())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("redirect:/admin/master?masterType=status")))
+                .andReturn();
+
+        List<StatusMaster> afterList = statusMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(afterList.size(), is(beforeList.size() + 1));
+        Optional<StatusMaster> latestMi = afterList.stream().max(Comparator.comparing(StatusMaster::getDispOrder));
+        StatusMaster sm = latestMi.get();
+        assertThat(sm.getStatusName(), is(additionalItem));
+        assertThat(sm.getTreatAsFinished(), is(true));
+    }
+
 }
