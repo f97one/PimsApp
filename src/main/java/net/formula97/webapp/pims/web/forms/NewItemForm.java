@@ -22,4 +22,8 @@ public class NewItemForm {
      */
     private int itemNameLength;
 
+    /**
+     * 終了とみなすフラグ
+     */
+    private boolean treatAsFinished;
 }

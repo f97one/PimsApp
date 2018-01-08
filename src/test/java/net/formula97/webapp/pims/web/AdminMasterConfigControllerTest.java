@@ -28,13 +28,16 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -196,6 +199,7 @@ public class AdminMasterConfigControllerTest extends BaseTestCase {
         MvcResult mvcResult = actions.andExpect(status().isOk())
                 .andExpect(model().hasNoErrors())
                 .andExpect(view().name(is("/admin/master_config")))
+                .andDo(print())
                 .andReturn();
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
@@ -253,6 +257,7 @@ public class AdminMasterConfigControllerTest extends BaseTestCase {
         MvcResult mvcResult = actions.andExpect(status().isOk())
                 .andExpect(model().hasNoErrors())
                 .andExpect(view().name(is("/admin/master_config")))
+                .andDo(print())
                 .andReturn();
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
@@ -282,6 +287,8 @@ public class AdminMasterConfigControllerTest extends BaseTestCase {
         MvcResult mvcResult = actions.andExpect(status().isOk())
                 .andExpect(model().hasNoErrors())
                 .andExpect(view().name(is("/admin/master_config")))
+                .andDo(print())
+                .andDo(print())
                 .andReturn();
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
@@ -359,5 +366,33 @@ public class AdminMasterConfigControllerTest extends BaseTestCase {
         assertThat(masterItems.size(), is(0));
     }
 
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void マスタータイプcategoryで1レコード追加できる() throws Exception {
+        List<CategoryMaster> beforeCmList = categoryMasterRepo.findAllOrderByDispOrder();
 
+        NewItemForm newItemForm = new NewItemForm();
+        newItemForm.setItemName("追加カテゴリー");
+        newItemForm.setItemNameLength(128);
+        newItemForm.setMasterType(MasterConfigService.MASTER_TYPE_CATEGORY);
+
+        String url = makeUrlByType(urlTemplate + "/add", MasterConfigService.MASTER_TYPE_CATEGORY);
+        ResultActions actions = mMvcMock.perform(post(url).with(csrf())
+                .param("newItemAdd", "追加")
+                .param("itemName", "追加カテゴリー")
+                .param("itemNameLength", "128")
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().is3xxRedirection())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("redirect:/admin/master?masterType=category")))
+                .andReturn();
+
+        List<CategoryMaster> afterCmList = categoryMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(afterCmList.size(), is(beforeCmList.size() + 1));
+        Optional<CategoryMaster> latestMi = afterCmList.stream().max(Comparator.comparing(CategoryMaster::getDispOrder));
+        CategoryMaster cm = latestMi.get();
+        assertThat(cm.getCategoryName(), is("追加カテゴリー"));
+    }
 }
