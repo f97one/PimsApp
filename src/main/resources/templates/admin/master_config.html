@@ -68,7 +68,7 @@
             <div class="col-lg-6 col-sm-9">
                 <input type="text" class="form-control text-left" th:id="*{itemName}" th:field="*{itemName}"
                        th:maxlength="*{itemNameLength}"/>
-                <span th:if="${#fields.hasErrors('itemName')}" th:errors="*{itemName}"
+                <span th:if="${itemError != null}" th:text="${itemError}"
                       class="help-block">error!</span>
             </div>
             <div class="col-lg-2" th:if="${masterType eq 'status'}">

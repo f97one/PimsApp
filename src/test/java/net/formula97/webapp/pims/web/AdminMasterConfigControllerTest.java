@@ -512,4 +512,168 @@ public class AdminMasterConfigControllerTest extends BaseTestCase {
         statusMasterRepo.delete(sm);
     }
 
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void マスタータイプcategoryで129文字のデータは追加できない() throws Exception {
+        List<CategoryMaster> beforeList = categoryMasterRepo.findAllOrderByDispOrder();
+
+        StringBuilder sb = new StringBuilder();
+        int itemLimit = 128;
+
+        for (int i = 0; i <= itemLimit; i++) {
+            sb.append("あ");
+        }
+
+        String additionalItem = sb.toString();
+
+        NewItemForm newItemForm = new NewItemForm();
+        newItemForm.setItemName(additionalItem);
+        newItemForm.setItemNameLength(itemLimit);
+        newItemForm.setMasterType(MasterConfigService.MASTER_TYPE_CATEGORY);
+
+        String url = makeUrlByType(urlTemplate + "/add", MasterConfigService.MASTER_TYPE_CATEGORY);
+        ResultActions actions = mMvcMock.perform(post(url).with(csrf())
+                .param("newItemAdd", "追加")
+                .param("itemName", additionalItem)
+                .param("itemNameLength", String.valueOf(itemLimit))
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("/admin/master_config")))
+                .andReturn();
+
+        List<CategoryMaster> afterList = categoryMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(afterList.size(), is(beforeList.size()));
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String itemError = (String) modelMap.get("itemError");
+
+        assertThat(itemError, is("カテゴリーは128文字以内で入力してください。"));
+    }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void マスタータイプprocessで17文字のデータは追加できない() throws Exception {
+        List<ProcessMaster> beforeList = processMasterRepo.findAllOrderByDispOrder();
+
+        StringBuilder sb = new StringBuilder();
+        int itemLimit = 16;
+
+        for (int i = 0; i <= itemLimit; i++) {
+            sb.append("あ");
+        }
+
+        String additionalItem = sb.toString();
+
+        NewItemForm newItemForm = new NewItemForm();
+        newItemForm.setItemName(additionalItem);
+        newItemForm.setItemNameLength(itemLimit);
+        newItemForm.setMasterType(MasterConfigService.MASTER_TYPE_PROCESS);
+
+        String url = makeUrlByType(urlTemplate + "/add", MasterConfigService.MASTER_TYPE_PROCESS);
+        ResultActions actions = mMvcMock.perform(post(url).with(csrf())
+                .param("newItemAdd", "追加")
+                .param("itemName", additionalItem)
+                .param("itemNameLength", String.valueOf(itemLimit))
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("/admin/master_config")))
+                .andReturn();
+
+        List<ProcessMaster> afterList = processMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(afterList.size(), is(beforeList.size()));
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String itemError = (String) modelMap.get("itemError");
+
+        assertThat(itemError, is("工程は16文字以内で入力してください。"));
+    }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void マスタータイプseverelevelで9文字のデータは追加できない() throws Exception {
+        List<SevereLevelMaster> beforeList = severeLevelMasterRepo.findAllOrderByDispOrder();
+
+        StringBuilder sb = new StringBuilder();
+        int itemLimit = 8;
+
+        for (int i = 0; i <= itemLimit; i++) {
+            sb.append("あ");
+        }
+
+        String additionalItem = sb.toString();
+
+        NewItemForm newItemForm = new NewItemForm();
+        newItemForm.setItemName(additionalItem);
+        newItemForm.setItemNameLength(itemLimit);
+        newItemForm.setMasterType(MasterConfigService.MASTER_TYPE_SEVERE_LEVEL);
+
+        String url = makeUrlByType(urlTemplate + "/add", MasterConfigService.MASTER_TYPE_SEVERE_LEVEL);
+        ResultActions actions = mMvcMock.perform(post(url).with(csrf())
+                .param("newItemAdd", "追加")
+                .param("itemName", additionalItem)
+                .param("itemNameLength", String.valueOf(itemLimit))
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("/admin/master_config")))
+                .andReturn();
+
+        List<SevereLevelMaster> afterList = severeLevelMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(afterList.size(), is(beforeList.size()));
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String itemError = (String) modelMap.get("itemError");
+
+        assertThat(itemError, is("緊急度は8文字以内で入力してください。"));
+    }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void マスタータイプstatusで17文字のデータは追加できない() throws Exception {
+        List<StatusMaster> beforeList = statusMasterRepo.findAllOrderByDispOrder();
+
+        StringBuilder sb = new StringBuilder();
+        int itemLimit = 16;
+
+        for (int i = 0; i <= itemLimit; i++) {
+            sb.append("あ");
+        }
+
+        String additionalItem = sb.toString();
+
+        NewItemForm newItemForm = new NewItemForm();
+        newItemForm.setItemName(additionalItem);
+        newItemForm.setItemNameLength(itemLimit);
+        newItemForm.setMasterType(MasterConfigService.MASTER_TYPE_STATUS);
+
+        String url = makeUrlByType(urlTemplate + "/add", MasterConfigService.MASTER_TYPE_STATUS);
+        ResultActions actions = mMvcMock.perform(post(url).with(csrf())
+                .param("newItemAdd", "追加")
+                .param("itemName", additionalItem)
+                .param("itemNameLength", String.valueOf(itemLimit))
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("/admin/master_config")))
+                .andReturn();
+
+        List<StatusMaster> afterList = statusMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(afterList.size(), is(beforeList.size()));
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String itemError = (String) modelMap.get("itemError");
+
+        assertThat(itemError, is("ステータスは16文字以内で入力してください。"));
+    }
+
 }
