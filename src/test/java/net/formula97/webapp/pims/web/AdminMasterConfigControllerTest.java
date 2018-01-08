@@ -397,6 +397,9 @@ public class AdminMasterConfigControllerTest extends BaseTestCase {
         Optional<CategoryMaster> latestMi = afterList.stream().max(Comparator.comparing(CategoryMaster::getDispOrder));
         CategoryMaster cm = latestMi.get();
         assertThat(cm.getCategoryName(), is(additionalItem));
+
+        // 追加したデータを消す
+        categoryMasterRepo.delete(cm);
     }
 
     @Test
@@ -430,6 +433,9 @@ public class AdminMasterConfigControllerTest extends BaseTestCase {
         Optional<ProcessMaster> latestMi = afterList.stream().max(Comparator.comparing(ProcessMaster::getDispOrder));
         ProcessMaster pm = latestMi.get();
         assertThat(pm.getProcessName(), is(additionalItem));
+
+        // 追加したデータを消す
+        processMasterRepo.delete(pm);
     }
 
     @Test
@@ -463,6 +469,9 @@ public class AdminMasterConfigControllerTest extends BaseTestCase {
         Optional<SevereLevelMaster> latestMi = afterList.stream().max(Comparator.comparing(SevereLevelMaster::getDispOrder));
         SevereLevelMaster slm = latestMi.get();
         assertThat(slm.getSevereLevel(), is(additionalItem));
+
+        // 追加したデータを消す
+        severeLevelMasterRepo.delete(slm);
     }
 
     @Test
@@ -498,6 +507,9 @@ public class AdminMasterConfigControllerTest extends BaseTestCase {
         StatusMaster sm = latestMi.get();
         assertThat(sm.getStatusName(), is(additionalItem));
         assertThat(sm.getTreatAsFinished(), is(true));
+
+        // 追加したデータを消す
+        statusMasterRepo.delete(sm);
     }
 
 }
