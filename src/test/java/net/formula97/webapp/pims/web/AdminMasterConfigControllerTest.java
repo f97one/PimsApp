@@ -676,4 +676,52 @@ public class AdminMasterConfigControllerTest extends BaseTestCase {
         assertThat(itemError, is("ステータスは16文字以内で入力してください。"));
     }
 
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void マスタータイプcategoryを更新できる() throws Exception {
+        List<CategoryMaster> beforeList = categoryMasterRepo.findAllOrderByDispOrder();
+
+        String url = makeUrlByType(urlTemplate + "/edit", MasterConfigService.MASTER_TYPE_CATEGORY);
+
+        ResultActions actions = mMvcMock.perform(post(url).with(csrf())
+                .param("updateBtn", "更新")
+                .param("masterList[0].itemId", "1")
+                .param("masterList[0].itemName", "Webアプリケーション")
+                .param("masterList[0].displayOrder", "0")
+                .param("masterList[1].itemId", "2")
+                .param("masterList[1].itemName", "REST API")
+                .param("masterList[1].displayOrder", "2")
+                .param("masterList[2].itemId", "3")
+                .param("masterList[2].itemName", "端末用フロントエンド")
+                .param("masterList[2].displayOrder", "1")
+                .param("masterList[3].itemId", "4")
+                .param("masterList[3].itemName", "バッチ")
+                .param("masterList[3].displayOrder", "3")
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().is3xxRedirection())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("redirect:/admin/master?masterType=category")))
+                .andReturn();
+
+        List<CategoryMaster> afterList = categoryMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(afterList.size(), is(beforeList.size()));
+
+        CategoryMaster cm1 = afterList.get(0);
+        assertThat(cm1.getCategoryId(), is(1));
+        assertThat(cm1.getCategoryName(), is("Webアプリケーション"));
+
+        CategoryMaster cm2 = afterList.get(1);
+        assertThat(cm2.getCategoryId(), is(3));
+        assertThat(cm2.getCategoryName(), is("端末用フロントエンド"));
+
+        CategoryMaster cm3 = afterList.get(2);
+        assertThat(cm3.getCategoryId(), is(2));
+        assertThat(cm3.getCategoryName(), is("REST API"));
+
+        CategoryMaster cm4 = afterList.get(3);
+        assertThat(cm4.getCategoryId(), is(4));
+        assertThat(cm4.getCategoryName(), is("バッチ"));
+    }
 }
