@@ -50,3 +50,5 @@ gradle.properties
 *.iws
 /.apt_generated/
 /.gradle/
+
+.vscode/*
