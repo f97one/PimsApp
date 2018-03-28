@@ -187,7 +187,7 @@ public class AdminController extends BaseWebController {
                 itemNameLength = 128;
 
                 if (newItemForm.getItemName().length() > itemNameLength) {
-                    itemError = makeIteErrorMsg(processMsg, itemNameLength);
+                    itemError = makeItemErrorMsg(processMsg, itemNameLength);
                 }
                 break;
             case MasterConfigService.MASTER_TYPE_PROCESS:
@@ -195,7 +195,7 @@ public class AdminController extends BaseWebController {
                 itemNameLength = 16;
 
                 if (newItemForm.getItemName().length() > itemNameLength) {
-                    itemError = makeIteErrorMsg(processMsg, itemNameLength);
+                    itemError = makeItemErrorMsg(processMsg, itemNameLength);
                 }
                 break;
             case MasterConfigService.MASTER_TYPE_SEVERE_LEVEL:
@@ -203,7 +203,7 @@ public class AdminController extends BaseWebController {
                 itemNameLength = 8;
 
                 if (newItemForm.getItemName().length() > itemNameLength) {
-                    itemError = makeIteErrorMsg(processMsg, itemNameLength);
+                    itemError = makeItemErrorMsg(processMsg, itemNameLength);
                 }
                 break;
             case MasterConfigService.MASTER_TYPE_STATUS:
@@ -211,7 +211,7 @@ public class AdminController extends BaseWebController {
                 itemNameLength = 16;
 
                 if (newItemForm.getItemName().length() > itemNameLength) {
-                    itemError = makeIteErrorMsg(processMsg, itemNameLength);
+                    itemError = makeItemErrorMsg(processMsg, itemNameLength);
                 }
                 break;
             default:
@@ -260,7 +260,29 @@ public class AdminController extends BaseWebController {
         return "redirect:/admin/master?masterType=" + masterType;
     }
 
-    private String makeIteErrorMsg(String processMsg, int itemNameLength) {
+    @RequestMapping(value = "master/edit", method = RequestMethod.POST, params = "updateBtn")
+    public String updateMasterListByType(@RequestParam(name = "masterType") String masterType, Model model,
+                                         HeaderForm headerForm, CurrentItemForm currentItemForm, RedirectAttributes redirectAttributes) {
+
+        Users myUserDetail = getUserState(model, headerForm);
+
+        List<MasterItem> masterItemList = currentItemForm.getMasterList();
+        List<MasterDomain> masterDomainList = new ArrayList<>();
+
+        switch (masterType) {
+            case MasterConfigService.MASTER_TYPE_CATEGORY:
+                for (MasterItem i : masterItemList) {
+                    masterDomainList.add(new CategoryMaster(i.getItemId(), i.getItemName(), i.getDisplayOrder()));
+                }
+                break;
+        }
+
+        masterConfigService.updateDisplayOrder(masterType, masterDomainList);
+
+        return "redirect:/admin/master?masterType=" + masterType;
+    }
+
+    private String makeItemErrorMsg(String processMsg, int itemNameLength) {
         String itemError;
         itemError = String.format(Locale.getDefault(), "%sは%d文字以内で入力してください。", processMsg, itemNameLength);
         return itemError;
