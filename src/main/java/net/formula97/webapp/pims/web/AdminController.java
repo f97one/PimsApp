@@ -275,6 +275,11 @@ public class AdminController extends BaseWebController {
                     masterDomainList.add(new CategoryMaster(i.getItemId(), i.getItemName(), i.getDisplayOrder()));
                 }
                 break;
+            case MasterConfigService.MASTER_TYPE_PROCESS:
+                for (MasterItem i : masterItemList) {
+                    masterDomainList.add(new ProcessMaster(i.getItemId(), i.getItemName(), i.getDisplayOrder()));
+                }
+                break;
         }
 
         masterConfigService.updateDisplayOrder(masterType, masterDomainList);

@@ -724,4 +724,67 @@ public class AdminMasterConfigControllerTest extends BaseTestCase {
         assertThat(cm4.getCategoryId(), is(4));
         assertThat(cm4.getCategoryName(), is("バッチ"));
     }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void マスタータイプprocessを更新できる() throws Exception {
+        List<ProcessMaster> beforeList = processMasterRepo.findAllOrderByDispOrder();
+
+        String url = makeUrlByType(urlTemplate + "/edit", MasterConfigService.MASTER_TYPE_PROCESS);
+
+        ResultActions actions = mMvcMock.perform(post(url).with(csrf())
+                .param("updateBtn", "更新")
+                .param("masterList[0].itemId", "1")
+                .param("masterList[0].itemName", "基本設計")
+                .param("masterList[0].displayOrder", "0")
+                .param("masterList[1].itemId", "2")
+                .param("masterList[1].itemName", "詳細設計")
+                .param("masterList[1].displayOrder", "2")
+                .param("masterList[2].itemId", "3")
+                .param("masterList[2].itemName", "PG")
+                .param("masterList[2].displayOrder", "1")
+                .param("masterList[3].itemId", "4")
+                .param("masterList[3].itemName", "単体テスト")
+                .param("masterList[3].displayOrder", "3")
+                .param("masterList[4].itemId", "5")
+                .param("masterList[4].itemName", "結合テスト")
+                .param("masterList[4].displayOrder", "5")
+                .param("masterList[5].itemId", "6")
+                .param("masterList[5].itemName", "受入テスト")
+                .param("masterList[5].displayOrder", "4")
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().is3xxRedirection())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("redirect:/admin/master?masterType=process")))
+                .andReturn();
+
+        List<ProcessMaster> afterList = processMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(afterList.size(), is(beforeList.size()));
+
+        ProcessMaster pm0 = afterList.get(0);
+        assertThat(pm0.getProcessId(), is(1));
+        assertThat(pm0.getProcessName(), is("基本設計"));
+
+        ProcessMaster pm1 = afterList.get(1);
+        assertThat(pm1.getProcessId(), is(3));
+        assertThat(pm1.getProcessName(), is("PG"));
+
+        ProcessMaster pm2 = afterList.get(2);
+        assertThat(pm2.getProcessId(), is(2));
+        assertThat(pm2.getProcessName(), is("詳細設計"));
+
+        ProcessMaster pm3 = afterList.get(3);
+        assertThat(pm3.getProcessId(), is(4));
+        assertThat(pm3.getProcessName(), is("単体テスト"));
+
+        ProcessMaster pm4 = afterList.get(4);
+        assertThat(pm4.getProcessId(), is(6));
+        assertThat(pm4.getProcessName(), is("受入テスト"));
+
+        ProcessMaster pm5 = afterList.get(5);
+        assertThat(pm5.getProcessId(), is(5));
+        assertThat(pm5.getProcessName(), is("結合テスト"));
+    }
 }
