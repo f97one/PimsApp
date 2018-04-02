@@ -11,7 +11,13 @@ buildscript {
 }
 
 plugins {
-    id 'net.ltgt.apt' version '0.10'
+    id 'io.franzbecker.gradle-lombok' version '1.11'
+    id 'java'
+}
+
+lombok {
+    version = "1.16.20"
+    sha256 = ""
 }
 
 apply plugin: 'java'
@@ -52,7 +58,7 @@ dependencies {
     runtime('com.h2database:h2')
 
     compileOnly 'org.projectlombok:lombok:1.16.20'
-    apt "org.projectlombok:lombok:1.16.20"
+//    apt "org.projectlombok:lombok:1.16.20"
 
     providedRuntime('org.springframework.boot:spring-boot-starter-tomcat')
     testCompile('org.springframework.boot:spring-boot-starter-test')
