@@ -800,4 +800,46 @@ public class MasterConfigServiceTest {
 
         assertThat(result, is("ステータス"));
     }
+
+    @Test
+    public void マスタータイプnullは長さが8() {
+        int ret = masterConfigService.getInputLengthByType(null);
+
+        assertThat(ret, is(8));
+    }
+
+    @Test
+    public void マスタータイプ空文字は長さが8() {
+        int ret = masterConfigService.getInputLengthByType("");
+
+        assertThat(ret, is(8));
+    }
+
+    @Test
+    public void マスタータイプcategoryは長さが128() {
+        int ret = masterConfigService.getInputLengthByType(MasterConfigService.MASTER_TYPE_CATEGORY);
+
+        assertThat(ret, is(128));
+    }
+
+    @Test
+    public void マスタータイプprocessは長さが16() {
+        int ret = masterConfigService.getInputLengthByType(MasterConfigService.MASTER_TYPE_PROCESS);
+
+        assertThat(ret, is(16));
+    }
+
+    @Test
+    public void マスタータイプseverelevelは長さが8() {
+        int ret = masterConfigService.getInputLengthByType(MasterConfigService.MASTER_TYPE_SEVERE_LEVEL);
+
+        assertThat(ret, is(8));
+    }
+
+    @Test
+    public void マスタータイプstatusは長さが16() {
+        int ret = masterConfigService.getInputLengthByType(MasterConfigService.MASTER_TYPE_STATUS);
+
+        assertThat(ret, is(16));
+    }
 }

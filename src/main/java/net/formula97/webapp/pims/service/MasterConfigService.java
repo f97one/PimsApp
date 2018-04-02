@@ -251,7 +251,28 @@ public class MasterConfigService extends BaseService {
      * @return 変換後の入力最大桁数、指定外のコードの場合は8を返す
      */
     public int getInputLengthByType(String typeCode) {
+        int ret = 8;
 
-        return -1;
+        if (typeCode != null) {
+            switch (typeCode) {
+                case MASTER_TYPE_CATEGORY:
+                    ret = 128;
+                    break;
+                case MASTER_TYPE_PROCESS:
+                    ret = 16;
+                    break;
+                case MASTER_TYPE_SEVERE_LEVEL:
+                    // 初期値のままなので何もしない
+                    break;
+                case MASTER_TYPE_STATUS:
+                    ret = 16;
+                    break;
+                default:
+                    // 初期値のままなので何もしない
+                    break;
+            }
+        }
+
+        return ret;
     }
 }
