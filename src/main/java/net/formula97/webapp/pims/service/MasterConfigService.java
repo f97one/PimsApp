@@ -211,4 +211,47 @@ public class MasterConfigService extends BaseService {
         }
     }
 
+    /**
+     * タイプコードに対応する表示名を取得する。
+     *
+     * @param typeCode 変換対象のタイプコード
+     * @return 変換後の表示名、指定外のコードの場合は空文字を返す
+     */
+    public String getDisplayNameByCode(String typeCode) {
+        if (typeCode == null) {
+            return "";
+        }
+
+        String ret;
+        switch (typeCode) {
+            case MASTER_TYPE_CATEGORY:
+                ret = "カテゴリー";
+                break;
+            case MASTER_TYPE_PROCESS:
+                ret = "工程";
+                break;
+            case MASTER_TYPE_SEVERE_LEVEL:
+                ret = "緊急度";
+                break;
+            case MASTER_TYPE_STATUS:
+                ret = "ステータス";
+                break;
+            default:
+                ret = "";
+                break;
+        }
+
+        return ret;
+    }
+
+    /**
+     * タイプコードに対応する入力時の最大桁数を取得する。
+     *
+     * @param typeCode 変換対象のタイプコード
+     * @return 変換後の入力最大桁数、指定外のコードの場合は8を返す
+     */
+    public int getInputLengthByType(String typeCode) {
+
+        return -1;
+    }
 }

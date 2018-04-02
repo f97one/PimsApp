@@ -758,4 +758,46 @@ public class MasterConfigServiceTest {
             assertThat(e.getMessage(), is("Argument masterType must be specified valid value."));
         }
     }
+
+    @Test
+    public void マスタータイプnullは名前が空文字() {
+        String result = masterConfigService.getDisplayNameByCode(null);
+
+        assertThat(result, is(""));
+    }
+
+    @Test
+    public void マスタータイプ空文字は名前が空文字() {
+        String result = masterConfigService.getDisplayNameByCode("");
+
+        assertThat(result, is(""));
+    }
+
+    @Test
+    public void マスタータイプcategoryは名前がカテゴリー() {
+        String result = masterConfigService.getDisplayNameByCode(MasterConfigService.MASTER_TYPE_CATEGORY);
+
+        assertThat(result, is("カテゴリー"));
+    }
+
+    @Test
+    public void マスタータイプprocessは名前が工程() {
+        String result = masterConfigService.getDisplayNameByCode(MasterConfigService.MASTER_TYPE_PROCESS);
+
+        assertThat(result, is("工程"));
+    }
+
+    @Test
+    public void マスタータイプseverelevelは名前が緊急度() {
+        String result = masterConfigService.getDisplayNameByCode(MasterConfigService.MASTER_TYPE_SEVERE_LEVEL);
+
+        assertThat(result, is("緊急度"));
+    }
+
+    @Test
+    public void マスタータイプstatusは名前がステータス() {
+        String result = masterConfigService.getDisplayNameByCode(MasterConfigService.MASTER_TYPE_STATUS);
+
+        assertThat(result, is("ステータス"));
+    }
 }
