@@ -787,4 +787,119 @@ public class AdminMasterConfigControllerTest extends BaseTestCase {
         assertThat(pm5.getProcessId(), is(5));
         assertThat(pm5.getProcessName(), is("結合テスト"));
     }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void マスタータイプseverelevelを更新できる() throws Exception {
+        List<SevereLevelMaster> beforeList = severeLevelMasterRepo.findAllOrderByDispOrder();
+
+        String url = makeUrlByType(urlTemplate + "/edit", MasterConfigService.MASTER_TYPE_SEVERE_LEVEL);
+
+        ResultActions actions = mMvcMock.perform(post(url).with(csrf())
+                .param("updateBtn", "更新")
+                .param("masterList[0].itemId", "1")
+                .param("masterList[0].itemName", "低")
+                .param("masterList[0].displayOrder", "0")
+                .param("masterList[1].itemId", "2")
+                .param("masterList[1].itemName", "中")
+                .param("masterList[1].displayOrder", "2")
+                .param("masterList[2].itemId", "4")
+                .param("masterList[2].itemName", "とても高い")
+                .param("masterList[2].displayOrder", "1")
+                .param("masterList[3].itemId", "3")
+                .param("masterList[3].itemName", "高")
+                .param("masterList[3].displayOrder", "3")
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().is3xxRedirection())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("redirect:/admin/master?masterType=severelevel")))
+                .andReturn();
+
+        List<SevereLevelMaster> afterList = severeLevelMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(afterList.size(), is(beforeList.size()));
+
+        SevereLevelMaster slm0 = afterList.get(0);
+        assertThat(slm0.getSevereLevelId(), is(1));
+        assertThat(slm0.getSevereLevel(), is("低"));
+
+        SevereLevelMaster slm1 = afterList.get(1);
+        assertThat(slm1.getSevereLevelId(), is(4));
+        assertThat(slm1.getSevereLevel(), is("とても高い"));
+
+        SevereLevelMaster slm2 = afterList.get(2);
+        assertThat(slm2.getSevereLevelId(), is(2));
+        assertThat(slm2.getSevereLevel(), is("中"));
+
+        SevereLevelMaster slm3 = afterList.get(3);
+        assertThat(slm3.getSevereLevelId(), is(3));
+        assertThat(slm3.getSevereLevel(), is("高"));
+    }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void マスタータイプstatusを更新できる() throws Exception {
+        List<StatusMaster> beforeList = statusMasterRepo.findAllOrderByDispOrder();
+
+        String url = makeUrlByType(urlTemplate + "/edit", MasterConfigService.MASTER_TYPE_STATUS);
+
+        ResultActions actions = mMvcMock.perform(post(url).with(csrf())
+                .param("updateBtn", "更新")
+                .param("masterList[0].itemId", "1")
+                .param("masterList[0].itemName", "新規")
+                .param("masterList[0].displayOrder", "0")
+                .param("masterList[0].treatAsFinished", "false")
+                .param("masterList[1].itemId", "2")
+                .param("masterList[1].itemName", "進行中")
+                .param("masterList[1].displayOrder", "2")
+                .param("masterList[1].treatAsFinished", "false")
+                .param("masterList[2].itemId", "4")
+                .param("masterList[2].itemName", "解決")
+                .param("masterList[2].displayOrder", "1")
+                .param("masterList[2].treatAsFinished", "false")
+                .param("masterList[3].itemId", "3")
+                .param("masterList[3].itemName", "終了")
+                .param("masterList[3].displayOrder", "3")
+                .param("masterList[3].treatAsFinished", "true")
+                .param("masterList[4].itemId", "5")
+                .param("masterList[4].itemName", "却下")
+                .param("masterList[4].displayOrder", "4")
+                .param("masterList[4].treatAsFinished", "false")
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().is3xxRedirection())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("redirect:/admin/master?masterType=status")))
+                .andReturn();
+
+        List<StatusMaster> afterList = statusMasterRepo.findAllOrderByDispOrder();
+
+        assertThat(afterList.size(), is(beforeList.size()));
+
+        StatusMaster sm0 = afterList.get(0);
+        assertThat(sm0.getStatusId(), is(1));
+        assertThat(sm0.getStatusName(), is("新規"));
+        assertThat(sm0.getTreatAsFinished(), is(false));
+
+        StatusMaster sm1 = afterList.get(1);
+        assertThat(sm1.getStatusId(), is(4));
+        assertThat(sm1.getStatusName(), is("解決"));
+        assertThat(sm1.getTreatAsFinished(), is(false));
+
+        StatusMaster sm2 = afterList.get(2);
+        assertThat(sm2.getStatusId(), is(2));
+        assertThat(sm2.getStatusName(), is("進行中"));
+        assertThat(sm2.getTreatAsFinished(), is(false));
+
+        StatusMaster sm3 = afterList.get(3);
+        assertThat(sm3.getStatusId(), is(3));
+        assertThat(sm3.getStatusName(), is("終了"));
+        assertThat(sm3.getTreatAsFinished(), is(true));
+
+        StatusMaster sm4 = afterList.get(4);
+        assertThat(sm4.getStatusId(), is(5));
+        assertThat(sm4.getStatusName(), is("却下"));
+        assertThat(sm4.getTreatAsFinished(), is(false));
+    }
 }

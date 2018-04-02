@@ -82,30 +82,10 @@ public class AdminController extends BaseWebController {
     public String showMasterConfig(@RequestParam(name = "masterType") String masterType, Model model, HeaderForm headerForm) {
         Users myUserDetail = getUserState(model, headerForm);
 
-        String masterTypeName;
-        int itemNameLength;
-        switch (masterType) {
-            case MasterConfigService.MASTER_TYPE_STATUS:
-                masterTypeName = "ステータス";
-                itemNameLength = 16;
-                break;
-            case MasterConfigService.MASTER_TYPE_SEVERE_LEVEL:
-                masterTypeName = "緊急度";
-                itemNameLength = 8;
-                break;
-            case MasterConfigService.MASTER_TYPE_PROCESS:
-                masterTypeName = "工程";
-                itemNameLength = 16;
-                break;
-            case MasterConfigService.MASTER_TYPE_CATEGORY:
-                masterTypeName = "カテゴリー";
-                itemNameLength = 128;
-                break;
-            default:
-                masterTypeName = "";
-                itemNameLength = 8;
-                break;
-        }
+        // 表示名と入力桁数を取得
+        String masterTypeName = masterConfigService.getDisplayNameByCode(masterType);
+        int itemNameLength = masterConfigService.getInputLengthByType(masterType);
+
         model.addAttribute("masterTypeName", masterTypeName);
 
         model.addAttribute("masterType", masterType);
@@ -178,46 +158,31 @@ public class AdminController extends BaseWebController {
         // 文字列長評価処理
         // 上限を超えたもの、または空を受け取った場合はエラーにする
         String itemError = null;
-        String processMsg;
-        int itemNameLength;
+        String processMsg = masterConfigService.getDisplayNameByCode(masterType);
+        int itemNameLength = masterConfigService.getInputLengthByType(masterType);
 
         switch (masterType) {
             case MasterConfigService.MASTER_TYPE_CATEGORY:
-                processMsg = "カテゴリー";
-                itemNameLength = 128;
-
                 if (newItemForm.getItemName().length() > itemNameLength) {
                     itemError = makeItemErrorMsg(processMsg, itemNameLength);
                 }
                 break;
             case MasterConfigService.MASTER_TYPE_PROCESS:
-                processMsg = "工程";
-                itemNameLength = 16;
-
                 if (newItemForm.getItemName().length() > itemNameLength) {
                     itemError = makeItemErrorMsg(processMsg, itemNameLength);
                 }
                 break;
             case MasterConfigService.MASTER_TYPE_SEVERE_LEVEL:
-                processMsg = "緊急度";
-                itemNameLength = 8;
-
                 if (newItemForm.getItemName().length() > itemNameLength) {
                     itemError = makeItemErrorMsg(processMsg, itemNameLength);
                 }
                 break;
             case MasterConfigService.MASTER_TYPE_STATUS:
-                processMsg = "ステータス";
-                itemNameLength = 16;
-
                 if (newItemForm.getItemName().length() > itemNameLength) {
                     itemError = makeItemErrorMsg(processMsg, itemNameLength);
                 }
                 break;
             default:
-                processMsg = "";
-                itemNameLength = 16;
-
                 break;
         }
 
@@ -280,9 +245,22 @@ public class AdminController extends BaseWebController {
                     masterDomainList.add(new ProcessMaster(i.getItemId(), i.getItemName(), i.getDisplayOrder()));
                 }
                 break;
+            case MasterConfigService.MASTER_TYPE_SEVERE_LEVEL:
+                for (MasterItem i : masterItemList) {
+                    masterDomainList.add(new SevereLevelMaster(i.getItemId(), i.getItemName(), i.getDisplayOrder()));
+                }
+                break;
+            case MasterConfigService.MASTER_TYPE_STATUS:
+                for (MasterItem i : masterItemList) {
+                    masterDomainList.add(new StatusMaster(i.getItemId(), i.getItemName(), i.getDisplayOrder(), i.getTreatAsFinished()));
+                }
+                break;
         }
 
         masterConfigService.updateDisplayOrder(masterType, masterDomainList);
+
+        String processMsg = masterConfigService.getDisplayNameByCode(masterType);
+        redirectAttributes.addFlashAttribute("processMsg", processMsg + "を追加しました。");
 
         return "redirect:/admin/master?masterType=" + masterType;
     }
