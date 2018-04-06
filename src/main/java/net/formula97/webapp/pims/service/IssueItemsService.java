@@ -139,12 +139,9 @@ public class IssueItemsService extends BaseService {
             return false;
         } else {
             LedgerRefUser ledgerRefUser = ledgerRefUserRepo.findOne(new LedgerRefUserPK(ledgerId, users.getUsername()));
-            if (ledgerRefUser == null) {
-                return false;
-            }
+            return ledgerRefUser != null;
         }
 
-        return true;
     }
 
     public void mapMaster(Model model) {
@@ -171,6 +168,14 @@ public class IssueItemsService extends BaseService {
             severityItemMap.put(slm.getSevereLevelId(), slm.getSevereLevel());
         }
         model.addAttribute("severityList", severityItemMap);
+
+        // ステータスマスタ
+        List<StatusMaster> statusMasterList = statusMasterRepo.findAllOrderByDispOrder();
+        Map<Integer, String> statusItemMap = new LinkedHashMap<>();
+        for (StatusMaster sm : statusMasterList) {
+            statusItemMap.put(sm.getStatusId(), sm.getStatusName());
+        }
+        model.addAttribute("statusList", statusItemMap);
     }
 
     public void mapRelatedUsers(Model model, int ledgerId) {
