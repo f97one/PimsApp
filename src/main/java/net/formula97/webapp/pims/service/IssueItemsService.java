@@ -100,10 +100,11 @@ public class IssueItemsService extends BaseService {
             frm.setConfirmedDate(item.getConfirmedDate());
 
             // 行のCSS
-            if (item.getConfirmedDate() != null) {
+            //   対応ステータスIDが終了ステータスの立っているものに一致する場合は、終了色にする
+            if (item.getConfirmedDate() != null || isItemFinished(item.getActionStatusId(), statusMasterList)) {
                 frm.setLineCssStyle("background-color:silver;");
             } else if (item.getCorrespondingEndDate() != null) {
-                frm.setLineCssStyle("background-color:cyan");
+                frm.setLineCssStyle("background-color:cyan;");
             } else {
                 frm.setLineCssStyle("");
             }
@@ -196,5 +197,22 @@ public class IssueItemsService extends BaseService {
 
         Map<String, String> empty3 = new LinkedHashMap<>();
         model.addAttribute("confirmedUsers", empty3);
+    }
+
+    /**
+     * 課題アイテムが、終了とみなされるか否かを判断する。
+     *
+     * @param statusId         課題アイテムの対応ステータスID
+     * @param statusMasterList ステータスマスタのリスト
+     * @return 終了とみなされる場合true、そぅでない場合false
+     */
+    private boolean isItemFinished(int statusId, List<StatusMaster> statusMasterList) {
+        Optional<StatusMaster> stOpt = statusMasterList.stream().filter(StatusMaster::getTreatAsFinished).findAny();
+
+        if (stOpt.isPresent()) {
+            return stOpt.filter(r -> r.getStatusId() == statusId).isPresent();
+        }
+
+        return false;
     }
 }
