@@ -93,6 +93,12 @@ public class IssueItemForm implements Serializable {
      */
     @DateTimeFormat(pattern = AppConstants.STD_DATE_FORMAT)
     private String confirmedDate;
+    /**
+     * 対応ステータスID
+     */
+    @NotNull
+    @Min(0)
+    private Integer actionStatusId;
 
     public IssueItemForm convertToForm(IssueItems item) {
         SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
@@ -100,8 +106,8 @@ public class IssueItemForm implements Serializable {
         this.foundDate = sdf.format(item.getFoundDate());
         this.severity = item.getSevereLevelId();
         this.foundUserId = item.getFoundUser();
-        this.categoryId = item.getCategoryId() == null ? null : item.getCategoryId();
-        this.processId = item.getFoundProcessId() == null ? null : item.getFoundProcessId();
+        this.categoryId = item.getCategoryId();
+        this.processId = item.getFoundProcessId();
         this.issueDetail = item.getIssueDetail();
         this.caused = item.getCaused();
         this.countermeasures = item.getCountermeasures();
@@ -124,6 +130,8 @@ public class IssueItemForm implements Serializable {
         if (item.getConfirmedDate() != null) {
             this.confirmedDate = sdf.format(item.getConfirmedDate());
         }
+
+        this.actionStatusId = item.getActionStatusId();
 
         return this;
     }
@@ -177,6 +185,8 @@ public class IssueItemForm implements Serializable {
         }
         Date d = new Date(this.recordTimestamp);
         items.setRowUpdatedAt(d);
+
+        items.setActionStatusId(this.actionStatusId);
 
         return items;
     }

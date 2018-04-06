@@ -94,6 +94,21 @@
                 </div>
             </div>
             <div class="row vertical-margin">
+                <div class="col-lg-2 col-sm-3">ステータス</div>
+                <div class="col-lg-10 col-sm-9">
+                    <div class="input-group col-lg-2 col-sm-4 col-xs-12">
+                        <select class="form-control" id="statusSelector" name="status"
+                                th:disabled="${modeTag eq 'R'}">
+                            <option value="-1">---</option>
+                            <option th:each="statusItem : ${statusList}" th:value="${statusItem.key}"
+                                    th:text="${statusItem.value}" th:selected="${statusItem.key} eq *{actionStatusId}">
+                                pulldown
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row vertical-margin">
                 <div class="col-lg-2 col-sm-3">緊急度</div>
                 <div class="col-lg-10 col-sm-9">
                     <div class="input-group col-lg-2 col-sm-4 col-xs-12">
