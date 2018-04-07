@@ -732,6 +732,8 @@ public class LedgerControllerTest extends BaseTestCase {
         assertThat("レコードは更新されている", resultItem.getRowUpdatedAt().compareTo(baseItem.getRowUpdatedAt()) >= 0, is(true));
         assertThat(resultItem.getCaused(), is("null判断が不十分だったため"));
         assertThat(resultItem.getCountermeasures(), is("null判断を追加"));
+
+        assertThat("対応ステータスIDは2", resultItem.getActionStatusId(), is(2));
     }
 
     @Test
