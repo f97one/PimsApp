@@ -3,15 +3,12 @@
  */
 package net.formula97.webapp.pims.service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import net.formula97.webapp.pims.domain.StatusMaster;
+import net.formula97.webapp.pims.repository.StatusMasterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import net.formula97.webapp.pims.domain.StatusMaster;
-import net.formula97.webapp.pims.repository.StatusMasterRepository;
+import java.util.*;
 
 /**
  * @author f97one
@@ -32,5 +29,16 @@ public class StatusMasterService {
         }
         
         return smMap;
+    }
+
+    /**
+     * ステータスマスタ内の、最小のステータスIDを取得する。
+     *
+     * @return ステータスID最小値
+     */
+    public int getMinimumStatus() {
+        Optional<StatusMaster> smOpt = statusRepo.findAllOrderByDispOrder().stream().min(Comparator.comparing(StatusMaster::getStatusId));
+
+        return smOpt.isPresent() ? smOpt.get().getStatusId() : Integer.MIN_VALUE;
     }
 }
