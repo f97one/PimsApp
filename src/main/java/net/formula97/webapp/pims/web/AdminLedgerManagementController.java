@@ -1,6 +1,5 @@
 package net.formula97.webapp.pims.web;
 
-import net.formula97.webapp.pims.domain.IssueItems;
 import net.formula97.webapp.pims.domain.IssueLedger;
 import net.formula97.webapp.pims.domain.LedgerRefUser;
 import net.formula97.webapp.pims.domain.Users;
@@ -8,6 +7,7 @@ import net.formula97.webapp.pims.misc.AppConstants;
 import net.formula97.webapp.pims.service.IssueItemsService;
 import net.formula97.webapp.pims.service.IssueLedgerService;
 import net.formula97.webapp.pims.service.LedgerRefUserService;
+import net.formula97.webapp.pims.service.StatusMasterService;
 import net.formula97.webapp.pims.web.forms.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by f97one on 17/01/14.
@@ -33,10 +34,21 @@ public class AdminLedgerManagementController extends BaseWebController {
     IssueItemsService issueItemsSvc;
     @Autowired
     LedgerRefUserService ledgerRefUserSvc;
+    @Autowired
+    private StatusMasterService statusMasterSvc;
+
+    public AdminLedgerManagementController(StatusMasterService statusMasterSvc) {
+        this.statusMasterSvc = statusMasterSvc;
+    }
 
     @RequestMapping(value = "search", method = RequestMethod.GET)
     public String searchLedger(Model model, HeaderForm headerForm, LedgerSearchConditionForm conditionForm) {
         Users myUserDetail = getUserState(model, headerForm);
+
+        // ステータスと検索条件を張りなおす
+        Map<Integer, String> statusMap = statusMasterSvc.getStatusMap();
+        model.addAttribute("statusMap", statusMap);
+        model.addAttribute("ledgerSearchConditionForm", conditionForm);
 
         List<IssueLedger> ledgerList = issueLedgerSvc.getLedgerByList(conditionForm);
         model.addAttribute("matchLedgerCount", ledgerList.size());
