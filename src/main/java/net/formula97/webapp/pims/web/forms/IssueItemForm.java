@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.formula97.webapp.pims.domain.IssueItems;
 import net.formula97.webapp.pims.misc.AppConstants;
+import net.formula97.webapp.pims.service.StatusMasterService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.*;
@@ -23,6 +25,10 @@ import java.util.Locale;
 public class IssueItemForm implements Serializable {
 
     private static final long serialVersionUID = 5734607814996487082L;
+
+    @Autowired
+    private StatusMasterService statusMasterService;
+
     /**
      * レコード更新日時(ミリ秒値)
      */
@@ -131,7 +137,12 @@ public class IssueItemForm implements Serializable {
             this.confirmedDate = sdf.format(item.getConfirmedDate());
         }
 
-        this.actionStatusId = item.getActionStatusId();
+        // 対応ステータスがnullのときは、ステータスIDの最小値を仮置きする
+        if (item.getActionStatusId() == null) {
+            this.actionStatusId = statusMasterService.getMinimumStatus();
+        } else {
+            this.actionStatusId = item.getActionStatusId();
+        }
 
         return this;
     }

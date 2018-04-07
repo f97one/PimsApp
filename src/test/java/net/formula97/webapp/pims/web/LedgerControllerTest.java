@@ -64,6 +64,8 @@ public class LedgerControllerTest extends BaseTestCase {
     private IssueLedgerRepository issueLedgerRepo;
     @Autowired
     private IssueItemsRepository issueItemsRepo;
+    @Autowired
+    private StatusMasterRepository statusMasterRepo;
 
     private Validator validator;
     private MockMvc mMvcMock;
@@ -363,6 +365,7 @@ public class LedgerControllerTest extends BaseTestCase {
         form.setCorrespondingTime(null);
         form.setConfirmedUserId("");
         form.setConfirmedDate("");
+        form.setActionStatusId(1);
 
         Set<ConstraintViolation<IssueItemForm>> violationsSet = validator.validate(form);
         assertThat("エラーは3件", violationsSet.size(), is(3));
@@ -418,8 +421,9 @@ public class LedgerControllerTest extends BaseTestCase {
                 .param("correspondingTime", "")
                 .param("correspondingEndDate", "")
                 .param("confirmedUserId", "")
-                .param("confirmedDate", ""))
-                .andDo(print());
+                .param("confirmedDate", "")
+                .param("actionStatusId", "2")
+        ).andDo(print());
 
         MvcResult mvcResult = actions
                 .andExpect(status().isOk())
@@ -429,6 +433,10 @@ public class LedgerControllerTest extends BaseTestCase {
 
         List<IssueItems> issueItemsList = issueItemsRepo.findAll();
         assertThat("課題が１増えている", issueItemsList.size(), is(beforeIssueCount + 1));
+
+        // ステータスが2になっているか確認
+        IssueItems i = issueItemsList.get(issueItemsList.size() - 1);
+        assertThat("投入された課題のStatusIdは2", i.getActionStatusId(), is(2));
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
         String infoMsg = (String) modelMap.get("infoMsg");
@@ -463,8 +471,9 @@ public class LedgerControllerTest extends BaseTestCase {
                 .param("correspondingTime", "1.5")
                 .param("correspondingEndDate", "2017/01/07")
                 .param("confirmedUserId", "")
-                .param("confirmedDate", ""))
-                .andDo(print());
+                .param("confirmedDate", "")
+                .param("actionStatusId", "2")
+        ).andDo(print());
 
         MvcResult mvcResult = actions
                 .andExpect(status().isOk())
@@ -508,8 +517,9 @@ public class LedgerControllerTest extends BaseTestCase {
                 .param("correspondingTime", "1.5")
                 .param("correspondingEndDate", "2017/01/07")
                 .param("confirmedUserId", "")
-                .param("confirmedDate", ""))
-                .andDo(print());
+                .param("confirmedDate", "")
+                .param("actionStatusId", "2")
+        ).andDo(print());
 
         MvcResult mvcResult = actions
                 .andExpect(status().isOk())
@@ -553,8 +563,9 @@ public class LedgerControllerTest extends BaseTestCase {
                 .param("correspondingTime", "1.5")
                 .param("correspondingEndDate", "2017/01/07")
                 .param("confirmedUserId", "")
-                .param("confirmedDate", ""))
-                .andDo(print());
+                .param("confirmedDate", "")
+                .param("actionStatusId", "2")
+        ).andDo(print());
 
         MvcResult mvcResult = actions
                 .andExpect(status().isOk())
@@ -598,8 +609,9 @@ public class LedgerControllerTest extends BaseTestCase {
                 .param("correspondingTime", "1.5")
                 .param("correspondingEndDate", "2017/01/07")
                 .param("confirmedUserId", "")
-                .param("confirmedDate", ""))
-                .andDo(print());
+                .param("confirmedDate", "")
+                .param("actionStatusId", "2")
+        ).andDo(print());
 
         MvcResult mvcResult = actions
                 .andExpect(status().isOk())
@@ -655,8 +667,9 @@ public class LedgerControllerTest extends BaseTestCase {
                 .param("correspondingTime", "1.5")
                 .param("correspondingEndDate", "2017/01/07")
                 .param("confirmedUserId", "")
-                .param("confirmedDate", ""))
-                .andDo(print());
+                .param("confirmedDate", "")
+                .param("actionStatusId", "2")
+        ).andDo(print());
 
         MvcResult mvcResult = actions
                 .andExpect(status().isOk())
@@ -701,8 +714,9 @@ public class LedgerControllerTest extends BaseTestCase {
                 .param("correspondingTime", "1.5")
                 .param("correspondingEndDate", "2017/01/07")
                 .param("confirmedUserId", "")
-                .param("confirmedDate", ""))
-                .andDo(print());
+                .param("confirmedDate", "")
+                .param("actionStatusId", "2")
+        ).andDo(print());
 
         MvcResult mvcResult = actions
                 .andExpect(status().isOk())
@@ -988,8 +1002,9 @@ public class LedgerControllerTest extends BaseTestCase {
                 .param("correspondingTime", "1.5")
                 .param("correspondingEndDate", "2017/01/07")
                 .param("confirmedUserId", "")
-                .param("confirmedDate", ""))
-                .andDo(print());
+                .param("confirmedDate", "")
+                .param("actionStatusId", "2")
+        ).andDo(print());
 
         MvcResult mvcResult = actions
                 .andExpect(status().isOk())
@@ -1035,8 +1050,9 @@ public class LedgerControllerTest extends BaseTestCase {
                 .param("correspondingTime", "1.5")
                 .param("correspondingEndDate", "2017/01/07")
                 .param("confirmedUserId", "")
-                .param("confirmedDate", ""))
-                .andDo(print());
+                .param("confirmedDate", "")
+                .param("actionStatusId", "2")
+        ).andDo(print());
 
         MvcResult mvcResult = actions
                 .andExpect(status().isOk())
@@ -1078,8 +1094,9 @@ public class LedgerControllerTest extends BaseTestCase {
                 .param("correspondingTime", "1.5")
                 .param("correspondingEndDate", "2017/01/07")
                 .param("confirmedUserId", "")
-                .param("confirmedDate", ""))
-                .andDo(print());
+                .param("confirmedDate", "")
+                .param("actionStatusId", "2")
+        ).andDo(print());
 
         MvcResult mvcResult = actions
                 .andExpect(status().isOk())
@@ -1125,8 +1142,9 @@ public class LedgerControllerTest extends BaseTestCase {
                 .param("correspondingTime", "1.5")
                 .param("correspondingEndDate", "2017/01/07")
                 .param("confirmedUserId", "")
-                .param("confirmedDate", ""))
-                .andDo(print());
+                .param("confirmedDate", "")
+                .param("actionStatusId", "2")
+        ).andDo(print());
 
         MvcResult mvcResult = actions
                 .andExpect(status().isOk())
@@ -1173,8 +1191,9 @@ public class LedgerControllerTest extends BaseTestCase {
                 .param("correspondingTime", "1.5")
                 .param("correspondingEndDate", "2017/01/07")
                 .param("confirmedUserId", "")
-                .param("confirmedDate", ""))
-                .andDo(print());
+                .param("confirmedDate", "")
+                .param("actionStatusId", "2")
+        ).andDo(print());
 
         MvcResult mvcResult = actions
                 .andExpect(status().isOk())
@@ -1196,5 +1215,27 @@ public class LedgerControllerTest extends BaseTestCase {
         assertThat("新規追加モードになっている", modeTag, is(AppConstants.EDIT_MODE_ADD));
         String issueNumberLabel = (String) modelMap.get("issueNumberLabel");
         assertThat(issueNumberLabel, is("新規"));
+    }
+
+    /**
+     * StatusMasterを初期値に戻す。
+     */
+    private void resetStatusMaster() {
+        statusMasterRepo.deleteAll();
+
+        StatusMaster stm1 = new StatusMaster(1, "新規", 0, false);
+        statusMasterRepo.save(stm1);
+
+        StatusMaster stm2 = new StatusMaster(2, "進行中", 1, false);
+        statusMasterRepo.save(stm2);
+
+        StatusMaster stm3 = new StatusMaster(3, "解決", 2, false);
+        statusMasterRepo.save(stm3);
+
+        StatusMaster stm4 = new StatusMaster(4, "終了", 3, true);
+        statusMasterRepo.save(stm4);
+
+        StatusMaster stm5 = new StatusMaster(5, "却下", 4, true);
+        statusMasterRepo.save(stm5);
     }
 }
