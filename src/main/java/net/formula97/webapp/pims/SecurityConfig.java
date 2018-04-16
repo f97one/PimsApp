@@ -53,6 +53,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutSuccessUrl("/")
                 .deleteCookies("JSESSIONID")
                 .invalidateHttpSession(true);
+
+        // Disable HTTP Basic Authentication
+        http.httpBasic().disable();
     }
 
     /**

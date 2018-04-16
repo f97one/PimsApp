@@ -3,12 +3,7 @@
  */
 package net.formula97.webapp.pims;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.sql.DataSource;
 
 /**
  * @author f97one
@@ -17,9 +12,6 @@ import javax.sql.DataSource;
 @Configuration
 public class AppConfig {
 
-    @Bean
-    @ConfigurationProperties("spring.datasource")
-    public DataSource dataSource() {
-        return DataSourceBuilder.create().build();
-    }
+    // dataSource Bean is now configurable in Properties files
+
 }

@@ -7,15 +7,18 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-security:
-  basic:
-    enabled: false
+  datasource:
+    hikari:
+      connection-timeout: 10000
+      maximum-pool-size: 10
+      minimum-idle: 15
+      pool-name: HikariConnectionPool
 
 ---
 spring:
   profiles: production
   datasource:
-    driverClassName: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
     url: jdbc:log4jdbc:h2:file:./bin/pims.db
     username: sa
     password:
@@ -24,7 +27,7 @@ spring:
 spring:
   profiles: develop
   datasource:
-    driverClassName: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
     url: jdbc:log4jdbc:postgresql://localhost:5432/pimsdb
     username: pims_admin
     password: pimsAdmin
@@ -33,7 +36,7 @@ spring:
 spring:
   profiles: test
   datasource:
-    driverClassName: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
     url: jdbc:log4jdbc:h2:mem:test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: sa
     password:
