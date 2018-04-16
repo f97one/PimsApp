@@ -35,7 +35,7 @@ public class AuthorizedUsersService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Users users = userRepo.findOne(username);
+        Users users = userRepo.findById(username).orElse(null);
         
         if (users == null || username.length() == 0) {
             throw new UsernameNotFoundException(String.format(Locale.getDefault(), "Requested username ( %s ) not found.", username));
@@ -64,6 +64,6 @@ public class AuthorizedUsersService implements UserDetailsService {
     }
 
     public Users findUserById(String username) {
-        return userRepo.findOne(username);
+        return userRepo.findById(username).orElse(null);
     }
 }

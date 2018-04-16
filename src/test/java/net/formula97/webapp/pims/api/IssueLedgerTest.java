@@ -3,17 +3,10 @@
  */
 package net.formula97.webapp.pims.api;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import net.formula97.webapp.pims.BaseTestCase;
+import net.formula97.webapp.pims.domain.IssueLedger;
+import net.formula97.webapp.pims.repository.IssueLedgerRepository;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,9 +17,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import net.formula97.webapp.pims.BaseTestCase;
-import net.formula97.webapp.pims.domain.IssueLedger;
-import net.formula97.webapp.pims.repository.IssueLedgerRepository;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * 課題台帳APIのテストケース。
@@ -83,8 +78,8 @@ public class IssueLedgerTest extends BaseTestCase {
         il3.setPublicLedger(false);
         il3.setLedgerName("非公開台帳１");
         il3.setOpenStatus(3);
-        
-        issueLedgerRepository.save(Arrays.asList(il1, il2, il3));
+
+        issueLedgerRepository.saveAll(Arrays.asList(il1, il2, il3));
     }
 
     /**

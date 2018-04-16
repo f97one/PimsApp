@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -73,8 +72,8 @@ public class AdminSystemPreferenceControllerTest extends BaseTestCase {
         }
 
         // 初期状態で存在する管理者ユーザーをとりあえず消す
-        Optional<Users> adminOptional = Optional.ofNullable(userRepo.findOne("admin"));
-        adminOptional.ifPresent(users -> userRepo.delete("admin"));
+        Optional<Users> adminOptional = userRepo.findById("admin");
+        adminOptional.ifPresent(users -> userRepo.deleteById("admin"));
 
         Users user1 = new Users();
         user1.setUsername("user1");
@@ -160,7 +159,7 @@ public class AdminSystemPreferenceControllerTest extends BaseTestCase {
         assertThat(frm, is(notNullValue()));
         assertThat(frm.getAppTitle(), is("pims alpha"));
 
-        SystemConfig sc = sysConfigRepo.findOne(AppConstants.SysConfig.APP_TITLE);
+        SystemConfig sc = sysConfigRepo.findById(AppConstants.SysConfig.APP_TITLE).get();
         assertThat(sc.getConfigValue(), is("pims alpha"));
 
         String infoMsg = (String) modelMap.get("infoMsg");

@@ -110,28 +110,28 @@ public class MasterConfigService extends BaseService {
                 for (MasterDomain md : masterDomains) {
                     catList.add((CategoryMaster) md);
                 }
-                categoryMasterRepo.save(catList);
+                categoryMasterRepo.saveAll(catList);
                 break;
             case MASTER_TYPE_PROCESS:
                 List<ProcessMaster> pmList = new ArrayList<>();
                 for (MasterDomain md : masterDomains) {
                     pmList.add((ProcessMaster) md);
                 }
-                processMasterRepo.save(pmList);
+                processMasterRepo.saveAll(pmList);
                 break;
             case MASTER_TYPE_SEVERE_LEVEL:
                 List<SevereLevelMaster> slmList = new ArrayList<>();
                 for (MasterDomain md : masterDomains) {
                     slmList.add((SevereLevelMaster) md);
                 }
-                severeLevelMasterRepo.save(slmList);
+                severeLevelMasterRepo.saveAll(slmList);
                 break;
             case MASTER_TYPE_STATUS:
                 List<StatusMaster> smList = new ArrayList<>();
                 for (MasterDomain md : masterDomains) {
                     smList.add((StatusMaster) md);
                 }
-                statusMasterRepo.save(smList);
+                statusMasterRepo.saveAll(smList);
                 break;
         }
     }

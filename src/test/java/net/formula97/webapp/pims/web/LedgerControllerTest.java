@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -123,7 +123,7 @@ public class LedgerControllerTest extends BaseTestCase {
 
         MySpecificationAdapter<IssueLedger> issueLedgerSpecification = new MySpecificationAdapter<>(IssueLedger.class);
 
-        IssueLedger ledger = issueLedgerRepo.findOne(issueLedgerSpecification.eq("ledgerName", l1.getLedgerName()));
+        IssueLedger ledger = issueLedgerRepo.findOne(issueLedgerSpecification.eq("ledgerName", l1.getLedgerName())).get();
         this.existingLedgerId = ledger.getLedgerId();
 
         LedgerRefUser lru1 = new LedgerRefUser();
@@ -144,10 +144,9 @@ public class LedgerControllerTest extends BaseTestCase {
         issueItemsRepo.save(items);
 
         MySpecificationAdapter<IssueItems> iiSpec = new MySpecificationAdapter<>(IssueItems.class);
-        Optional<IssueItems> itemsOpt = Optional.ofNullable(
-                issueItemsRepo.findOne(Specifications.where(iiSpec.eq("ledgerId", existingLedgerId))
+        Optional<IssueItems> itemsOpt = issueItemsRepo.findOne(Specification.where(iiSpec.eq("ledgerId", existingLedgerId))
                         .and(iiSpec.eq("foundUser", "user11"))
-                        .and(iiSpec.eq("issueDetail", "Hoge処理が動かない。なんとかしろ"))));
+                .and(iiSpec.eq("issueDetail", "Hoge処理が動かない。なんとかしろ")));
         itemsOpt.ifPresent(items1 -> this.existingIssueId = items1.getIssueId());
         this.existingIssueTimestamp = items.getRowUpdatedAt().toString();
     }
@@ -448,7 +447,7 @@ public class LedgerControllerTest extends BaseTestCase {
     public void 非ログインだと課題を更新できない() throws Exception {
         IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
 
-        IssueItems baseItem = issueItemsRepo.findOne(pk);
+        IssueItems baseItem = issueItemsRepo.findById(pk).get();
 
         SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
 
@@ -481,7 +480,7 @@ public class LedgerControllerTest extends BaseTestCase {
                 .andExpect(model().hasNoErrors())
                 .andReturn();
 
-        IssueItems resultItem = issueItemsRepo.findOne(pk);
+        IssueItems resultItem = issueItemsRepo.findById(pk).get();
         assertThat("レコードは更新されていない", resultItem.getRowUpdatedAt().compareTo(baseItem.getRowUpdatedAt()), is(0));
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
@@ -494,7 +493,7 @@ public class LedgerControllerTest extends BaseTestCase {
     public void 存在しない台帳の課題は更新できない() throws Exception {
         IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
 
-        IssueItems baseItem = issueItemsRepo.findOne(pk);
+        IssueItems baseItem = issueItemsRepo.findById(pk).get();
 
         SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
 
@@ -527,7 +526,7 @@ public class LedgerControllerTest extends BaseTestCase {
                 .andExpect(model().hasNoErrors())
                 .andReturn();
 
-        IssueItems resultItem = issueItemsRepo.findOne(pk);
+        IssueItems resultItem = issueItemsRepo.findById(pk).get();
         assertThat("レコードは更新されていない", resultItem.getRowUpdatedAt().compareTo(baseItem.getRowUpdatedAt()), is(0));
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
@@ -540,7 +539,7 @@ public class LedgerControllerTest extends BaseTestCase {
     public void 存在しない課題は更新できない() throws Exception {
         IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
 
-        IssueItems baseItem = issueItemsRepo.findOne(pk);
+        IssueItems baseItem = issueItemsRepo.findById(pk).get();
 
         SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
 
@@ -573,7 +572,7 @@ public class LedgerControllerTest extends BaseTestCase {
                 .andExpect(model().hasNoErrors())
                 .andReturn();
 
-        IssueItems resultItem = issueItemsRepo.findOne(pk);
+        IssueItems resultItem = issueItemsRepo.findById(pk).get();
         assertThat("レコードは更新されていない", resultItem.getRowUpdatedAt().compareTo(baseItem.getRowUpdatedAt()), is(0));
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
@@ -586,7 +585,7 @@ public class LedgerControllerTest extends BaseTestCase {
     public void 台帳に関係ないユーザーでは課題を更新できない() throws Exception {
         IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
 
-        IssueItems baseItem = issueItemsRepo.findOne(pk);
+        IssueItems baseItem = issueItemsRepo.findById(pk).get();
 
         SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
 
@@ -619,7 +618,7 @@ public class LedgerControllerTest extends BaseTestCase {
                 .andExpect(model().hasNoErrors())
                 .andReturn();
 
-        IssueItems resultItem = issueItemsRepo.findOne(pk);
+        IssueItems resultItem = issueItemsRepo.findById(pk).get();
         assertThat("レコードは更新されていない", resultItem.getRowUpdatedAt().compareTo(baseItem.getRowUpdatedAt()), is(0));
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
@@ -633,7 +632,7 @@ public class LedgerControllerTest extends BaseTestCase {
         // アイテムの更新日時を未来日付に書き換えておく
         IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
 
-        IssueItems baseItem = issueItemsRepo.findOne(pk);
+        IssueItems baseItem = issueItemsRepo.findById(pk).get();
 
         String baseTimestamp = String.valueOf(baseItem.getRowUpdatedAt().getTime());
 
@@ -677,7 +676,7 @@ public class LedgerControllerTest extends BaseTestCase {
                 .andExpect(model().hasNoErrors())
                 .andReturn();
 
-        IssueItems resultItem = issueItemsRepo.findOne(pk);
+        IssueItems resultItem = issueItemsRepo.findById(pk).get();
         assertThat("レコードは更新されていない", resultItem.getRowUpdatedAt().compareTo(baseItem.getRowUpdatedAt()), is(0));
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
@@ -691,7 +690,7 @@ public class LedgerControllerTest extends BaseTestCase {
     public void 課題を更新できる() throws Exception {
         IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
 
-        IssueItems baseItem = issueItemsRepo.findOne(pk);
+        IssueItems baseItem = issueItemsRepo.findById(pk).get();
 
         SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
 
@@ -728,7 +727,7 @@ public class LedgerControllerTest extends BaseTestCase {
         String infoMsg = (String) modelMap.get("infoMsg");
         assertThat(infoMsg, is("課題を更新しました。"));
 
-        IssueItems resultItem = issueItemsRepo.findOne(pk);
+        IssueItems resultItem = issueItemsRepo.findById(pk).get();
         assertThat("レコードは更新されている", resultItem.getRowUpdatedAt().compareTo(baseItem.getRowUpdatedAt()) >= 0, is(true));
         assertThat(resultItem.getCaused(), is("null判断が不十分だったため"));
         assertThat(resultItem.getCountermeasures(), is("null判断を追加"));
@@ -797,7 +796,7 @@ public class LedgerControllerTest extends BaseTestCase {
     @WithMockUser("user22")
     public void 非公開台帳に関係ないユーザーだと課題を表示できない() throws Exception {
         // 非公開台帳に書き換える
-        IssueLedger l1 = issueLedgerRepo.findOne(existingLedgerId);
+        IssueLedger l1 = issueLedgerRepo.findById(existingLedgerId).get();
         l1.setPublicLedger(false);
         issueLedgerRepo.save(l1);
 
@@ -823,7 +822,7 @@ public class LedgerControllerTest extends BaseTestCase {
     @WithAnonymousUser
     public void 非ログインだと非公開台帳の課題も参照できない() throws Exception {
         // 非公開台帳に書き換える
-        IssueLedger l1 = issueLedgerRepo.findOne(existingLedgerId);
+        IssueLedger l1 = issueLedgerRepo.findById(existingLedgerId).get();
         l1.setPublicLedger(false);
         issueLedgerRepo.save(l1);
 
@@ -981,7 +980,7 @@ public class LedgerControllerTest extends BaseTestCase {
     public void 存在しない台帳の課題は削除できない() throws Exception {
         IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
 
-        IssueItems baseItem = issueItemsRepo.findOne(pk);
+        IssueItems baseItem = issueItemsRepo.findById(pk).get();
 
         SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
 
@@ -1029,7 +1028,7 @@ public class LedgerControllerTest extends BaseTestCase {
     public void 存在しない課題は削除できない() throws Exception {
         IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
 
-        IssueItems baseItem = issueItemsRepo.findOne(pk);
+        IssueItems baseItem = issueItemsRepo.findById(pk).get();
 
         SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
 
@@ -1073,7 +1072,7 @@ public class LedgerControllerTest extends BaseTestCase {
     public void 公開非公開にかかわらず台帳に関係ないユーザーだと課題を削除できない() throws Exception {
         IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
 
-        IssueItems baseItem = issueItemsRepo.findOne(pk);
+        IssueItems baseItem = issueItemsRepo.findById(pk).get();
 
         SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
 
@@ -1110,7 +1109,12 @@ public class LedgerControllerTest extends BaseTestCase {
         String errMsg = (String) modelMap.get("errMsg");
         assertThat(errMsg, is("課題を削除する権限がありません。"));
 
-        IssueItems resultItem = issueItemsRepo.findOne(pk);
+        IssueItems resultItem = null;
+        try {
+            resultItem = issueItemsRepo.findById(pk).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         assertNotNull("課題は削除されずに残っている", resultItem);
         assertThat("原因は空のまま", CommonsStringUtils.isNullOrEmpty(resultItem.getCaused()), is(true));
         assertThat("更新処理を通っていない", baseItem.getRowUpdatedAt().compareTo(resultItem.getRowUpdatedAt()), is(0));
@@ -1121,7 +1125,7 @@ public class LedgerControllerTest extends BaseTestCase {
     public void 非ログインだと課題を削除できない() throws Exception {
         IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
 
-        IssueItems baseItem = issueItemsRepo.findOne(pk);
+        IssueItems baseItem = issueItemsRepo.findById(pk).get();
 
         SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
 
@@ -1158,7 +1162,7 @@ public class LedgerControllerTest extends BaseTestCase {
         String errMsg = (String) modelMap.get("errMsg");
         assertThat(errMsg, is("課題の削除にはログインが必要です。"));
 
-        IssueItems resultItem = issueItemsRepo.findOne(pk);
+        IssueItems resultItem = issueItemsRepo.findById(pk).get();
         assertNotNull("課題は削除されずに残っている", resultItem);
         assertThat("原因は空のまま", CommonsStringUtils.isNullOrEmpty(resultItem.getCaused()), is(true));
         assertThat("更新処理を通っていない", baseItem.getRowUpdatedAt().compareTo(resultItem.getRowUpdatedAt()), is(0));
@@ -1169,7 +1173,7 @@ public class LedgerControllerTest extends BaseTestCase {
     public void 課題を削除できる() throws Exception {
         IssueItemsPK pk = new IssueItemsPK(existingLedgerId, existingIssueId);
 
-        IssueItems baseItem = issueItemsRepo.findOne(pk);
+        IssueItems baseItem = issueItemsRepo.findById(pk).get();
         int baseItemCount = issueItemsRepo.findAll().size();
 
         SimpleDateFormat sdf = new SimpleDateFormat(AppConstants.STD_DATE_FORMAT, Locale.getDefault());
@@ -1207,8 +1211,8 @@ public class LedgerControllerTest extends BaseTestCase {
         String infoMsg = (String) modelMap.get("infoMsg");
         assertThat(infoMsg, is("課題を削除しました。"));
 
-        IssueItems resultItem = issueItemsRepo.findOne(pk);
-        assertNull("課題は削除されている", resultItem);
+        Optional<IssueItems> resultItemOpt = issueItemsRepo.findById(pk);
+        assertThat("課題は削除されている", resultItemOpt.isPresent(), is(false));
 
         int resultItemCount = issueItemsRepo.findAll().size();
         assertThat("1レコードだけ減少している", resultItemCount, is(baseItemCount - 1));

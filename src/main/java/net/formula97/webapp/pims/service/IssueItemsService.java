@@ -34,7 +34,7 @@ public class IssueItemsService extends BaseService {
     UserRepository userRepo;
 
     public IssueItems getIssueItem(Integer ledgerId, Integer issueId) {
-        return issueItemsRepo.findOne(new IssueItemsPK(ledgerId, issueId));
+        return issueItemsRepo.findById(new IssueItemsPK(ledgerId, issueId)).orElse(null);
     }
 
     public List<IssueItems> getIssueItemsByLedgerId(Integer ledgerId) {
@@ -126,7 +126,7 @@ public class IssueItemsService extends BaseService {
     public void removeItem(int ledgerId, int issueId) {
         IssueItemsPK pk = new IssueItemsPK(ledgerId, issueId);
 
-        issueItemsRepo.delete(pk);
+        issueItemsRepo.deleteById(pk);
     }
 
     public boolean hasEditPrivilege(int ledgerId, Users users) {
@@ -134,12 +134,12 @@ public class IssueItemsService extends BaseService {
             return false;
         }
 
-        IssueLedger ledger = issueLedgerRepo.findOne(ledgerId);
+        IssueLedger ledger = issueLedgerRepo.findById(ledgerId).orElse(null);
         if (ledger == null) {
             return false;
         } else {
-            LedgerRefUser ledgerRefUser = ledgerRefUserRepo.findOne(new LedgerRefUserPK(ledgerId, users.getUsername()));
-            return ledgerRefUser != null;
+            Optional<LedgerRefUser> ledgerRefUserOpt = ledgerRefUserRepo.findById(new LedgerRefUserPK(ledgerId, users.getUsername()));
+            return ledgerRefUserOpt.isPresent();
         }
 
     }

@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -40,7 +41,6 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -120,7 +120,7 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
         issueLedgerRepo.save(ledger);
 
         MySpecificationAdapter<IssueLedger> issueLedgerSpec = new MySpecificationAdapter<>(IssueLedger.class);
-        IssueLedger savedLedger = issueLedgerRepo.findOne(Specifications.where(issueLedgerSpec.eq("ledgerName", "非公開台帳１")));
+        IssueLedger savedLedger = issueLedgerRepo.findOne(Specifications.where(issueLedgerSpec.eq("ledgerName", "非公開台帳１"))).get();
         this.existingLedgerId = savedLedger.getLedgerId();
 
         IssueLedger ledger1 = new IssueLedger();
@@ -485,7 +485,7 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
         String infoMsg = (String) modelMap.get("infoMsg");
         assertThat(infoMsg, is("台帳を更新しました。"));
 
-        IssueLedger actualLedger = issueLedgerRepo.findOne(existingLedgerId);
+        IssueLedger actualLedger = issueLedgerRepo.findById(existingLedgerId).get();
 
         assertThat("台帳名は非公開台帳１−１", actualLedger.getLedgerName(), is("非公開台帳１−１"));
         assertThat("公開台帳扱い", actualLedger.getPublicLedger(), is(true));
@@ -577,7 +577,7 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
         assertThat(errMsg, is("台帳が見つかりません。"));
 
         MySpecificationAdapter<LedgerRefUser> refUserMySpec = new MySpecificationAdapter<>(LedgerRefUser.class);
-        List<LedgerRefUser> existingparticipants = ledgerRefUserRepo.findAll(Specifications.where(refUserMySpec.eq("ledgerId", existingLedgerId)));
+        List<LedgerRefUser> existingparticipants = ledgerRefUserRepo.findAll(Specification.where(refUserMySpec.eq("ledgerId", existingLedgerId)));
 
         Optional<LedgerRefUser> kanrisha1LRUOpt = existingparticipants.stream().filter(r -> r.getUserId().equals("kanrisha1")).findFirst();
         assertThat("kanrisha1は非参加のまま", kanrisha1LRUOpt.isPresent(), is(false));
@@ -613,7 +613,7 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
         assertThat(infoMsg, is("台帳参加ユーザーを更新しました。"));
 
         MySpecificationAdapter<LedgerRefUser> refUserMySpec = new MySpecificationAdapter<>(LedgerRefUser.class);
-        List<LedgerRefUser> existingparticipants = ledgerRefUserRepo.findAll(Specifications.where(refUserMySpec.eq("ledgerId", existingLedgerId)));
+        List<LedgerRefUser> existingparticipants = ledgerRefUserRepo.findAll(Specification.where(refUserMySpec.eq("ledgerId", existingLedgerId)));
 
         Optional<LedgerRefUser> kanrisha1LRUOpt = existingparticipants.stream().filter(r -> r.getUserId().equals("kanrisha1")).findFirst();
         assertThat("kanrisha1は参加", kanrisha1LRUOpt.isPresent(), is(true));
@@ -621,7 +621,7 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
         Optional<LedgerRefUser> user1LRUOpt = existingparticipants.stream().filter(r -> r.getUserId().equals("user1")).findFirst();
         assertThat("user1は非参加", user1LRUOpt.isPresent(), is(false));
 
-        IssueLedger existingLedger = issueLedgerRepo.findOne(existingLedgerId);
+        IssueLedger existingLedger = issueLedgerRepo.findById(existingLedgerId).get();
         assertThat("台帳名は非公開台帳１のまま", existingLedger.getLedgerName(), is("非公開台帳１"));
         assertThat("公開範囲は非公開のまま", existingLedger.getPublicLedger(), is(false));
     }

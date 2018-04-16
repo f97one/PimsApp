@@ -73,7 +73,9 @@ public class StatusMasterServiceTest {
     @Test
     public void 最小値が変わったらその値になる() {
         // ステータスID = 1 をいったん削除
-        statusMasterRepo.delete(1);
+        StatusMaster n1Item = new StatusMaster();
+        n1Item.setStatusId(1);
+        statusMasterRepo.delete(n1Item);
 
         assertThat(statusMasterService.getMinimumStatus(), is(2));
 

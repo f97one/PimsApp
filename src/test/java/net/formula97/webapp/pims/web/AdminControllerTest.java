@@ -74,8 +74,8 @@ public class AdminControllerTest extends BaseTestCase {
             validator = Validation.buildDefaultValidatorFactory().getValidator();
         }
 
-        Optional<Users> adminOptional = Optional.ofNullable(userRepo.findOne("admin"));
-        adminOptional.ifPresent(users -> userRepo.delete("admin"));
+        Optional<Users> adminOptional = userRepo.findById("admin");
+        adminOptional.ifPresent(users -> userRepo.deleteById("admin"));
 
         Users user1 = new Users();
         user1.setUsername("user1");

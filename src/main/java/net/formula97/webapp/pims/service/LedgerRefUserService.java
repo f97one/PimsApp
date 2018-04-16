@@ -1,13 +1,13 @@
 package net.formula97.webapp.pims.service;
 
 import net.formula97.webapp.pims.domain.LedgerRefUser;
-import net.formula97.webapp.pims.domain.LedgerRefUserPK;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.repository.LedgerRefUserRepository;
 import net.formula97.webapp.pims.repository.MySpecificationAdapter;
 import net.formula97.webapp.pims.repository.UserRepository;
 import net.formula97.webapp.pims.web.forms.RefUserItem;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,10 @@ public class LedgerRefUserService {
     UserRepository userRepo;
 
     public LedgerRefUser findReferenceForUser(String userId, int ledgerId) {
-        return ledgerRefUserRepo.findOne(new LedgerRefUserPK(ledgerId, userId));
+        LedgerRefUser ledgerRefUser = new LedgerRefUser(ledgerId, userId);
+        Example<LedgerRefUser> ledgerRefUserExample = Example.of(ledgerRefUser);
+
+        return ledgerRefUserRepo.findOne(ledgerRefUserExample).orElse(null);
     }
 
     public List<RefUserItem> getReferenceConditionById(int ledgerId) {
@@ -60,7 +63,7 @@ public class LedgerRefUserService {
 
     @Transactional
     public void refreshParticipants(List<LedgerRefUser> updateParticipants, List<LedgerRefUser> removeParticipants) {
-        ledgerRefUserRepo.save(updateParticipants);
+        ledgerRefUserRepo.saveAll(updateParticipants);
         ledgerRefUserRepo.deleteInBatch(removeParticipants);
     }
 

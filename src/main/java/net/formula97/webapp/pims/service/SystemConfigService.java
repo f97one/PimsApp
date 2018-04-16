@@ -3,11 +3,9 @@
  */
 package net.formula97.webapp.pims.service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import net.formula97.webapp.pims.domain.SystemConfig;
 import net.formula97.webapp.pims.misc.SystemConfigKeyValueBinder;
+import net.formula97.webapp.pims.repository.SystemConfigRepository;
 import net.formula97.webapp.pims.web.forms.SystemPreferenceForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -15,8 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import net.formula97.webapp.pims.domain.SystemConfig;
-import net.formula97.webapp.pims.repository.SystemConfigRepository;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author f97one
@@ -75,6 +74,6 @@ public class SystemConfigService {
         SystemConfigKeyValueBinder binder = new SystemConfigKeyValueBinder();
         List<SystemConfig> updateList = binder.exportToList(sysPrefForm);
 
-        sysConfigRepos.save(updateList);
+        sysConfigRepos.saveAll(updateList);
     }
 }

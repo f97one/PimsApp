@@ -12,12 +12,13 @@ import net.formula97.webapp.pims.repository.LedgerRefUserRepository;
 import net.formula97.webapp.pims.repository.MySpecificationAdapter;
 import net.formula97.webapp.pims.web.forms.LedgerSearchConditionForm;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -54,7 +55,8 @@ public class IssueLedgerService {
 
         IssueLedger ledger1;
         if (ledger.getLedgerId() == null) {
-            ledger1 = issueLedgerRepo.findOne(issueLedgerSpecification.eq("ledgerName", ledger.getLedgerName()));
+            Optional<IssueLedger> issueLedgerOpt = issueLedgerRepo.findOne(issueLedgerSpecification.eq("ledgerName", ledger.getLedgerName()));
+            ledger1 = issueLedgerOpt.orElse(ledger);
         } else {
             ledger1 = ledger;
         }
@@ -71,7 +73,7 @@ public class IssueLedgerService {
     }
 
     public IssueLedger getLedgerById(int ledgerId) {
-        return issueLedgerRepo.findOne(ledgerId);
+        return issueLedgerRepo.findById(ledgerId).orElse(null);
     }
 
     public List<IssueLedger> getLedgerByList(LedgerSearchConditionForm form) {
@@ -96,7 +98,7 @@ public class IssueLedgerService {
         }
 
         List<IssueLedger> ledgerBaseList = issueLedgerRepo.findAll(
-                Specifications.where(issueLedgerSpec.contains("ledgerName", ledgerName)).
+                Specification.where(issueLedgerSpec.contains("ledgerName", ledgerName)).
                         and(issueLedgerSpec.eq("publicLedger", publicLedger)));
 
         final List<Integer> statusList = form.getLedgerStatus() == null ?

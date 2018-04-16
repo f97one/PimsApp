@@ -130,17 +130,17 @@ public class TitleControllerTest extends BaseTestCase {
 
         MySpecificationAdapter<IssueLedger> issueLedgerSpecification = new MySpecificationAdapter<>(IssueLedger.class);
 
-        IssueLedger ledger = issueLedgerRepo.findOne(issueLedgerSpecification.contains("ledgerName", l1.getLedgerName()));
+        IssueLedger ledger = issueLedgerRepo.findOne(issueLedgerSpecification.contains("ledgerName", l1.getLedgerName())).orElse(null);
         LedgerRefUser lru1 = new LedgerRefUser();
         lru1.setUserId(user1.getUsername());
         lru1.setLedgerId(ledger.getLedgerId());
 
-        IssueLedger ledger2 = issueLedgerRepo.findOne(issueLedgerSpecification.contains("ledgerName", l2.getLedgerName()));
+        IssueLedger ledger2 = issueLedgerRepo.findOne(issueLedgerSpecification.contains("ledgerName", l2.getLedgerName())).orElse(null);
         LedgerRefUser lru2 = new LedgerRefUser();
         lru2.setUserId(user1.getUsername());
         lru2.setLedgerId(ledger2.getLedgerId());
 
-        IssueLedger ledger3 = issueLedgerRepo.findOne(issueLedgerSpecification.contains("ledgerName", l3.getLedgerName()));
+        IssueLedger ledger3 = issueLedgerRepo.findOne(issueLedgerSpecification.contains("ledgerName", l3.getLedgerName())).orElse(null);
         LedgerRefUser lru3 = new LedgerRefUser();
         lru3.setUserId(user2.getUsername());
         lru3.setLedgerId(ledger3.getLedgerId());
