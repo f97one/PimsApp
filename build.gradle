@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '1.4.2.RELEASE'
+        springBootVersion = '1.5.12.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -19,6 +19,8 @@ lombok {
     version = "1.16.20"
     sha256 = ""
 }
+
+ext['flyway.version'] = "4.2.0"
 
 apply plugin: 'java'
 apply plugin: 'eclipse-wtp'
