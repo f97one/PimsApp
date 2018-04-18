@@ -162,8 +162,8 @@
                         <select class="form-control" id="causedProcess" name="processId"
                                 th:disabled="${modeTag eq 'R'}">
                             <option value="-1">---</option>
-                            <option th:each="processItem : ${causedProcessList}" th:value="${processItem.value}"
-                                    th:text="${processItem.key}" th:selected="${processItem.value} == *{processId}">
+                            <option th:each="processItem : ${causedProcessList}" th:value="${processItem.key}"
+                                    th:text="${processItem.value}" th:selected="${processItem.key} == *{processId}">
                                 found user
                             </option>
                         </select>
