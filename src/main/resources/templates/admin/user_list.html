@@ -64,9 +64,8 @@
                         </div>
                     </div>
                     <div class="row">
-                        <input type="button" id="addUserBtn" name="addUserBtn"
-                               class="btn btn-default col-lg-2 pull-left" value="ユーザー追加"
-                               onclick="window.location.href = 'userManagement/add';"/>
+                        <a id="addUserBtn" name="addUserBtn" th:href="@{/admin/userManagement/add}"
+                           class="btn btn-default col-lg-2 pull-left">ユーザー追加</a>
                         <input type="submit" id="searchUserBtn" name="searchUserBtn"
                                class="btn btn-default col-lg-2 pull-right" value="検索"/>
                     </div>
