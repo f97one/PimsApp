@@ -75,7 +75,7 @@
     <div th:replace="/common/info_block::info_block"></div>
 
     <div class="form-group">
-        <form th:action="@{'/ledger/' + ${issueId}}" th:object="${issueItem}" class="form-horizontal" method="POST">
+        <form th:action="@{${actionStr}}" th:object="${issueItem}" class="form-horizontal" method="POST">
             <!-- そのまま返却が必要なメンバー -->
             <input type="hidden" id="recordTimestamp" name="recordTimestamp" th:field="*{recordTimestamp}"/>
 

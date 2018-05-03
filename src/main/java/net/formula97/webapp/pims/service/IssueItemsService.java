@@ -4,6 +4,8 @@ import net.formula97.webapp.pims.domain.*;
 import net.formula97.webapp.pims.repository.*;
 import net.formula97.webapp.pims.web.forms.IssueItemsLineForm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -119,7 +121,20 @@ public class IssueItemsService extends BaseService {
     public void saveItem(IssueItems item) {
         // 更新日時をUpdateする
         item.setRowUpdatedAt(new Date());
+
+        if (item.getIssueId() == null) {
+            // 課題IDを採番する
+            IssueItems i = new IssueItems();
+            i.setLedgerId(item.getLedgerId());
+            Example<IssueItems> cond = Example.of(i);
+            List<IssueItems> resultItems = issueItemsRepo.findAll(cond, Sort.by(Sort.Order.desc("issueId")));
+
+            int issueId = resultItems.size() == 0 ? 1 : resultItems.get(0).getIssueId() + 1;
+            item.setIssueId(issueId);
+        }
+
         issueItemsRepo.save(item);
+        issueItemsRepo.flush();
     }
 
     @Transactional

@@ -144,11 +144,14 @@ public class LedgerController extends BaseWebController {
         return dest;
     }
 
-    @RequestMapping(value = "{ledgerId}/add", method = RequestMethod.GET)
+    @RequestMapping(value = "/{ledgerId}/add", method = RequestMethod.GET)
     public String showIssueItemCreationView(@PathVariable("ledgerId") Integer ledgerId, Model model, HeaderForm headerForm) {
         Users users = getUserState(model, headerForm);
 
         IssueItemForm issueItemForm = new IssueItemForm();
+
+        String actionStr = getActionStr(ledgerId, null, AppConstants.EDIT_MODE_ADD);
+        model.addAttribute("actionStr", actionStr);
 
         issueItemsSvc.mapEmptyUsers(model);
 
@@ -190,12 +193,16 @@ public class LedgerController extends BaseWebController {
         return "/ledger/issueItem";
     }
 
-    @RequestMapping(value = "{ledgerId}/add", method = RequestMethod.POST, params = "addItemBtn")
+    @RequestMapping(value = "/{ledgerId}/add", method = RequestMethod.POST)
     public String addIssueToLedger(@PathVariable("ledgerId") Integer ledgerId,
                                    @ModelAttribute("issueItem") @Validated IssueItemForm issueItemForm,
                                    BindingResult result, Model model, HeaderForm headerForm) {
 
         model.addAttribute("issueItem", issueItemForm);
+
+        // th:actionの値
+        String actionStr = getActionStr(ledgerId, null, AppConstants.EDIT_MODE_ADD);
+        model.addAttribute("actionStr", actionStr);
 
         Users users = getUserState(model, headerForm);
         if (!result.hasErrors()) {
@@ -230,6 +237,9 @@ public class LedgerController extends BaseWebController {
     public String getIssueItem(@PathVariable("ledgerId") Integer ledgerId, @PathVariable("issueId") Integer issueId,
                                Model model, HeaderForm headerForm) {
         Users myUserDetail = getUserState(model, headerForm);
+
+        String actionStr = getActionStr(ledgerId, issueId, AppConstants.EDIT_MODE_MODIFY);
+        model.addAttribute("actionStr", actionStr);
 
         IssueLedger ledger = issueLedgerSvc.getLedgerById(ledgerId);
         IssueItems items = issueItemsSvc.getIssueItem(ledgerId, issueId);
@@ -303,6 +313,9 @@ public class LedgerController extends BaseWebController {
 
         model.addAttribute("issueItem", issueItemForm);
 
+        String actionStr = getActionStr(ledgerId, issueId, AppConstants.EDIT_MODE_MODIFY);
+        model.addAttribute("actionStr", actionStr);
+
         if (!result.hasErrors()) {
             Optional<IssueLedger> ledgerOptional = Optional.ofNullable(issueLedgerSvc.getLedgerById(ledgerId));
             if (ledgerOptional.isPresent()) {
@@ -353,6 +366,9 @@ public class LedgerController extends BaseWebController {
 
         IssueLedger ledger = issueLedgerSvc.getLedgerById(ledgerId);
         IssueItems items = issueItemsSvc.getIssueItem(ledgerId, issueId);
+
+        String actionStr = getActionStr(ledgerId, issueId, AppConstants.EDIT_MODE_REMOVE);
+        model.addAttribute("actionStr", actionStr);
 
         issueItemsSvc.mapMaster(model);
 
@@ -412,6 +428,9 @@ public class LedgerController extends BaseWebController {
         IssueLedger ledger = issueLedgerSvc.getLedgerById(ledgerId);
         IssueItems items = issueItemsSvc.getIssueItem(ledgerId, issueId);
 
+        String actionStr = getActionStr(ledgerId, issueId, AppConstants.EDIT_MODE_REMOVE);
+        model.addAttribute("actionStr", actionStr);
+
         issueItemsSvc.mapMaster(model);
 
         if (ledger == null) {
@@ -458,5 +477,25 @@ public class LedgerController extends BaseWebController {
         }
 
         return "/ledger/issueItem";
+    }
+
+    private String getActionStr(Integer ledgerId, Integer issueId, String modeTag) {
+        String actionStr;
+
+        switch (modeTag) {
+            case AppConstants.EDIT_MODE_ADD:
+                actionStr = String.format(Locale.getDefault(), "/ledger/%d/add", ledgerId);
+                break;
+            case AppConstants.EDIT_MODE_MODIFY:
+                actionStr = String.format(Locale.getDefault(), "/ledger/%d/%d", ledgerId, issueId);
+                break;
+            case AppConstants.EDIT_MODE_REMOVE:
+                actionStr = String.format(Locale.getDefault(), "/ledger/%d/remove/%d", ledgerId, issueId);
+                break;
+            default:
+                actionStr = "/ledger/";
+        }
+
+        return actionStr;
     }
 }
