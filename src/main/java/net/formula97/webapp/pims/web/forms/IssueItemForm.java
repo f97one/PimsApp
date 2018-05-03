@@ -144,6 +144,12 @@ public class IssueItemForm implements Serializable {
             this.actionStatusId = item.getActionStatusId();
         }
 
+        if (item.getRowUpdatedAt() == null) {
+            this.recordTimestamp = Calendar.getInstance().getTimeInMillis();
+        } else {
+            this.recordTimestamp = item.getRowUpdatedAt().getTime();
+        }
+
         return this;
     }
 
@@ -182,17 +188,21 @@ public class IssueItemForm implements Serializable {
             items.setCorrespondingTime(calendar.getTime());
         }
 
-        try {
-            items.setCorrespondingEndDate(sdf.parse(this.correspondingEndDate));
-        } catch (ParseException e) {
-            e.printStackTrace();
-            items.setCorrespondingEndDate(null);
+        if (this.correspondingEndDate != null) {
+            try {
+                items.setCorrespondingEndDate(sdf.parse(this.correspondingEndDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+                items.setCorrespondingEndDate(null);
+            }
         }
         items.setCorrespondingUserId(this.correspondingUserId);
-        try {
-            items.setConfirmedDate(sdf.parse(this.confirmedDate));
-        } catch (ParseException e) {
-            e.printStackTrace();
+        if (this.confirmedDate != null) {
+            try {
+                items.setConfirmedDate(sdf.parse(this.confirmedDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
         Date d = new Date(this.recordTimestamp);
         items.setRowUpdatedAt(d);
