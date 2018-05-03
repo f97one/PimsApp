@@ -11,7 +11,7 @@
           href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
           th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap-theme.min.css}"/>
     <link rel="stylesheet" type="text/css"
-          href="../../../static/css/pimsmain.css" th:href="@{/static/css/pimsmain.css}"/>
+          href="../../../static/css/pimsmain.css" th:href="@{/css/pimsmain.css}"/>
 </head>
 
 <body>
@@ -77,22 +77,22 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="issue : ${issueItems}" th:style="${issue.lineStyle}">
-                <td th:text="${issue.issueId}" th:class="small text-center">1</td>
-                <td th:text="${issue.severeLevel}" th:class="small text-center">中</td>
-                <td th:text="${issue.actionStatus}" th:class="small text-center">PG中</td>
-                <td th:text="${issue.foundDate}" th:class="small text-center">2016/10/21</td>
-                <td th:text="${issue.foundUser}" th:class="small text-center">HAJIME Fukuna</td>
-                <td th:text="${issue.moduleCategory}" th:class="small text-center">ユーザー検索</td>
-                <td th:text="${issue.process}" th:class="small text-center">詳細設計</td>
-                <td th:text="${issue.issueDetail}" th:class="small text-left">ユーザー検索するとぬるぽが投げられることがある。</td>
-                <td th:text="${issue.caused}" th:class="small text-center">検索に引っかからなかったらnullになることに考慮がなかったため</td>
-                <td th:text="${issue.countermeasures}" th:class="small text-center">nullチェックを追加</td>
-                <td th:text="${issue.correspondingUser}" th:class="small text-center">HAJIME Fukuna</td>
-                <td th:text="${issue.correspondingTime}" th:class="small text-center">1.5</td>
-                <td th:text="${issue.correspondingEndDate}" th:class="small text-center">2016/10/22</td>
-                <td th:text="${issue.confirmedUser}" th:class="small text-center">HAJIME Fukuna</td>
-                <td th:text="${issue.confirmedDate}" th:class="small text-center">2016/10/23</td>
+            <tr th:each="issue : ${issueItems}" th:style="${issue.lineCssStyle}">
+                <td th:text="${issue.issueId}" class="small text-center">1</td>
+                <td th:text="${issue.severeLevel}" class="small text-center">中</td>
+                <td th:text="${issue.actionStatus}" class="small text-center">PG中</td>
+                <td th:text="${issue.foundDate}" class="small text-center">2016/10/21</td>
+                <td th:text="${issue.foundUser}" class="small text-center">HAJIME Fukuna</td>
+                <td th:text="${issue.moduleCategory}" class="small text-center">ユーザー検索</td>
+                <td th:text="${issue.process}" class="small text-center">詳細設計</td>
+                <td th:text="${issue.issueDetail}" class="small text-left">ユーザー検索するとぬるぽが投げられることがある。</td>
+                <td th:text="${issue.caused}" class="small text-center">検索に引っかからなかったらnullになることに考慮がなかったため</td>
+                <td th:text="${issue.countermeasures}" class="small text-center">nullチェックを追加</td>
+                <td th:text="${issue.correspondingUser}" class="small text-center">HAJIME Fukuna</td>
+                <td th:text="${issue.correspondingTime}" class="small text-center">1.5</td>
+                <td th:text="${issue.correspondingEndDate}" class="small text-center">2016/10/22</td>
+                <td th:text="${issue.confirmedUser}" class="small text-center">HAJIME Fukuna</td>
+                <td th:text="${issue.confirmedDate}" class="small text-center">2016/10/23</td>
                 <td th:if="${#httpServletRequest.remoteUser != null}">
                     <a th:href="@{'/ledger/' + ${ledgerId} + '/' + ${issue.issueId}}" class="btn btn-default btn-block"
                        th:disabled="${#httpServletRequest.remoteUser == null}">編集</a>
