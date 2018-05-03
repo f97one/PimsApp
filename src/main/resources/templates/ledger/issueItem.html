@@ -291,14 +291,15 @@
                 <button type="reset" id="resetBtn" class="btn btn-default col-lg-1"
                         th:disabled="${modeTag eq 'R'}">リセット
                 </button>
-                <input type="submit" id="fakeUpdateItemBtn" class="btn btn-primary col-lg-1 pull-right"
+                <input type="submit" id="fakeUpdateItemBtn" name="fakeUpdateItemBtn"
+                       class="btn btn-primary col-lg-1 pull-right"
                        th:if="${modeTag eq 'R'}" th:disabled="${modeTag eq 'R'}"
                        value="更新"/>
-                <input type="submit" id="updateItemBtn" class="btn btn-primary col-lg-1 pull-right"
+                <input type="submit" id="updateItemBtn" name="updateItemBtn" class="btn btn-primary col-lg-1 pull-right"
                        th:if="${modeTag eq 'M'}" value="更新"/>
-                <input type="submit" id="addItemBtn" class="btn btn-primary col-lg-1 pull-right"
+                <input type="submit" id="addItemBtn" name="addItemBtn" class="btn btn-primary col-lg-1 pull-right"
                        th:if="${modeTag eq 'A'}" value="追加"/>
-                <input type="submit" id="removeItemBtn" class="btn btn-danger col-lg-1 pull-right"
+                <input type="submit" id="removeItemBtn" name="removeItemBtn" class="btn btn-danger col-lg-1 pull-right"
                        th:if="${modeTag eq 'D'}" value="削除"/>
             </div>
         </form>
