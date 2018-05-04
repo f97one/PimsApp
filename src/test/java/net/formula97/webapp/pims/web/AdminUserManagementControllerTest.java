@@ -602,4 +602,26 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
         assertThat("変更パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getOrgPassword()), is(true));
         assertThat("確認用パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPasswordConfirm()), is(true));
     }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void 指定ユーザーのユーザー詳細画面を表示できる() throws Exception {
+        ResultActions actions = mMvcMock.perform(get(userManagementUrlTemplate + "/user1")).andDo(print());
+
+        actions.andExpect(status().isOk())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("/admin/user_detail")))
+                .andReturn();
+    }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void 存在しないユーザーを指定するとユーザー詳細画面は表示できない() throws Exception {
+        ResultActions actions = mMvcMock.perform(get(userManagementUrlTemplate + "/user0")).andDo(print());
+
+        actions.andExpect(status().is3xxRedirection())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(is("redirect:/admin/userManagement")))
+                .andReturn();
+    }
 }

@@ -13,8 +13,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Locale;
@@ -116,6 +118,21 @@ public class AdminUserManagementController extends BaseWebController {
         }
 
         return "/admin/user_detail";
+    }
+
+    @RequestMapping(value = "{userId}", method = RequestMethod.GET)
+    public String shwoUserDetail(@PathVariable String userId, Model model, HeaderForm headerForm, RedirectAttributes redirectAttributes) {
+        Users myUserDetail = getUserState(model, headerForm);
+
+        // ユーザーの存在確認
+        Users targetUser = authUsersSvc.findUserById(userId);
+        if (targetUser == null) {
+            String errMsg = String.format(Locale.getDefault(), "ユーザー %s は存在しません。", userId);
+            redirectAttributes.addFlashAttribute("errMsg", errMsg);
+            return "redirect:/admin/userManagement";
+        }
+
+        return null;
     }
 
     /**
