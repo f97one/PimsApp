@@ -34,4 +34,7 @@ public class AppConstants {
      * ドロップダウンリストで何も選択していないときの値
      */
     public static final int SELECTION_NOT_SELECTED = -1;
+
+    public static final String ROLE_CODE_ADMIN = "A";
+    public static final String ROLE_CODE_USER = "U";
 }

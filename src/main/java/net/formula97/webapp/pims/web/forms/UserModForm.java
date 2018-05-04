@@ -70,12 +70,37 @@ public class UserModForm {
      */
     private String searchUsername;
 
+    public UserModForm(Users users) {
+        setSearchUsername(users.getUsername());
+
+        this.mailAddress = users.getMailAddress();
+        this.displayName = users.getDisplayName();
+        this.enableUser = users.getEnabled();
+
+        switch (users.getAuthority()) {
+            case AppConstants.ROLE_ADMIN:
+                this.assignedRole = AppConstants.ROLE_CODE_ADMIN;
+                break;
+            case AppConstants.ROLE_USER:
+                this.assignedRole = AppConstants.ROLE_CODE_USER;
+                break;
+            default:
+                this.assignedRole = "";
+                break;
+        }
+
+        // パスワード類は空にする
+        this.password = "";
+        this.passwordConfirm = "";
+        this.orgPassword = "";
+    }
+
     /**
      * 検索用ユーザーIDをセットする。
      *
      * @param username 検索用ユーザーID
      */
-    private void serSearchUsername(String username) {
+    private void setSearchUsername(String username) {
         this.username = username;
         this.searchUsername = username;
     }
@@ -92,10 +117,10 @@ public class UserModForm {
         users.setDisplayName(this.displayName);
         users.setEnabled(this.enableUser);
         switch (this.assignedRole) {
-            case "U":
+            case AppConstants.ROLE_CODE_USER:
                 users.setAuthority(AppConstants.ROLE_USER);
                 break;
-            case "A":
+            case AppConstants.ROLE_CODE_ADMIN:
                 users.setAuthority(AppConstants.ROLE_ADMIN);
                 break;
         }

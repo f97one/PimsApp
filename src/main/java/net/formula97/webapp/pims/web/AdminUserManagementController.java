@@ -132,7 +132,15 @@ public class AdminUserManagementController extends BaseWebController {
             return "redirect:/admin/userManagement";
         }
 
-        return null;
+        model.addAttribute("modeTag", AppConstants.EDIT_MODE_MODIFY);
+
+        UserModForm userModForm = new UserModForm(targetUser);
+
+        userModForm.setEnableUser(targetUser.getEnabled());
+
+        model.addAttribute("userModForm", userModForm);
+
+        return "/admin/user_detail";
     }
 
     /**

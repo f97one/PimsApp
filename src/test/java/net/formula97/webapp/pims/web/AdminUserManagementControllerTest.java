@@ -608,10 +608,20 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
     public void 指定ユーザーのユーザー詳細画面を表示できる() throws Exception {
         ResultActions actions = mMvcMock.perform(get(userManagementUrlTemplate + "/user1")).andDo(print());
 
-        actions.andExpect(status().isOk())
+        MvcResult mvcResult = actions.andExpect(status().isOk())
                 .andExpect(model().hasNoErrors())
                 .andExpect(view().name(is("/admin/user_detail")))
                 .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        UserModForm userModForm = (UserModForm) modelMap.get("userModForm");
+
+        assertThat(userModForm.getUsername(), is("user1"));
+        assertThat(userModForm.getSearchUsername(), is("user1"));
+        assertThat(userModForm.getMailAddress(), is("test1@example.com"));
+        assertThat(userModForm.getDisplayName(), is("JUnit test1"));
+        assertThat(userModForm.getEnableUser(), is(true));
+        assertThat(userModForm.getAssignedRole(), is(AppConstants.ROLE_CODE_USER));
     }
 
     @Test

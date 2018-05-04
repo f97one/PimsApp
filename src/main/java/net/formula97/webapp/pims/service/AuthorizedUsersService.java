@@ -66,4 +66,5 @@ public class AuthorizedUsersService implements UserDetailsService {
     public Users findUserById(String username) {
         return userRepo.findById(username).orElse(null);
     }
+
 }
