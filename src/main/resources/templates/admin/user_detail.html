@@ -37,18 +37,6 @@
                           class="help-block text-warning">Error</span>
                 </div>
             </div>
-            <div class="row" th:if="${modeTag eq 'M'}">
-                <div class="col-lg-2 col-sm-2">現パスワード</div>
-                <div class="col-lg-4 col-sm-4">
-                    <input type="password" maxlength="32" id="orgPassword" name="orgPassword" value="mockuserpasswd1"
-                           class="form-control" th:field="*{orgPassword}" th:errorClass="form-control"/>
-                </div>
-                <div class="col-lg-6 col-sm-6">
-                    <span th:if="${#fields.hasErrors('orgPassword')}"
-                          th:errors="*{orgPassword}"
-                          class="help-block text-warning">Error</span>
-                </div>
-            </div>
             <div class="row" th:if="${modeTag eq 'A' || modeTag eq 'M'}">
                 <div class="col-lg-2 col-sm-2"><span th:if="${modeTag eq 'M'}">新</span>パスワード</div>
                 <div class="col-lg-4 col-sm-4">

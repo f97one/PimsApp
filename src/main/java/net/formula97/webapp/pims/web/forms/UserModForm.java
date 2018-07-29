@@ -26,12 +26,6 @@ public class UserModForm {
     private String username;
 
     /**
-     * 変更前のパスワード
-     */
-    @Size(max = 32)
-    private String orgPassword;
-
-    /**
      * 変更するパスワード
      */
     @Size(max = 32)
@@ -92,7 +86,6 @@ public class UserModForm {
         // パスワード類は空にする
         this.password = "";
         this.passwordConfirm = "";
-        this.orgPassword = "";
     }
 
     /**

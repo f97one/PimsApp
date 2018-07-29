@@ -34,6 +34,7 @@ import java.util.Set;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -365,7 +366,6 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
         UserModForm frm = new UserModForm();
         frm.setUsername("A");
         frm.setPassword("観自在菩薩行深般若波羅蜜多時照見五蘊皆空度一切苦厄舎利子色不異空");
-        frm.setOrgPassword("空不異色色即是空空即是色受想行識亦復如是舎利子是諸法空相不生不滅");
         frm.setPasswordConfirm("不垢不浄不増不減是故空中無色無受想行識無眼耳鼻舌身意無色声香味触");
         frm.setDisplayName("法無眼界乃至無意識界無無明亦無無明尽乃至無老死亦無老死尽無苦集滅");
         frm.setAssignedRole("");
@@ -426,7 +426,6 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
 
         UserModForm resultForm = (UserModForm) modelMap.get("userModForm");
         assertThat("パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPassword()), is(true));
-        assertThat("変更パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getOrgPassword()), is(true));
         assertThat("確認用パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPasswordConfirm()), is(true));
 
         List<Users> currentUsers = userRepo.findAll();
@@ -476,7 +475,6 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
 
         UserModForm resultForm = (UserModForm) modelMap.get("userModForm");
         assertThat("パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPassword()), is(true));
-        assertThat("変更パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getOrgPassword()), is(true));
         assertThat("確認用パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPasswordConfirm()), is(true));
     }
 
@@ -517,7 +515,6 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
 
         UserModForm resultForm = (UserModForm) modelMap.get("userModForm");
         assertThat("パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPassword()), is(true));
-        assertThat("変更パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getOrgPassword()), is(true));
         assertThat("確認用パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPasswordConfirm()), is(true));
     }
 
@@ -558,7 +555,6 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
 
         UserModForm resultForm = (UserModForm) modelMap.get("userModForm");
         assertThat("パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPassword()), is(true));
-        assertThat("変更パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getOrgPassword()), is(true));
         assertThat("確認用パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPasswordConfirm()), is(true));
     }
 
@@ -599,7 +595,6 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
 
         UserModForm resultForm = (UserModForm) modelMap.get("userModForm");
         assertThat("パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPassword()), is(true));
-        assertThat("変更パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getOrgPassword()), is(true));
         assertThat("確認用パスワード入力欄は空", CommonsStringUtils.isNullOrEmpty(resultForm.getPasswordConfirm()), is(true));
     }
 
@@ -634,4 +629,110 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
                 .andExpect(view().name(is("redirect:/admin/userManagement")))
                 .andReturn();
     }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void 存在するユーザーを更新できる() throws Exception {
+        ResultActions actions = mMvcMock.perform(post(userManagementUrlTemplate + "/add")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .with(csrf())
+                .param("updateBtn", "保存")
+                .param("username", "user2")
+                .param("password", "")
+                .param("passwordConfirm", "")
+                .param("displayName", "変更するユーザー１")
+                .param("enableUser", "true")
+                .param("assignedRole", "U")
+                .param("mailAddress", "user2@example.com"))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        Optional<Users> usersOpt = userRepo.findById("user2");
+        assertTrue("変更したユーザーは存在する", usersOpt.isPresent());
+
+        Users u = usersOpt.get();
+        assertThat(u.getDisplayName(), is("変更するユーザー１"));
+        assertThat(u.getEnabled(), is(true));
+        assertThat(u.getAuthority(), is(AppConstants.ROLE_USER));
+        assertThat(u.getMailAddress(), is("user2@example.com"));
+        // パスワードが変更されていないことを確認
+        assertTrue(BCrypt.checkpw("P@ssw0rd", u.getPassword()));
+    }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void パスワードも併せてユーザーを更新できる() throws Exception {
+        ResultActions actions = mMvcMock.perform(post(userManagementUrlTemplate + "/add")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .with(csrf())
+                .param("updateBtn", "保存")
+                .param("username", "user2")
+                .param("password", "abcd1234")
+                .param("passwordConfirm", "abcd1234")
+                .param("displayName", "変更するユーザー１")
+                .param("enableUser", "true")
+                .param("assignedRole", "A")
+                .param("mailAddress", "user2@example.com"))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        Optional<Users> usersOpt = userRepo.findById("user2");
+        assertTrue("変更したユーザーは存在する", usersOpt.isPresent());
+
+        Users u = usersOpt.get();
+        assertThat(u.getDisplayName(), is("変更するユーザー１"));
+        assertThat(u.getEnabled(), is(true));
+        assertThat(u.getAuthority(), is(AppConstants.ROLE_ADMIN));
+        assertThat(u.getMailAddress(), is("user2@example.com"));
+        // パスワードが変更されていることを確認
+        assertTrue(BCrypt.checkpw("abcd1234", u.getPassword()));
+
+    }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void パスワードが一致しない更新は拒否される() throws Exception {
+        ResultActions actions = mMvcMock.perform(post(userManagementUrlTemplate + "/add")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .with(csrf())
+                .param("updateBtn", "保存")
+                .param("username", "user2")
+                .param("password", "abcd1234")
+                .param("passwordConfirm", "abcd12345")
+                .param("displayName", "変更するユーザー１")
+                .param("enableUser", "true")
+                .param("assignedRole", "U")
+                .param("mailAddress", "user2@example.com"))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String errMsg = (String) modelMap.get("errMsg");
+
+        assertThat(errMsg, is("パスワードが一致しません。"));
+
+        Optional<Users> usersOpt = userRepo.findById("user2");
+        assertTrue("変更したユーザーは存在する", usersOpt.isPresent());
+
+        Users u = usersOpt.get();
+        assertThat(u.getDisplayName(), is("JUnit test2"));
+        assertThat(u.getEnabled(), is(false));
+        assertThat(u.getAuthority(), is(AppConstants.ROLE_USER));
+        assertThat(u.getMailAddress(), is("test2@example.com"));
+        // パスワードが変更されていないことを確認
+        assertTrue(BCrypt.checkpw("P@ssw0rd", u.getPassword()));
+    }
+
 }

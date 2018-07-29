@@ -8,6 +8,7 @@ import net.formula97.webapp.pims.web.forms.HeaderForm;
 import net.formula97.webapp.pims.web.forms.UserModForm;
 import net.formula97.webapp.pims.web.forms.UserSearchConditionForm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -144,13 +145,84 @@ public class AdminUserManagementController extends BaseWebController {
     }
 
     /**
+     * 詳細表示しているユーザーを更新で保存する。
+     *
+     * @param userModForm ユーザー更新情報のform
+     * @param result      BeanValidation結果
+     * @param model       画面Model
+     * @param headerForm  ヘッダ表示用form
+     * @return 正常終了の場合リダイレクト、そうでない場合は自身のview
+     */
+    @RequestMapping(value = "add", method = RequestMethod.POST, params = "updateBtn")
+    public String updateUserDetail(@ModelAttribute("userModForm") @Validated UserModForm userModForm, BindingResult result,
+                                   Model model, HeaderForm headerForm, RedirectAttributes redirectAttributes) {
+        // ログイン中かどうかを判断
+        Users currentUser = getUserState(model, headerForm);
+
+        if (result.hasErrors()) {
+            model.addAttribute("userModForm", userModForm);
+            model.addAttribute("modeTag", AppConstants.EDIT_MODE_MODIFY);
+            return "/admin/user_detail";
+        }
+
+        String targetUserId = userModForm.getUsername();
+        Users targetUser = authUsersSvc.findUserById(targetUserId);
+
+        // ユーザーがいない場合はエラー
+        if (targetUser == null) {
+            String errMsg = String.format(Locale.getDefault(), "ユーザー %s は存在しません。", targetUser);
+            putErrMsg(model, errMsg);
+            model.addAttribute("userModForm", userModForm);
+            model.addAttribute("modeTag", AppConstants.EDIT_MODE_MODIFY);
+            return "/admin/user_detail";
+        }
+        // パスワード（新、確認用）のいずれかに入力がある場合、値の一致を検証する
+        if (!CommonsStringUtils.isNullOrWhiteSpace(userModForm.getPassword())) {
+            if (!userModForm.getPassword().equals(userModForm.getPasswordConfirm())) {
+                model.addAttribute("userModForm", userModForm);
+                putErrMsg(model, "パスワードが一致しません。");
+                model.addAttribute("modeTag", AppConstants.EDIT_MODE_MODIFY);
+                return "/admin/user_detail";
+            }
+        } else if (!CommonsStringUtils.isNullOrWhiteSpace(userModForm.getPasswordConfirm())) {
+            if (userModForm.getPasswordConfirm().equals(userModForm.getPassword())) {
+                model.addAttribute("userModForm", userModForm);
+                putErrMsg(model, "パスワードが一致しません。");
+                model.addAttribute("modeTag", AppConstants.EDIT_MODE_MODIFY);
+                return "/admin/user_detail";
+            }
+        }
+        // NPE対策でこんなコードになったが、もっとエレガントに書けんかな....
+
+        // パスワードを両方せっていしている場合は、値を更新する
+        if (!CommonsStringUtils.isNullOrWhiteSpace(userModForm.getPassword()) && !CommonsStringUtils.isNullOrWhiteSpace(userModForm.getPasswordConfirm())) {
+            targetUser.setPassword(BCrypt.hashpw(userModForm.getPassword(), BCrypt.gensalt()));
+        }
+        targetUser.setDisplayName(userModForm.getDisplayName());
+        targetUser.setMailAddress(userModForm.getMailAddress());
+        String authority = "";
+        if (AppConstants.ROLE_CODE_ADMIN.equals(userModForm.getAssignedRole())) {
+            authority = AppConstants.ROLE_ADMIN;
+        } else if (AppConstants.ROLE_CODE_USER.equals(userModForm.getAssignedRole())) {
+            authority = AppConstants.ROLE_USER;
+        }
+        targetUser.setAuthority(authority);
+        targetUser.setEnabled(userModForm.getEnableUser());
+
+        authUsersSvc.saveUsers(targetUser);
+        String infoMsg = String.format(Locale.getDefault(), "ユーザー %s を更新しました。", targetUser);
+        redirectAttributes.addFlashAttribute("infoMsg", infoMsg);
+
+        return "redirect:/admin/userManagement/" + targetUserId;
+    }
+
+    /**
      * 画面に返送する前に、パスワード入力値を消去する。
      *
      * @param form 画面入力値が入っているForm
      */
     private void erasePasswordElements(UserModForm form) {
         form.setPassword("");
-        form.setOrgPassword("");
         form.setPasswordConfirm("");
     }
 }
