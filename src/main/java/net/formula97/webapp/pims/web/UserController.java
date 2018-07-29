@@ -46,7 +46,7 @@ public class UserController extends BaseWebController {
 
         model.addAttribute("userConfigForm", userConfigForm);
 
-        return "user/userdetail";
+        return "/user/userdetail";
     }
 
     @RequestMapping(path = "config", method = RequestMethod.POST, name = "updateBtn")
@@ -70,32 +70,32 @@ public class UserController extends BaseWebController {
         model.addAttribute("userConfigForm", userConfigForm);
 
         if (result.hasErrors()) {
-            return "user/userdetail";
+            return "/user/userdetail";
         }
 
         if (!BCrypt.checkpw(userConfigForm.getOrgPassword(), users.getPassword())) {
             putErrMsg(model, "パスワードが一致しません。");
-            return "user/userdetail";
+            return "/user/userdetail";
         }
 
         if (!userConfigForm.isPasswdMatches()) {
             putErrMsg(model, "パスワードが一致しません。");
-            return "user/userdetail";
+            return "/user/userdetail";
         }
 
         if (!userConfigForm.isDisableUsernameModify() && userConfigForm.getUsername().trim().length() == 0) {
             putErrMsg(model, "半角スペースだけのユーザーIDは使用できません。");
-            return "user/userdetail";
+            return "/user/userdetail";
         }
 
         if (userConfigForm.getPassword().trim().length() == 0) {
             putErrMsg(model, "半角スペースだけのパスワードは使用できません。");
-            return "user/userdetail";
+            return "/user/userdetail";
         }
 
         if (userConfigForm.getDisplayName().trim().length() == 0) {
             putErrMsg(model, "半角スペースだけの表示名は使用できません。");
-            return "user/userdetail";
+            return "/user/userdetail";
         }
 
         // ユーザー情報の更新
