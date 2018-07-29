@@ -102,11 +102,11 @@
                 <div class="col-lg-4 col-sm-4 radio-inline">
                     <label class="control-label radio-inline">
                         <input type="radio" id="userRole" name="assignedRole" th:field="${userConfigForm.assignedRole}"
-                               value="ROLE_USER" th:disabled="${userConfigForm.disableRoleModify}"/>一般ユーザー
+                               value="USER" th:disabled="${userConfigForm.disableRoleModify}"/>一般ユーザー
                     </label>
                     <label class="control-label radio-inline">
                         <input type="radio" id="adminRole" name="assignedRole" th:field="${userConfigForm.assignedRole}"
-                               value="ROLE_ADMIN" th:disabled="${userConfigForm.disableRoleModify}"/>管理者ユーザー
+                               value="ADMIN" th:disabled="${userConfigForm.disableRoleModify}"/>管理者ユーザー
                     </label>
                 </div>
             </div>
