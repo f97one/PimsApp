@@ -80,7 +80,7 @@ public class AdminSystemPreferenceControllerTest extends BaseTestCase {
         user1.setPassword(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
         user1.setDisplayName("JUnit test1");
         user1.setMailAddress("test1@example.com");
-        user1.setAuthority(AppConstants.ROLE_USER);
+        user1.setAuthority(AppConstants.CANONICAL_ROLE_USER);
         user1.setEnabled(true);
         userRepo.save(user1);
 
@@ -89,7 +89,7 @@ public class AdminSystemPreferenceControllerTest extends BaseTestCase {
         admin1.setPassword(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
         admin1.setDisplayName("JUnit kanrisha1");
         admin1.setMailAddress("kanrisha1@example.net");
-        admin1.setAuthority(AppConstants.ROLE_ADMIN);
+        admin1.setAuthority(AppConstants.CANONICAL_ROLE_ADMIN);
         admin1.setEnabled(true);
         userRepo.save(admin1);
 

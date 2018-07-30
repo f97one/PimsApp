@@ -96,7 +96,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
         user1.setPassword(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
         user1.setDisplayName("JUnit test1");
         user1.setMailAddress("test1@example.com");
-        user1.setAuthority(AppConstants.ROLE_USER);
+        user1.setAuthority(AppConstants.CANONICAL_ROLE_USER);
         user1.setEnabled(true);
         userRepo.save(user1);
 
@@ -105,7 +105,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
         user2.setPassword(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
         user2.setDisplayName("JUnit test2");
         user2.setMailAddress("test2@example.com");
-        user2.setAuthority(AppConstants.ROLE_USER);
+        user2.setAuthority(AppConstants.CANONICAL_ROLE_USER);
         user2.setEnabled(false);
         userRepo.save(user2);
 
@@ -114,7 +114,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
         admin1.setPassword(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
         admin1.setDisplayName("JUnit kanrisha1");
         admin1.setMailAddress("kanrisha1@example.net");
-        admin1.setAuthority(AppConstants.ROLE_ADMIN);
+        admin1.setAuthority(AppConstants.CANONICAL_ROLE_ADMIN);
         admin1.setEnabled(true);
         userRepo.save(admin1);
     }
@@ -435,7 +435,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
         assertThat("reguser1が追加されている", usersOpt.isPresent(), is(true));
         Users u1 = usersOpt.get();
         assertThat("入力したパスワードと一致している", BCrypt.checkpw("abcdefgh", u1.getPassword()), is(true));
-        assertThat("一般ユーザーになっている", u1.getAuthority(), is(AppConstants.ROLE_USER));
+        assertThat("一般ユーザーになっている", u1.getAuthority(), is(AppConstants.CANONICAL_ROLE_USER));
     }
 
     @Test
@@ -657,7 +657,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
         Users u = usersOpt.get();
         assertThat(u.getDisplayName(), is("変更するユーザー１"));
         assertThat(u.getEnabled(), is(true));
-        assertThat(u.getAuthority(), is(AppConstants.ROLE_USER));
+        assertThat(u.getAuthority(), is(AppConstants.CANONICAL_ROLE_USER));
         assertThat(u.getMailAddress(), is("user2@example.com"));
         // パスワードが変更されていないことを確認
         assertTrue(BCrypt.checkpw("P@ssw0rd", u.getPassword()));
@@ -690,7 +690,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
         Users u = usersOpt.get();
         assertThat(u.getDisplayName(), is("変更するユーザー１"));
         assertThat(u.getEnabled(), is(true));
-        assertThat(u.getAuthority(), is(AppConstants.ROLE_ADMIN));
+        assertThat(u.getAuthority(), is(AppConstants.CANONICAL_ROLE_ADMIN));
         assertThat(u.getMailAddress(), is("user2@example.com"));
         // パスワードが変更されていることを確認
         assertTrue(BCrypt.checkpw("abcd1234", u.getPassword()));
@@ -729,7 +729,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
         Users u = usersOpt.get();
         assertThat(u.getDisplayName(), is("JUnit test2"));
         assertThat(u.getEnabled(), is(false));
-        assertThat(u.getAuthority(), is(AppConstants.ROLE_USER));
+        assertThat(u.getAuthority(), is(AppConstants.CANONICAL_ROLE_USER));
         assertThat(u.getMailAddress(), is("test2@example.com"));
         // パスワードが変更されていないことを確認
         assertTrue(BCrypt.checkpw("P@ssw0rd", u.getPassword()));

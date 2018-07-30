@@ -37,4 +37,13 @@ public class AppConstants {
 
     public static final String ROLE_CODE_ADMIN = "A";
     public static final String ROLE_CODE_USER = "U";
+
+    /**
+     * プリフィックス付きのユーザー権限：管理者ユーザー
+     */
+    public static final String CANONICAL_ROLE_ADMIN = "ROLE_ADMIN";
+    /**
+     * プリフィックス付きのユーザー権限：一般ユーザー
+     */
+    public static final String CANONICAL_ROLE_USER = "ROLE_USER";
 }

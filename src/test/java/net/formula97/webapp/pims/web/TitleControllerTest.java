@@ -93,7 +93,7 @@ public class TitleControllerTest extends BaseTestCase {
         user1.setPassword(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
         user1.setDisplayName("JUnit test");
         user1.setMailAddress("test@example.com");
-        user1.setAuthority(AppConstants.ROLE_USER);
+        user1.setAuthority(AppConstants.CANONICAL_ROLE_USER);
         userRepo.save(user1);
         
         Users user2 = new Users();
@@ -101,7 +101,7 @@ public class TitleControllerTest extends BaseTestCase {
         user2.setPassword(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
         user2.setDisplayName("JUnit test 2");
         user2.setMailAddress("test2@example.com");
-        user2.setAuthority(AppConstants.ROLE_ADMIN);
+        user2.setAuthority(AppConstants.CANONICAL_ROLE_ADMIN);
         userRepo.save(user2);
         
         IssueLedger l1 = new IssueLedger();

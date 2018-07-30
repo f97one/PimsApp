@@ -82,7 +82,7 @@ public class AdminControllerTest extends BaseTestCase {
         user1.setPassword(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
         user1.setDisplayName("JUnit test1");
         user1.setMailAddress("test1@example.com");
-        user1.setAuthority(AppConstants.ROLE_USER);
+        user1.setAuthority(AppConstants.CANONICAL_ROLE_USER);
         userRepo.save(user1);
 
         Users user2 = new Users();
@@ -90,7 +90,7 @@ public class AdminControllerTest extends BaseTestCase {
         user2.setPassword(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
         user2.setDisplayName("JUnit test2");
         user2.setMailAddress("test2@example.com");
-        user2.setAuthority(AppConstants.ROLE_USER);
+        user2.setAuthority(AppConstants.CANONICAL_ROLE_USER);
         userRepo.save(user2);
 
         Users admin1 = new Users();
@@ -98,7 +98,7 @@ public class AdminControllerTest extends BaseTestCase {
         admin1.setPassword(BCrypt.hashpw("P@ssw0rd", BCrypt.gensalt()));
         admin1.setDisplayName("JUnit kanrisha1");
         admin1.setMailAddress("kanrisha1@example.net");
-        admin1.setAuthority(AppConstants.ROLE_ADMIN);
+        admin1.setAuthority(AppConstants.CANONICAL_ROLE_ADMIN);
         userRepo.save(admin1);
     }
 
