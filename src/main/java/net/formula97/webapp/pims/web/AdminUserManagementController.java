@@ -202,9 +202,9 @@ public class AdminUserManagementController extends BaseWebController {
         targetUser.setMailAddress(userModForm.getMailAddress());
         String authority = "";
         if (AppConstants.ROLE_CODE_ADMIN.equals(userModForm.getAssignedRole())) {
-            authority = AppConstants.ROLE_ADMIN;
+            authority = AppConstants.CANONICAL_ROLE_ADMIN;
         } else if (AppConstants.ROLE_CODE_USER.equals(userModForm.getAssignedRole())) {
-            authority = AppConstants.ROLE_USER;
+            authority = AppConstants.CANONICAL_ROLE_USER;
         }
         targetUser.setAuthority(authority);
         targetUser.setEnabled(userModForm.getEnableUser());

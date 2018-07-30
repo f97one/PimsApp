@@ -72,10 +72,10 @@ public class UserModForm {
         this.enableUser = users.getEnabled();
 
         switch (users.getAuthority()) {
-            case AppConstants.ROLE_ADMIN:
+            case AppConstants.CANONICAL_ROLE_ADMIN:
                 this.assignedRole = AppConstants.ROLE_CODE_ADMIN;
                 break;
-            case AppConstants.ROLE_USER:
+            case AppConstants.CANONICAL_ROLE_USER:
                 this.assignedRole = AppConstants.ROLE_CODE_USER;
                 break;
             default:
@@ -111,10 +111,10 @@ public class UserModForm {
         users.setEnabled(this.enableUser);
         switch (this.assignedRole) {
             case AppConstants.ROLE_CODE_USER:
-                users.setAuthority(AppConstants.ROLE_USER);
+                users.setAuthority(AppConstants.CANONICAL_ROLE_USER);
                 break;
             case AppConstants.ROLE_CODE_ADMIN:
-                users.setAuthority(AppConstants.ROLE_ADMIN);
+                users.setAuthority(AppConstants.CANONICAL_ROLE_ADMIN);
                 break;
         }
         users.setMailAddress(this.mailAddress);
