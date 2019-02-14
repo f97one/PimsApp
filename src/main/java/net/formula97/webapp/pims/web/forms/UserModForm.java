@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.misc.AppConstants;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import javax.validation.constraints.Pattern;
@@ -20,8 +19,7 @@ public class UserModForm {
     /**
      * 編集用ユーザーID
      */
-    @NotBlank
-    @Size(min = 1, max = 32)
+    @Size(max = 32)
     @Pattern(regexp = "[\\p{Alnum}]*")
     private String username;
 
@@ -62,6 +60,8 @@ public class UserModForm {
     /**
      * ユーザーIDをDisabledにしていると、中身はnullになるため、検索用のバックアップとして使用するユーザーID
      */
+    @Size(max = 32)
+    @Pattern(regexp = "[\\p{Alnum}]*")
     private String searchUsername;
 
     public UserModForm(Users users) {

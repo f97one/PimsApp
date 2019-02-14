@@ -35,6 +35,7 @@ import java.util.Set;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -391,6 +392,11 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
         violationsSet = validator.validate(frm);
         assertThat("エラーは0件", violationsSet.size(), is(0));
 
+        // ユーザー名を空にしてもエラーにしない
+        frm.setUsername("");
+        violationsSet = validator.validate(frm);
+        assertThat("エラーは0件", violationsSet.size(), is(0));
+
     }
 
     @Test
@@ -617,6 +623,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
         assertThat(userModForm.getDisplayName(), is("JUnit test1"));
         assertThat(userModForm.getEnableUser(), is(true));
         assertThat(userModForm.getAssignedRole(), is(AppConstants.ROLE_CODE_USER));
+
     }
 
     @Test
@@ -637,6 +644,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .with(csrf())
                 .param("updateBtn", "保存")
+                .param("searchUsername", "user2")
                 .param("username", "user2")
                 .param("password", "")
                 .param("passwordConfirm", "")
@@ -670,6 +678,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .with(csrf())
                 .param("updateBtn", "保存")
+                .param("searchUsername", "user2")
                 .param("username", "user2")
                 .param("password", "abcd1234")
                 .param("passwordConfirm", "abcd1234")
@@ -704,6 +713,7 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .with(csrf())
                 .param("updateBtn", "保存")
+                .param("searchUsername", "user2")
                 .param("username", "user2")
                 .param("password", "abcd1234")
                 .param("passwordConfirm", "abcd12345")
@@ -734,5 +744,4 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
         // パスワードが変更されていないことを確認
         assertTrue(BCrypt.checkpw("P@ssw0rd", u.getPassword()));
     }
-
 }

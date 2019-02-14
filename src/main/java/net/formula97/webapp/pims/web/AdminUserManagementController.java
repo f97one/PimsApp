@@ -166,6 +166,11 @@ public class AdminUserManagementController extends BaseWebController {
         }
 
         String targetUserId = userModForm.getUsername();
+        // Formをdisableにしていて見つからないので、searchUsernameから移植する
+        if (CommonsStringUtils.isNullOrWhiteSpace(targetUserId)) {
+            targetUserId = userModForm.getSearchUsername();
+            userModForm.setUsername(targetUserId);
+        }
         Users targetUser = authUsersSvc.findUserById(targetUserId);
 
         // ユーザーがいない場合はエラー
