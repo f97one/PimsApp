@@ -175,7 +175,7 @@ public class AdminUserManagementController extends BaseWebController {
 
         // ユーザーがいない場合はエラー
         if (targetUser == null) {
-            String errMsg = String.format(Locale.getDefault(), "ユーザー %s は存在しません。", targetUser);
+            String errMsg = String.format(Locale.getDefault(), "ユーザー %s は存在しません。", targetUserId);
             putErrMsg(model, errMsg);
             model.addAttribute("userModForm", userModForm);
             model.addAttribute("modeTag", AppConstants.EDIT_MODE_MODIFY);

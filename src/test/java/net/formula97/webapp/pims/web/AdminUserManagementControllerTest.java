@@ -33,9 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -743,5 +741,37 @@ public class AdminUserManagementControllerTest extends BaseTestCase {
         assertThat(u.getMailAddress(), is("test2@example.com"));
         // パスワードが変更されていないことを確認
         assertTrue(BCrypt.checkpw("P@ssw0rd", u.getPassword()));
+    }
+
+    @Test
+    @WithMockUser(value = "kanrisha1", roles = {"ADMIN"})
+    public void 存在しないユーザーは更新できない() throws Exception {
+        ResultActions actions = mMvcMock.perform(post(userManagementUrlTemplate + "/add")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .with(csrf())
+                .param("updateBtn", "保存")
+                .param("searchUsername", "user00")
+                .param("username", "user00")
+                .param("password", "abcd1234")
+                .param("passwordConfirm", "abcd1234")
+                .param("displayName", "変更するユーザー１")
+                .param("enableUser", "true")
+                .param("assignedRole", "U")
+                .param("mailAddress", "user00@example.com"))
+                .andDo(print());
+
+        MvcResult mvcResult = actions
+                .andExpect(status().isOk())
+                .andExpect(model().hasNoErrors())
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        String errMsg = (String) modelMap.get("errMsg");
+
+        assertThat(errMsg, is("ユーザー user00 は存在しません。"));
+
+        Optional<Users> usersOpt = userRepo.findById("user00");
+        assertFalse("変更しようとしたユーザーは存在しない", usersOpt.isPresent());
+
     }
 }
