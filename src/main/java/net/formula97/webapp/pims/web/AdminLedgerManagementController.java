@@ -183,10 +183,15 @@ public class AdminLedgerManagementController extends BaseWebController {
         return "/admin/ledger_removal";
     }
 
-//    @RequestMapping(value = "{ledgerId}", method = RequestMethod.POST)
-//    public String removeLedger(@PathVariable Integer ledgerId, Model model, HeaderForm headerForm) {
-//        Users myUserDetail = getUserState(model, headerForm);
-//
-//        return null;
-//    }
+    @RequestMapping(value = "add", method = RequestMethod.GET)
+    public String showLedgerEditorFormAsAdd(Model model, HeaderForm headerForm) {
+        Users myUserDetail = getUserState(model, headerForm);
+
+        NewLedgerForm newLedgerForm = new NewLedgerForm();
+        newLedgerForm.setPublicLedger(false);
+
+        model.addAttribute("newLedgerForm", newLedgerForm);
+
+        return "/admin/ledger_add";
+    }
 }

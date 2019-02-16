@@ -41,6 +41,7 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -648,5 +649,16 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
 
         MvcResult mvcResult = actions.andExpect(status().isOk())
                 .andExpect(view().name(is("/admin/ledger_removal"))).andReturn();
+    }
+
+    @Test
+    @WithMockUser(username = "kanrisha1", roles = "ADMIN")
+    public void 台帳追加画面を表示できる() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/add", apiEndpoint);
+        ResultActions actions = mMvcMock.perform(get(template)).andDo(print());
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(view().name(is("/admin/ledger_add")))
+                .andReturn();
+
     }
 }

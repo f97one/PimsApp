@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8"/>
+    <title>Adding Ledger | PIMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css"
+          href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap-theme.min.css}"/>
+</head>
+
+<body>
+<div class="container">
+    <div th:replace="/common/common_header::common_header"></div>
+
+    <h2 class="h2">台帳追加</h2>
+
+    <div th:replace="/common/info_block::info_block"></div>
+
+    <form id="newLedgerForm" name="newLedgerForm" th:action="@{/admin/ledgerManagement/create}"
+          th:object="${newLedgerForm}"
+          class="form-horizontal" method="POST">
+
+        <div class="row vertical-margin">
+            <div class="col-lg-2">台帳名</div>
+            <div class="col-lg-10">
+                <input type="text" id="ledgerName" name="ledgerName"
+                       th:field="*{ledgerName}" th:errorClass="form-control"
+                       th:disabled="${#httpServletRequest.remoteUser == null}" class="form-control"
+                       value="hogeシステム改修"/>
+                <span th:if="${#fields.hasErrors('ledgerName')}" th:errors="*{ledgerName}"
+                      class="help-block">Error</span>
+            </div>
+        </div>
+
+        <div class="row vertical-margin">
+            <div class="col-lg-2"></div>
+            <div class="col-lg-10">
+                <input type="hidden" id="openStatus" name="openStatus" th:field="*{openStatus}" value="1"/>
+                <input type="checkbox" id="publicLedger" name="publicLedger" th:field="*{publicLedger}"
+                       th:disabled="${#httpServletRequest.remoteUser == null}"/>
+                <label for="publicLedger">参加ユーザー以外も参照できるようにする</label>
+            </div>
+        </div>
+
+        <div class="row vertical-margin">
+            <div class="col-lg-2 col-sm-3">
+                <a th:href="@{'/admin/ledgerManagement/'}" class="btn btn-default btn-block">戻る</a>
+            </div>
+            <div class="col-lg-2 col-sm-3 pull-right">
+                <input type="submit" class="btn btn-primary btn-block" id="addLedgerBtn" name="addLedgerBtn"
+                       value="追加"/>
+            </div>
+        </div>
+
+    </form>
+</div>
+</body>
+
+</html>
