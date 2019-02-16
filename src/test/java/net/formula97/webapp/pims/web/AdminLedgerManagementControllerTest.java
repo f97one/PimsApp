@@ -40,8 +40,7 @@ import javax.validation.constraints.Size;
 import java.util.*;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -243,6 +242,9 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
 
+        boolean searchExecuted = (boolean) modelMap.get("searchExecuted");
+        assertTrue("検索実行フラグが立っている", searchExecuted);
+
         List<IssueLedger> ledgerList = (List<IssueLedger>) modelMap.get("ledgerList");
         assertThat("２件ヒットしている", ledgerList.size(), is(2));
 
@@ -269,6 +271,9 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
                 .andReturn();
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+
+        boolean searchExecuted = (boolean) modelMap.get("searchExecuted");
+        assertTrue("検索実行フラグが立っている", searchExecuted);
 
         List<IssueLedger> ledgerList = (List<IssueLedger>) modelMap.get("ledgerList");
         assertThat("２件ヒットしている", ledgerList.size(), is(2));
@@ -297,6 +302,9 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
 
+        boolean searchExecuted = (boolean) modelMap.get("searchExecuted");
+        assertTrue("検索実行フラグが立っている", searchExecuted);
+
         List<IssueLedger> ledgerList = (List<IssueLedger>) modelMap.get("ledgerList");
         assertThat("１件ヒットしている", ledgerList.size(), is(1));
         assertThat("非公開台帳１が見つかっている", ledgerList.get(0).getLedgerName(), is("非公開台帳１"));
@@ -319,6 +327,9 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
                 .andReturn();
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+
+        boolean searchExecuted = (boolean) modelMap.get("searchExecuted");
+        assertTrue("検索実行フラグが立っている", searchExecuted);
 
         List<IssueLedger> ledgerList = (List<IssueLedger>) modelMap.get("ledgerList");
         assertThat("2件ヒットしている", ledgerList.size(), is(2));
@@ -345,6 +356,9 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
                 .andReturn();
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+
+        boolean searchExecuted = (boolean) modelMap.get("searchExecuted");
+        assertTrue("検索実行フラグが立っている", searchExecuted);
 
         List<IssueLedger> ledgerList = (List<IssueLedger>) modelMap.get("ledgerList");
         assertThat("0件ヒットしている", ledgerList.size(), is(0));

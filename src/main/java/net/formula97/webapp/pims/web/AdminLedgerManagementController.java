@@ -54,6 +54,8 @@ public class AdminLedgerManagementController extends BaseWebController {
         model.addAttribute("matchLedgerCount", ledgerList.size());
         model.addAttribute("ledgerList", ledgerList);
 
+        model.addAttribute("searchExecuted", true);
+
         return "/admin/ledger_list";
     }
 
