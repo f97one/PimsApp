@@ -40,6 +40,7 @@ import javax.validation.constraints.Size;
 import java.util.*;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -674,5 +675,58 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
                 .andExpect(view().name(is("/admin/ledger_add")))
                 .andReturn();
 
+    }
+
+    @Test
+    @WithMockUser(username = "kanrisha1", roles = "ADMIN")
+    public void 管理者機能で台帳を追加できる() throws Exception {
+        List<IssueLedger> before = issueLedgerRepo.findAll();
+
+        String template = String.format(Locale.getDefault(), "%s/create", apiEndpoint);
+
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("ledgerName", "追加台帳１")
+                .param("openStatus", "1")
+                .param("publicLedger", "false")
+                .param("addLedgerBtn", "追加")
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().is3xxRedirection())
+                .andExpect(view().name(is("redirect:/admin/ledgerManagement")))
+                .andReturn();
+
+        List<IssueLedger> results = issueLedgerRepo.findAll();
+        assertThat("1件増えている", results.size(), is(before.size() + 1));
+
+        MySpecificationAdapter<IssueLedger> specAdapter = new MySpecificationAdapter<>(IssueLedger.class);
+        Optional<IssueLedger> ledger = issueLedgerRepo.findOne(Specification.where(specAdapter.eq("ledgerName", "追加台帳１")));
+        assertThat("追加した台帳が見つかる", ledger, is(notNullValue()));
+
+        String infoMsg = (String) mvcResult.getFlashMap().get("infoMsg");
+        assertThat(infoMsg, is("台帳 追加台帳１ を追加しました。"));
+    }
+
+    @Test
+    @WithMockUser(username = "kanrisha1", roles = "ADMIN")
+    public void 台帳名を空にすると登録できない() throws Exception {
+        List<IssueLedger> before = issueLedgerRepo.findAll();
+
+        String template = String.format(Locale.getDefault(), "%s/create", apiEndpoint);
+
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("ledgerName", "")
+                .param("openStatus", "1")
+                .param("publicLedger", "false")
+                .param("addLedgerBtn", "追加")
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().isOk())
+                .andExpect(view().name(is("/admin/ledger_add")))
+                .andReturn();
+
+        List<IssueLedger> results = issueLedgerRepo.findAll();
+        assertThat("件数は同じ", results.size(), is(before.size()));
     }
 }

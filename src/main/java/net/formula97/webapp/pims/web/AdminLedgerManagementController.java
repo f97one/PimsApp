@@ -13,12 +13,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -195,5 +198,26 @@ public class AdminLedgerManagementController extends BaseWebController {
         model.addAttribute("newLedgerForm", newLedgerForm);
 
         return "/admin/ledger_add";
+    }
+
+    @RequestMapping(value = "create", method = RequestMethod.POST, params = "addLedgerBtn")
+    public String createNewLedger(@Validated NewLedgerForm newLedgerForm, BindingResult result, Model model, HeaderForm headerForm, RedirectAttributes redirectAttributes) {
+        Users myUserDetail = getUserState(model, headerForm);
+
+        if (result.hasErrors()) {
+            model.addAttribute("newLedgerForm", newLedgerForm);
+            return "/admin/ledger_add";
+        } else {
+            IssueLedger ledger = new IssueLedger();
+            ledger.setLedgerName(newLedgerForm.getLedgerName());
+            ledger.setOpenStatus(newLedgerForm.getOpenStatus());
+            ledger.setPublicLedger(newLedgerForm.isPublicLedger());
+
+            issueLedgerSvc.saveLedger(ledger);
+
+            String msg = String.format(Locale.getDefault(), "台帳 %s を追加しました。", newLedgerForm.getLedgerName());
+            redirectAttributes.addFlashAttribute("infoMsg", msg);
+            return "redirect:/admin/ledgerManagement";
+        }
     }
 }
