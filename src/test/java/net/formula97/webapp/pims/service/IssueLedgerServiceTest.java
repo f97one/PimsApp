@@ -12,16 +12,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
@@ -80,7 +77,7 @@ public class IssueLedgerServiceTest {
         issueLedgerRepo.save(ledger);
 
         MySpecificationAdapter<IssueLedger> issueLedgerSpec = new MySpecificationAdapter<>(IssueLedger.class);
-        IssueLedger savedLedger = issueLedgerRepo.findOne(Specifications.where(issueLedgerSpec.eq("ledgerName", "非公開台帳１"))).get();
+        IssueLedger savedLedger = issueLedgerRepo.findOne(Specification.where(issueLedgerSpec.eq("ledgerName", "非公開台帳１"))).get();
         this.existingLedgerId = savedLedger.getLedgerId();
 
         IssueLedger ledger1 = new IssueLedger();
@@ -187,5 +184,39 @@ public class IssueLedgerServiceTest {
 
         List<IssueLedger> resultList3 = issueLedgerService.getLedgerByList(frm1);
         assertThat("結果は3件", resultList3.size(), is(3));
+    }
+
+    @Test
+    public void 指定番号の台帳を消せる() {
+        issueLedgerService.removeLedgerById(existingLedgerId);
+
+        Users user1 = userRepo.findById("user1").orElse(null);
+        assertThat("user1は消されていない", user1, is(notNullValue(Users.class)));
+
+        IssueLedger ledger = issueLedgerRepo.findById(existingLedgerId).orElse(null);
+        assertThat(ledger, is(nullValue(IssueLedger.class)));
+
+        MySpecificationAdapter<IssueItems> issueItemsAdapter = new MySpecificationAdapter<>(IssueItems.class);
+        List<IssueItems> issueItemsList = issueItemsRepo.findAll(Specification.where(issueItemsAdapter.eq("ledgerId", existingLedgerId)));
+        assertThat(issueItemsList.size(), is(0));
+
+        MySpecificationAdapter<LedgerRefUser> ledgerRefUserAdapter = new MySpecificationAdapter<>(LedgerRefUser.class);
+        List<LedgerRefUser> ledgerRefUserList = ledgerRefUserRepo.findAll(Specification.where(ledgerRefUserAdapter.eq("ledgerId", existingLedgerId)));
+        assertThat(ledgerRefUserList.size(), is(0));
+    }
+
+    @Test
+    public void ない番号の台帳を消そうとすると例外を投げる() {
+        try {
+            issueLedgerService.removeLedgerById(Integer.MAX_VALUE);
+
+            fail("例外が投げられなかった");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(IllegalArgumentException.class)));
+
+            String msg = String.format(Locale.getDefault(), "LedgerID %d was not found on this system.", Integer.MAX_VALUE);
+            assertThat(e.getMessage(), is(msg));
+        }
+
     }
 }

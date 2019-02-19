@@ -3,10 +3,12 @@
  */
 package net.formula97.webapp.pims.service;
 
+import net.formula97.webapp.pims.domain.IssueItems;
 import net.formula97.webapp.pims.domain.IssueLedger;
 import net.formula97.webapp.pims.domain.LedgerRefUser;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.misc.CommonsStringUtils;
+import net.formula97.webapp.pims.repository.IssueItemsRepository;
 import net.formula97.webapp.pims.repository.IssueLedgerRepository;
 import net.formula97.webapp.pims.repository.LedgerRefUserRepository;
 import net.formula97.webapp.pims.repository.MySpecificationAdapter;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -32,6 +35,8 @@ public class IssueLedgerService {
     IssueLedgerRepository issueLedgerRepo;
     @Autowired
     LedgerRefUserRepository ledgerRefUserRepo;
+    @Autowired
+    IssueItemsRepository issueItemsRepo;
     
     public List<IssueLedger> getPublicLedgers() {
         MySpecificationAdapter<IssueLedger> issueLedgerSpecification = new MySpecificationAdapter<>(IssueLedger.class);
@@ -112,5 +117,32 @@ public class IssueLedgerService {
         }
 
         return ledgerList;
+    }
+
+    @Transactional
+    public void removeLedgerById(int ledgerId) {
+        // LedgerRefUser → IssueItems → IssueLedger の順でレコードを消す
+        Optional<IssueLedger> issueLedgerOpt = issueLedgerRepo.findById(ledgerId);
+
+        if (issueLedgerOpt.isPresent()) {
+            // 複数あるものは、先に削除対象を取得して deleteInBatch に流す
+            MySpecificationAdapter<LedgerRefUser> ledgerRefUserAdapter = new MySpecificationAdapter<>(LedgerRefUser.class);
+            List<LedgerRefUser> delLRU = ledgerRefUserRepo.findAll(Specification.where(ledgerRefUserAdapter.eq("ledgerId", ledgerId)));
+            if (delLRU.size() > 0) {
+                ledgerRefUserRepo.deleteInBatch(delLRU);
+            }
+
+            MySpecificationAdapter<IssueItems> issueItemsAdapter = new MySpecificationAdapter<>(IssueItems.class);
+            List<IssueItems> delIssueItemsList = issueItemsRepo.findAll(Specification.where(issueItemsAdapter.eq("ledgerId", ledgerId)));
+            if (delIssueItemsList.size() > 0) {
+                issueItemsRepo.deleteInBatch(delIssueItemsList);
+            }
+
+            issueLedgerRepo.delete(issueLedgerOpt.get());
+
+        } else {
+            String msg = String.format(Locale.getDefault(), "LedgerID %d was not found on this system.", ledgerId);
+            throw new IllegalArgumentException(msg);
+        }
     }
 }
