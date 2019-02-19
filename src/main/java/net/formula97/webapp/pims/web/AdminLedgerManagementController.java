@@ -163,9 +163,8 @@ public class AdminLedgerManagementController extends BaseWebController {
         return "/admin/ledger_detail";
     }
 
-    @RequestMapping(value = "ledgerDetail/{ledgerId}", method = RequestMethod.POST, params = "removeItemBtn")
-    public String confirmToRemoveLedger(@PathVariable Integer ledgerId, LedgerDetailForm detailForm,
-                                        Model model, HeaderForm headerForm) {
+    @RequestMapping(value = "ledgerDetail/remove/{ledgerId}", method = RequestMethod.GET)
+    public String confirmToRemoveLedger(@PathVariable Integer ledgerId, Model model, HeaderForm headerForm) {
         Users myUserDetail = getUserState(model, headerForm);
 
         IssueLedger issueLedger = issueLedgerSvc.getLedgerById(ledgerId);

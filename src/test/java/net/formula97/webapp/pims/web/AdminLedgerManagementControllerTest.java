@@ -7,6 +7,7 @@ import net.formula97.webapp.pims.domain.LedgerRefUser;
 import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.repository.*;
 import net.formula97.webapp.pims.web.forms.LedgerDetailForm;
+import net.formula97.webapp.pims.web.forms.LedgerRemovalDetailForm;
 import net.formula97.webapp.pims.web.forms.LedgerSearchConditionForm;
 import net.formula97.webapp.pims.web.forms.RefUserItem;
 import org.junit.After;
@@ -645,25 +646,18 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
     @Test
     @WithMockUser(username = "kanrisha1", roles = "ADMIN")
     public void 削除ボタンで確認画面を表示する() throws Exception {
-        String template = String.format(Locale.getDefault(), "%s/ledgerDetail/%d", apiEndpoint, existingLedgerId);
+        String template = String.format(Locale.getDefault(), "%s/ledgerDetail/remove/%d", apiEndpoint, existingLedgerId);
 
-        ResultActions actions = mMvcMock.perform(post(template)
-                .with(csrf())
-                .param("removeItemBtn", "削除")
-                .param("ledgerId", String.valueOf(existingLedgerId))
-                .param("ledgerName", "非公開台帳１−１")
-                .param("publicLedger", "true")
-                .param("openStatus", "1")
-                .param("refUserItemList[0].userJoined", "true")
-                .param("refUserItemList[0].userId", "kanrisha1")
-                .param("refUserItemList[0].displayName", "管理者１")
-                .param("refUserItemList[1].userJoined", "false")
-                .param("refUserItemList[1].userId", "user1")
-                .param("refUserItemList[1].displayName", "ユーザー１")
-        ).andDo(print());
+        ResultActions actions = mMvcMock.perform(get(template)).andDo(print());
 
         MvcResult mvcResult = actions.andExpect(status().isOk())
                 .andExpect(view().name(is("/admin/ledger_removal"))).andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        LedgerRemovalDetailForm frm = (LedgerRemovalDetailForm) modelMap.get("ledgerRemovalDetailForm");
+
+        assertThat(frm.getLedgerName(), is("非公開台帳１"));
+        assertThat(frm.getPublicLedger(), is(false));
     }
 
     @Test

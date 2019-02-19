@@ -113,8 +113,8 @@
                                         </a>
                                     </td>
                                     <td>
-                                        <input type="button" class="btn btn-danger col-lg-4 pull-right" value="削除"
-                                                th:onclick="'window.location.href = \'ledgerManagement/remove/' + ${ledger.ledgerId} + '\';'"/>
+                                        <a th:href="@{'/admin/ledgerManagement/ledgerDetail/remove/' + ${ledger.ledgerId}}"
+                                           class="btn btn-danger col-lg-4 pull-right">削除</a>
                                     </td>
                                 </tr>
                             </tbody>
