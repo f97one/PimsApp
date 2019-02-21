@@ -30,7 +30,8 @@
     </div>
 
     <form id="ledgerRemovalDetailForm" method="post" class="form-horizontal"
-          th:action="@{'/admin/ledgerManagement/remove/' + __${ledgerRemovalDetailForm.ledgerId}__}" th:object="${ledgerRemovalDetailForm}">
+          th:action="@{'/admin/ledgerManagement/ledgerDetail/remove/' + __${ledgerRemovalDetailForm.ledgerId}__}"
+          th:object="${ledgerRemovalDetailForm}">
 
         <div class="row">
             <input type="submit" class="btn btn-danger col-lg-1 pull-right" name="removeBtn" value="削除" />
