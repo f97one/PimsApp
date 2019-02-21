@@ -187,6 +187,30 @@ public class AdminLedgerManagementController extends BaseWebController {
         return "/admin/ledger_removal";
     }
 
+    @RequestMapping(value = "ledgerDetail/remove/{ledgerId}", method = RequestMethod.POST, params = "removeBtn")
+    public String removeLedgersById(@PathVariable Integer ledgerId, Model model, HeaderForm headerForm, RedirectAttributes redirectAttributes) {
+        Users myUserDetail = getUserState(model, headerForm);
+
+        try {
+            IssueLedger ledger = issueLedgerSvc.getLedgerById(ledgerId);
+
+            issueLedgerSvc.removeLedgerById(ledgerId);
+
+            String info = String.format(Locale.getDefault(), "台帳 %s を削除しました。", ledger.getLedgerName());
+            redirectAttributes.addFlashAttribute("infoMsg", info);
+        } catch (Exception e) {
+            String msg = String.format(Locale.getDefault(), "LedgerID %d was not found on this system.", ledgerId);
+            if (e instanceof IllegalArgumentException && msg.equals(e.getMessage())) {
+                redirectAttributes.addFlashAttribute("errMsg", "指定された台帳は見つかりません。");
+            } else {
+                e.printStackTrace();
+                throw e;
+            }
+        }
+
+        return "redirect:/admin/ledgerManagement";
+    }
+
     @RequestMapping(value = "add", method = RequestMethod.GET)
     public String showLedgerEditorFormAsAdd(Model model, HeaderForm headerForm) {
         Users myUserDetail = getUserState(model, headerForm);

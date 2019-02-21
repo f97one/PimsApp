@@ -122,7 +122,7 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
         issueLedgerRepo.save(ledger);
 
         MySpecificationAdapter<IssueLedger> issueLedgerSpec = new MySpecificationAdapter<>(IssueLedger.class);
-        IssueLedger savedLedger = issueLedgerRepo.findOne(Specifications.where(issueLedgerSpec.eq("ledgerName", "非公開台帳１"))).get();
+        IssueLedger savedLedger = issueLedgerRepo.findOne(Specification.where(issueLedgerSpec.eq("ledgerName", "非公開台帳１"))).get();
         this.existingLedgerId = savedLedger.getLedgerId();
 
         IssueLedger ledger1 = new IssueLedger();
@@ -722,5 +722,65 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
 
         List<IssueLedger> results = issueLedgerRepo.findAll();
         assertThat("件数は同じ", results.size(), is(before.size()));
+    }
+
+    @Test
+    @WithMockUser(username = "kanrisha1", roles = "ADMIN")
+    public void 削除確認画面で台帳を削除できる() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/ledgerDetail/remove/%d", apiEndpoint, existingLedgerId);
+
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("removeBtn", "削除")
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().is3xxRedirection())
+                .andExpect(view().name(is("redirect:/admin/ledgerManagement")))
+                .andReturn();
+
+        String infoMsg = (String) mvcResult.getFlashMap().get("infoMsg");
+        assertThat(infoMsg, is("台帳 非公開台帳１ を削除しました。"));
+
+        MySpecificationAdapter<IssueLedger> issueLedgerSpec = new MySpecificationAdapter<>(IssueLedger.class);
+        Optional<IssueLedger> ledgerOpt = issueLedgerRepo.findOne(Specification.where(issueLedgerSpec.eq("ledgerName", "非公開台帳１")));
+        assertFalse("非公開台帳１は削除されている", ledgerOpt.isPresent());
+
+        MySpecificationAdapter<LedgerRefUser> ledgerRefUserSpec = new MySpecificationAdapter<>(LedgerRefUser.class);
+        List<LedgerRefUser> ledgerRefUserList = ledgerRefUserRepo.findAll(Specification.where(ledgerRefUserSpec.eq("ledgerId", existingLedgerId)));
+        assertThat(ledgerRefUserList.size(), is(0));
+
+        MySpecificationAdapter<IssueItems> issueItemsSpec = new MySpecificationAdapter<>(IssueItems.class);
+        List<IssueItems> issueItemsList = issueItemsRepo.findAll(Specification.where(issueItemsSpec.eq("ledgerId", existingLedgerId)));
+        assertThat(issueItemsList.size(), is(0));
+    }
+
+    @Test
+    @WithMockUser(username = "kanrisha1", roles = "ADMIN")
+    public void ない台帳を指定しても削除できない() throws Exception {
+        String template = String.format(Locale.getDefault(), "%s/ledgerDetail/remove/%d", apiEndpoint, Integer.MAX_VALUE);
+
+        ResultActions actions = mMvcMock.perform(post(template)
+                .with(csrf())
+                .param("removeBtn", "削除")
+        ).andDo(print());
+
+        MvcResult mvcResult = actions.andExpect(status().is3xxRedirection())
+                .andExpect(view().name(is("redirect:/admin/ledgerManagement")))
+                .andReturn();
+
+        String infoMsg = (String) mvcResult.getFlashMap().get("errMsg");
+        assertThat(infoMsg, is("指定された台帳は見つかりません。"));
+
+        MySpecificationAdapter<IssueLedger> issueLedgerSpec = new MySpecificationAdapter<>(IssueLedger.class);
+        Optional<IssueLedger> ledgerOpt = issueLedgerRepo.findOne(Specification.where(issueLedgerSpec.eq("ledgerName", "非公開台帳１")));
+        assertTrue("非公開台帳１は残っている", ledgerOpt.isPresent());
+
+        MySpecificationAdapter<LedgerRefUser> ledgerRefUserSpec = new MySpecificationAdapter<>(LedgerRefUser.class);
+        List<LedgerRefUser> ledgerRefUserList = ledgerRefUserRepo.findAll(Specification.where(ledgerRefUserSpec.eq("ledgerId", existingLedgerId)));
+        assertThat(ledgerRefUserList.size(), is(1));
+
+        MySpecificationAdapter<IssueItems> issueItemsSpec = new MySpecificationAdapter<>(IssueItems.class);
+        List<IssueItems> issueItemsList = issueItemsRepo.findAll(Specification.where(issueItemsSpec.eq("ledgerId", existingLedgerId)));
+        assertThat(issueItemsList.size(), is(1));
     }
 }
