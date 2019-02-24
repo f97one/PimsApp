@@ -46,4 +46,17 @@ public class AppConstants {
      * プリフィックス付きのユーザー権限：一般ユーザー
      */
     public static final String CANONICAL_ROLE_USER = "ROLE_USER";
+
+    /**
+     * 台帳ステータス：公開
+     */
+    public static final int LEDGER_OPEN = 1;
+    /**
+     * 台帳ステータス：ブロック中
+     */
+    public static final int LEDGER_BLOCKING = 2;
+    /**
+     * 台帳ステータス：終了
+     */
+    public static final int LEDGER_CLOSED = 3;
 }
