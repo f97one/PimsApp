@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by f97one on 17/01/14.
@@ -68,6 +65,8 @@ public class AdminLedgerManagementController extends BaseWebController {
 
         IssueLedger ledger = issueLedgerSvc.getLedgerById(ledgerId);
         LedgerDetailForm frm = new LedgerDetailForm();
+
+        model.addAttribute("openStatusList", statusMap());
 
         if (ledger == null) {
             // 台帳が見つからない時はエラー
@@ -242,5 +241,14 @@ public class AdminLedgerManagementController extends BaseWebController {
             redirectAttributes.addFlashAttribute("infoMsg", msg);
             return "redirect:/admin/ledgerManagement";
         }
+    }
+
+    private Map<Integer, String> statusMap() {
+        Map<Integer, String> statusmap = new LinkedHashMap<>();
+        statusmap.put(AppConstants.LEDGER_OPEN, "公開");
+        statusmap.put(AppConstants.LEDGER_BLOCKING, "ブロック中");
+        statusmap.put(AppConstants.LEDGER_CLOSED, "終了");
+
+        return statusmap;
     }
 }
