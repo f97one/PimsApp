@@ -11,6 +11,7 @@ import net.formula97.webapp.pims.domain.Users;
 import net.formula97.webapp.pims.misc.AppConstants;
 import net.formula97.webapp.pims.repository.*;
 import net.formula97.webapp.pims.service.IssueLedgerService;
+import net.formula97.webapp.pims.web.forms.DispLedgerForm;
 import org.hamcrest.Matchers;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -23,17 +24,28 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 /**
  * タイトル画面Controllerのテストケース。
@@ -107,25 +119,25 @@ public class TitleControllerTest extends BaseTestCase {
         IssueLedger l1 = new IssueLedger();
         l1.setPublicLedger(true);
         l1.setLedgerName("テスト用台帳１");
-        l1.setOpenStatus(1);
+        l1.setOpenStatus(AppConstants.LEDGER_OPEN);
         issueLedgerRepo.save(l1);
         
         IssueLedger l2 = new IssueLedger();
         l2.setPublicLedger(false);
         l2.setLedgerName("テスト用非公開台帳１");
-        l2.setOpenStatus(1);
+        l2.setOpenStatus(AppConstants.LEDGER_BLOCKING);
         issueLedgerRepo.save(l2);
         
         IssueLedger l3 = new IssueLedger();
         l3.setPublicLedger(false);
         l3.setLedgerName("テスト用非公開台帳２");
-        l3.setOpenStatus(1);
+        l3.setOpenStatus(AppConstants.LEDGER_CLOSED);
         issueLedgerRepo.save(l3);
         
         IssueLedger l4 = new IssueLedger();
         l4.setPublicLedger(true);
         l4.setLedgerName("テスト用台帳２");
-        l4.setOpenStatus(1);
+        l4.setOpenStatus(AppConstants.LEDGER_CLOSED);
         issueLedgerRepo.save(l4);
 
         MySpecificationAdapter<IssueLedger> issueLedgerSpecification = new MySpecificationAdapter<>(IssueLedger.class);
@@ -166,30 +178,56 @@ public class TitleControllerTest extends BaseTestCase {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void 普通に起動すると公開データだけ表示される() throws Exception {
-        List<IssueLedger> currList = issueLedgerSvc.getPublicLedgers();
-        assertThat("取得できる台帳は2個", currList.size(), Matchers.is(2));
+        MvcResult mvcResult = mMvcMock.perform(get("/"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(view().name("/title"))
+                .andExpect(model().attribute("title", "PIMS Beta"))
+                .andReturn();
 
-        URI uri = new URI(apiEndpoint);
-        this.mMvcMock.perform(MockMvcRequestBuilders.get(uri))
-            .andDo(MockMvcResultHandlers.print())
-            .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.view().name("/title"))
-            .andExpect(MockMvcResultMatchers.model().attribute("title", "PIMS Beta"));
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+
+        List<DispLedgerForm> dispIssueLedgers = (List<DispLedgerForm>) modelMap.get("dispIssueLedgers");
+        assertThat(dispIssueLedgers.size(), is(2));
+
+        Optional<DispLedgerForm> frm1Opt = dispIssueLedgers.stream().filter(r -> r.getLedgerName().equals("テスト用台帳１")).findAny();
+        assertTrue(frm1Opt.isPresent());
+        assertThat(frm1Opt.get().getStatus(), is("公開"));
+
+        Optional<DispLedgerForm> frm2Opt = dispIssueLedgers.stream().filter(r -> r.getLedgerName().equals("テスト用台帳２")).findAny();
+        assertTrue(frm2Opt.isPresent());
+        assertThat(frm2Opt.get().getStatus(), is("終了"));
     }
 
     @Test
     @WithMockUser(username = "user1")
+    @SuppressWarnings("unchecked")
     public void ログインしているとそのユーザーの台帳が表示される() throws Exception {
-        List<IssueLedger> currList = issueLedgerSvc.getLedgersForUser("user1");
-        assertThat("取得できる台帳は3個", currList.size(), Matchers.is(3));
-        
-        URI uri = new URI(apiEndpoint);
-        this.mMvcMock.perform(MockMvcRequestBuilders.get(uri))
-            .andDo(MockMvcResultHandlers.print())
-            .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.view().name("/title"))
-            .andExpect(MockMvcResultMatchers.model().attribute("title", "PIMS Beta"));
+        MvcResult mvcResult = mMvcMock.perform(get("/"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(view().name("/title"))
+                .andExpect(model().attribute("title", "PIMS Beta"))
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+
+        List<DispLedgerForm> dispIssueLedgers = (List<DispLedgerForm>) modelMap.get("dispIssueLedgers");
+        assertThat(dispIssueLedgers.size(), is(3));
+
+        Optional<DispLedgerForm> frm1Opt = dispIssueLedgers.stream().filter(r -> r.getLedgerName().equals("テスト用台帳１")).findAny();
+        assertTrue(frm1Opt.isPresent());
+        assertThat(frm1Opt.get().getStatus(), is("公開"));
+
+        Optional<DispLedgerForm> frm2Opt = dispIssueLedgers.stream().filter(r -> r.getLedgerName().equals("テスト用台帳２")).findAny();
+        assertTrue(frm2Opt.isPresent());
+        assertThat(frm2Opt.get().getStatus(), is("終了"));
+
+        Optional<DispLedgerForm> frm3Opt = dispIssueLedgers.stream().filter(r -> r.getLedgerName().equals("テスト用非公開台帳１")).findAny();
+        assertTrue(frm3Opt.isPresent());
+        assertThat(frm3Opt.get().getStatus(), is("ブロック中"));
     }
     
 }

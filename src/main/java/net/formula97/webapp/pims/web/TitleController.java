@@ -16,10 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author f97one
@@ -28,12 +25,16 @@ import java.util.Map;
 @Controller
 @RequestMapping("")
 public class TitleController extends BaseWebController {
-    
-    @Autowired
-    IssueLedgerService issueLedgerSvc;
-    @Autowired
-    StatusMasterService statusMasterSvc;
-    
+
+	private final IssueLedgerService issueLedgerSvc;
+	private final StatusMasterService statusMasterSvc;
+
+	@Autowired
+	public TitleController(IssueLedgerService issueLedgerSvc, StatusMasterService statusMasterSvc) {
+		this.issueLedgerSvc = issueLedgerSvc;
+		this.statusMasterSvc = statusMasterSvc;
+	}
+
 	@RequestMapping(method = RequestMethod.GET)
     public String createTitle(Model model, HeaderForm form) {
         // ログイン中ユーザーを取得
@@ -44,16 +45,17 @@ public class TitleController extends BaseWebController {
 	    model.addAttribute("title", title);
 	    
 	    // 台帳一覧
-	    List<IssueLedger> issueLeddgerList;
+		List<IssueLedger> issueLedgerList;
 	    if (users == null) {
-            issueLeddgerList = issueLedgerSvc.getPublicLedgers();
+			issueLedgerList = issueLedgerSvc.getPublicLedgers();
 	    } else {
-            issueLeddgerList = issueLedgerSvc.getLedgersForUser(users.getUsername());
+			issueLedgerList = issueLedgerSvc.getLedgersForUser(users.getUsername());
 	    }
-	    
-	    Map<Integer, String> smMap = statusMasterSvc.getStatusMap();
+
+		Map<Integer, String> smMap = statusMasterSvc.getOpenStatus();
+
 	    List<DispLedgerForm> frm = new ArrayList<>();
-	    for (IssueLedger l : issueLeddgerList) {
+		for (IssueLedger l : issueLedgerList) {
 	        DispLedgerForm f = new DispLedgerForm();
 	        f.setLedgerId(l.getLedgerId());
 	        f.setLedgerName(l.getLedgerName());
