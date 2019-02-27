@@ -4,6 +4,7 @@
 package net.formula97.webapp.pims.service;
 
 import net.formula97.webapp.pims.domain.StatusMaster;
+import net.formula97.webapp.pims.misc.AppConstants;
 import net.formula97.webapp.pims.repository.StatusMasterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,15 @@ public class StatusMasterService {
         }
         
         return smMap;
+    }
+
+    public Map<Integer, String> getOpenStatus() {
+        Map<Integer, String> ret = new HashMap<>();
+        ret.put(AppConstants.LEDGER_OPEN, "公開");
+        ret.put(AppConstants.LEDGER_BLOCKING, "ブロック中");
+        ret.put(AppConstants.LEDGER_CLOSED, "終了");
+
+        return ret;
     }
 
     /**
