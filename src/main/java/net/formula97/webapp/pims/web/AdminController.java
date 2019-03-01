@@ -71,7 +71,7 @@ public class AdminController extends BaseWebController {
     public String showLedgerManagement(Model model, HeaderForm headerForm) {
         Users myUserDetail = getUserState(model, headerForm);
 
-        Map<Integer, String> statusMap =statusMasterSvc.getStatusMap();
+        Map<Integer, String> statusMap = statusMasterSvc.getOpenStatus();
         model.addAttribute("statusMap", statusMap);
         model.addAttribute("ledgerSearchConditionForm", new LedgerSearchConditionForm());
 

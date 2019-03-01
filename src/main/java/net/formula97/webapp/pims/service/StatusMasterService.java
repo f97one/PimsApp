@@ -20,20 +20,9 @@ public class StatusMasterService {
 
     @Autowired
     StatusMasterRepository statusRepo;
-    
-    public Map<Integer, String> getStatusMap() {
-        List<StatusMaster> smList = statusRepo.findAll();
-        Map<Integer, String> smMap = new HashMap<>();
-        
-        for (StatusMaster m : smList) {
-            smMap.put(m.getStatusId(), m.getStatusName());
-        }
-        
-        return smMap;
-    }
 
     public Map<Integer, String> getOpenStatus() {
-        Map<Integer, String> ret = new HashMap<>();
+        Map<Integer, String> ret = new LinkedHashMap<>();
         ret.put(AppConstants.LEDGER_OPEN, "公開");
         ret.put(AppConstants.LEDGER_BLOCKING, "ブロック中");
         ret.put(AppConstants.LEDGER_CLOSED, "終了");

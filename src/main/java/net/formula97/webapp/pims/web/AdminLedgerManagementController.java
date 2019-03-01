@@ -46,7 +46,7 @@ public class AdminLedgerManagementController extends BaseWebController {
         Users myUserDetail = getUserState(model, headerForm);
 
         // ステータスと検索条件を張りなおす
-        Map<Integer, String> statusMap = statusMasterSvc.getStatusMap();
+        Map<Integer, String> statusMap = statusMasterSvc.getOpenStatus();
         model.addAttribute("statusMap", statusMap);
         model.addAttribute("ledgerSearchConditionForm", conditionForm);
 
@@ -66,7 +66,7 @@ public class AdminLedgerManagementController extends BaseWebController {
         IssueLedger ledger = issueLedgerSvc.getLedgerById(ledgerId);
         LedgerDetailForm frm = new LedgerDetailForm();
 
-        model.addAttribute("openStatusList", statusMap());
+        model.addAttribute("openStatusList", statusMasterSvc.getOpenStatus());
 
         if (ledger == null) {
             // 台帳が見つからない時はエラー
@@ -243,12 +243,4 @@ public class AdminLedgerManagementController extends BaseWebController {
         }
     }
 
-    private Map<Integer, String> statusMap() {
-        Map<Integer, String> statusmap = new LinkedHashMap<>();
-        statusmap.put(AppConstants.LEDGER_OPEN, "公開");
-        statusmap.put(AppConstants.LEDGER_BLOCKING, "ブロック中");
-        statusmap.put(AppConstants.LEDGER_CLOSED, "終了");
-
-        return statusmap;
-    }
 }

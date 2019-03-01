@@ -218,12 +218,22 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
 
     @Test
     @WithMockUser(username = "kanrisha1", roles = "ADMIN")
+    @SuppressWarnings("unchecked")
     public void 管理者ユーザーなら台帳検索画面を表示できる() throws Exception {
         ResultActions actions = mMvcMock.perform(get(apiEndpoint)).andDo(print());
         MvcResult mvcResult = actions.andExpect(status().isOk())
                 .andExpect(view().name(is("/admin/ledger_list")))
                 .andReturn();
 
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+
+        Map<Integer, String> statusMap = (Map<Integer, String>) modelMap.get("statusMap");
+
+        assertThat(statusMap.size(), is(3));
+
+        assertThat(statusMap.containsValue("公開"), is(true));
+        assertThat(statusMap.containsValue("ブロック中"), is(true));
+        assertThat(statusMap.containsValue("終了"), is(true));
     }
 
     @Test
@@ -254,6 +264,14 @@ public class AdminLedgerManagementControllerTest extends BaseTestCase {
         assertThat("非公開台帳１が見つかっている", issueLedgerOpt.isPresent(), is(true));
         issueLedgerOpt = ledgerList.stream().filter(r -> r.getLedgerName().equals("公開台帳1")).findFirst();
         assertThat("公開台帳1が見つかっている", issueLedgerOpt.isPresent(), is(true));
+
+        Map<Integer, String> statusMap = (Map<Integer, String>) modelMap.get("statusMap");
+
+        assertThat(statusMap.size(), is(3));
+
+        assertThat(statusMap.containsValue("公開"), is(true));
+        assertThat(statusMap.containsValue("ブロック中"), is(true));
+        assertThat(statusMap.containsValue("終了"), is(true));
     }
 
     @Test
