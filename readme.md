@@ -11,9 +11,19 @@ PIMS is abbreviation of Poorly Issue Management System.
 - Java 8
 - (Optional) Web container that supports the Servlet API 3.1 (e.g. Apache Tomcat 8.x)
 
-## 2. Development Environment
+## 2. How to run
+
+PIMS is a Spring Boot Web Apps, so Just run
+
+```bash
+$ java -jar pims.war
+```
+
+or deploy on your web container.
+
+## 3. Development Environment
 
 - JDK 8u101 or later
-- Eclipse Luna for Java EE Developers (recommended : Eclipse Neon)
-- Gradle 2.14.1 or later
+- Eclipse Luna for Java EE Developers (recommended : Eclipse Neon or later)
+- Gradle 4.6 or later
 - (Optional) Spring Tools Suite plugin
