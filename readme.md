@@ -21,6 +21,11 @@ $ java -jar pims.war
 
 or deploy on your web container.
 
+Initial user and password are below:
+
+- username : admin
+- password : pimsadmin
+
 ## 3. Development Environment
 
 - JDK 8u101 or later
